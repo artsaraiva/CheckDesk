@@ -5,6 +5,7 @@
  */
 package com.checkdesk.view;
 
+import com.checkdesk.control.ResourceLocator;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -66,7 +68,7 @@ public class LoginView extends Application{
         passwordField.setPrefWidth(200);
         loginButton.setPrefWidth(200);
         
-        //login.setImage( new Image ( ResourceLocator.getInstance().getImageResource("login.png")));
+//        icon.setImage( new Image( ResourceLocator.getInstance().getImageResource("login.png")));
         
         vbox.autosize();
         vbox.setSpacing(5);
