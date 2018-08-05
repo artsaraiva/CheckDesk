@@ -5,10 +5,40 @@
  */
 package com.checkdesk.control;
 
+import java.io.File;
+
 /**
  *
  * @author arthu
  */
-public class ResourceLocator {
-    
+public class ResourceLocator
+{
+    private static ResourceLocator instance;
+
+    public static ResourceLocator getInstance()
+    {
+        if ( instance == null )
+        {
+            instance = new ResourceLocator();
+        }
+
+        return instance;
+    }
+
+    private String imagesPath;
+
+    private ResourceLocator()
+    {
+        load();
+    }
+
+    private void load()
+    {
+        imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + File.separator;
+    }
+
+    public String getImageResource( String name )
+    {
+        return imagesPath + name;
+    }
 }

@@ -27,89 +27,98 @@ import javafx.stage.Stage;
  *
  * @author arthu
  */
-public class LoginView extends Application{
-    
+public class LoginView
+    extends Application
+{
     private Stage stage;
-    
-    public static void main(String[] args) 
+
+    public static void main( String[] args )
     {
-        launch(args);
+        launch( args );
     }
 
     @Override
-    public void start(Stage stage) throws Exception 
+    public void start( Stage stage ) throws Exception
     {
-      this.stage = stage;
-      
-      initComponents();
-      
-      stage.setTitle("Login");
-      stage.setScene(scene);
-      stage.setResizable(false);
-      stage.show();
-      
-      resize();
+        this.stage = stage;
+
+        initComponents();
+
+        stage.setTitle( "Login" );
+        stage.setScene( scene );
+        stage.setResizable( false );
+        stage.show();
+
+        resize();
     }
-    
+
     private void resize()
     {
-        vbox.setPrefSize( pane.getWidth(), pane.getHeight());
+        vbox.setLayoutY( ( pane.getHeight() - vbox.getHeight() ) / 2  );
+        vbox.setLayoutX( ( pane.getWidth() - vbox.getWidth() ) / 2 );
     }
-    
+
     private void initComponents()
     {
-        emailField.setPromptText("Usuário ou E-mail");
-        passwordField.setPromptText("Senha");
-        
-        pane.setPrefSize(400, 300);
-        icon.setFitHeight(200);
-        icon.setFitWidth(200);
-        emailField.setPrefWidth(200);
-        passwordField.setPrefWidth(200);
-        loginButton.setPrefWidth(200);
-        
-//        icon.setImage( new Image( ResourceLocator.getInstance().getImageResource("login.png")));
-        
+        emailField.setPromptText( "Usuário ou E-mail" );
+        passwordField.setPromptText( "Senha" );
+
+        pane.setPrefSize( 400, 300 );
+        icon.setFitHeight( 200 );
+        icon.setFitWidth( 200 );
+        emailField.setPrefWidth( 200 );
+        passwordField.setPrefWidth( 200 );
+        loginButton.setPrefWidth( 200 );
+
+        icon.setImage( new Image( ResourceLocator.getInstance().getImageResource( "login.jpg" ) ) );
+
         vbox.autosize();
-        vbox.setSpacing(5);
-        vbox.setAlignment(Pos.CENTER);
+        vbox.setSpacing( 5 );
+        vbox.setAlignment( Pos.CENTER );
         vbox.getChildren().addAll( icon, emailField, passwordField, loginButton );
-        
+
         pane.getChildren().add( vbox );
-        pane.setStyle( "-fx-background-color: #ececec" );
-        
-        loginButton.setCursor(Cursor.HAND);
-        
-        loginButton.setOnAction( new EventHandler<ActionEvent>() {
+        pane.setStyle( "-fx-background-color: #ffffff" );
+
+        loginButton.setCursor( Cursor.HAND );
+
+        loginButton.setOnAction( new EventHandler<ActionEvent>()
+        {
             @Override
-            public void handle(ActionEvent event) 
+            public void handle( ActionEvent event )
             {
-               //To Do criar método de validação de login 
+                //To Do criar método de validação de login 
             }
+
         } );
-        
-        pane.setOnKeyPressed( new EventHandler<KeyEvent>() {
-            
+
+        pane.setOnKeyPressed( new EventHandler<KeyEvent>()
+        {
+
             @Override
-            public void handle(KeyEvent event) {
-               if( event.getCode().equals(KeyCode.ENTER) )
-               {
-                   //TO-DO Validate Login
-               }else if(event.getCode().equals(KeyCode.ESCAPE)){
-                   System.exit(0);
-               }
+            public void handle( KeyEvent event )
+            {
+                if ( event.getCode().equals( KeyCode.ENTER ) )
+                {
+                    //TO-DO Validate Login
+                }
+                else if ( event.getCode().equals( KeyCode.ESCAPE ) )
+                {
+                    System.exit( 0 );
+                }
             }
-        });
+
+        } );
     }
-    
+
     private AnchorPane pane = new AnchorPane();
-    private Scene scene = new Scene(pane);
-    
+    private Scene scene = new Scene( pane );
+
     private ImageView icon = new ImageView();
     private TextField emailField = new TextField();
     private PasswordField passwordField = new PasswordField();
-    
-    private Button loginButton = new Button("Entrar");
-    
+
+    private Button loginButton = new Button( "Entrar" );
+
     private VBox vbox = new VBox();
 }
