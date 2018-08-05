@@ -70,7 +70,7 @@ public class LoginView
         passwordField.setPrefWidth( 200 );
         loginButton.setPrefWidth( 200 );
 
-        icon.setImage( new Image( ResourceLocator.getInstance().getImageResource( "login.jpg" ) ) );
+        icon.setImage( new Image( ResourceLocator.getInstance().getImageResource( "login.png" ) ) );
 
         vbox.autosize();
         vbox.setSpacing( 5 );
@@ -78,7 +78,7 @@ public class LoginView
         vbox.getChildren().addAll( icon, emailField, passwordField, loginButton );
 
         pane.getChildren().add( vbox );
-        pane.setStyle( "-fx-background-color: #ffffff" );
+        pane.setStyle( "-fx-background-color: #cecece" );
 
         loginButton.setCursor( Cursor.HAND );
 
