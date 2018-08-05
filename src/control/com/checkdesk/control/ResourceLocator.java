@@ -13,11 +13,12 @@ import java.io.File;
  */
 public class ResourceLocator
 {
+
     private static ResourceLocator instance;
 
     public static ResourceLocator getInstance()
     {
-        if ( instance == null )
+        if (instance == null)
         {
             instance = new ResourceLocator();
         }
@@ -26,6 +27,7 @@ public class ResourceLocator
     }
 
     private String imagesPath;
+    private String stylePath;
 
     private ResourceLocator()
     {
@@ -34,11 +36,17 @@ public class ResourceLocator
 
     private void load()
     {
-        imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + File.separator;
+        imagesPath = getClass().getClassLoader().getResource("images").toString() + File.separator;
+        stylePath = getClass().getClassLoader().getResource("styles").toString() + File.separator;
     }
 
-    public String getImageResource( String name )
+    public String getImageResource(String name)
     {
         return imagesPath + name;
+    }
+
+    public String getStyleResource(String name)
+    {
+        return stylePath + name;
     }
 }
