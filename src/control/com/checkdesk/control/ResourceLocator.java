@@ -5,8 +5,6 @@
  */
 package com.checkdesk.control;
 
-import java.io.File;
-
 /**
  *
  * @author arthu
@@ -18,7 +16,7 @@ public class ResourceLocator
 
     public static ResourceLocator getInstance()
     {
-        if (instance == null)
+        if ( instance == null )
         {
             instance = new ResourceLocator();
         }
@@ -36,17 +34,18 @@ public class ResourceLocator
 
     private void load()
     {
-        imagesPath = getClass().getClassLoader().getResource("images").toString() + File.separator;
-        stylePath = getClass().getClassLoader().getResource("styles").toString() + File.separator;
+        imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + "/";
+        stylePath = getClass().getClassLoader().getResource( "styles" ).toString() + "/";
     }
 
-    public String getImageResource(String name)
+    public String getImageResource( String name )
     {
         return imagesPath + name;
     }
 
-    public String getStyleResource(String name)
+    public String getStyleResource( String name )
     {
         return stylePath + name;
     }
+
 }

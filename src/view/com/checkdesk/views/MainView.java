@@ -10,9 +10,14 @@ import com.checkdesk.views.panes.MenuPane;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 /**
@@ -22,19 +27,18 @@ import javafx.stage.Stage;
 public class MainView
         extends Application
 {
-
     private Stage stage;
 
     @Override
-    public void start(Stage stage) throws Exception
+    public void start( Stage stage ) throws Exception
     {
         this.stage = stage;
 
         initComponents();
-        scene.getStylesheets().add(ResourceLocator.getInstance().getStyleResource("default.css"));
-        stage.setTitle("CheckDesk");
-        stage.setScene(scene);
-        stage.setMaximized(true);
+        scene.getStylesheets().add( ResourceLocator.getInstance().getStyleResource( "default.css" ) );
+        stage.setTitle( "CheckDesk" );
+        stage.setScene( scene );
+        stage.setMaximized( true );
         stage.show();
 
         //resize();
@@ -42,19 +46,25 @@ public class MainView
 
     private void initComponents()
     {
-        borderPane.setLeft(menuPane);
-        menuPane.addEventHandler(MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
+        HBox hbox = new HBox();
+        hbox.setBackground( new Background( new BackgroundFill( Paint.valueOf( "#000000" ), CornerRadii.EMPTY, Insets.EMPTY) ) );
+        hbox.setPrefHeight( 100 );
+        
+        borderPane.setTop( hbox );
+        borderPane.setLeft( menuPane );
+        
+        menuPane.addEventHandler( MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
         {
             @Override
-            public void handle(Event event)
+            public void handle( Event event )
             {
-                borderPane.setCenter(menuPane.getSelectedPane());
+                borderPane.setCenter( menuPane.getSelectedPane() );
             }
-        });
+
+        } );
     }
 
     private BorderPane borderPane = new BorderPane();
-    private Scene scene = new Scene(borderPane);
+    private Scene scene = new Scene( borderPane );
     private MenuPane menuPane = new MenuPane();
-
 }

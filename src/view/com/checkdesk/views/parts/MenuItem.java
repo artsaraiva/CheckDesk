@@ -6,17 +6,17 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Paint;
 
 /**
@@ -26,12 +26,11 @@ import javafx.scene.paint.Paint;
 public class MenuItem
         extends HBox
 {
-
     private Node pane;
     private String icon;
     private String name;
 
-    public MenuItem(Node pane, String icon, String name)
+    public MenuItem( Node pane, String icon, String name )
     {
         this.pane = pane;
         this.icon = icon;
@@ -45,30 +44,33 @@ public class MenuItem
         return pane;
     }
 
-    public void setSelected(boolean selected)
+    public void setSelected( boolean selected )
     {
-        if (selected)
+        if ( selected )
         {
-            setBackground(new Background(new BackgroundFill(Paint.valueOf("#20202c"), CornerRadii.EMPTY, Insets.EMPTY)));
+            setBackground( new Background( new BackgroundFill( Paint.valueOf( "#20202c" ), CornerRadii.EMPTY, Insets.EMPTY ) ) );
         }
         else
         {
-            setBackground(null);
+            setBackground( null );
         }
     }
 
     private void initComponents()
     {
-        iconView.setFitHeight(20);
-        iconView.setFitWidth(20);
-        iconView.setImage(new Image(ResourceLocator.getInstance().getImageResource(icon)));
+        iconView.setFitHeight( 15 );
+        iconView.setFitWidth( 15 );
+        iconView.setImage( new Image( ResourceLocator.getInstance().getImageResource( icon ) ) );
 
-        label.setText(name);
-        label.setTextFill(Paint.valueOf("#ffffff"));
+        label.setText( name );
+        label.getStyleClass().add( "menu-label" );
 
-        setSpacing(15);
-        getStyleClass().add("menu-item");
-        getChildren().addAll(iconView, label);
+        HBox.setHgrow( label, Priority.ALWAYS );
+
+        setSpacing( 20 );
+        setAlignment( Pos.CENTER_LEFT );
+        getStyleClass().add( "menu-item" );
+        getChildren().addAll( iconView, label );
 
     }
 

@@ -94,7 +94,7 @@ public class LoginView
         vbox.getChildren().addAll(icon, emailField, passwordField, loginButton);
 
         pane.getChildren().add(vbox);
-        pane.setStyle("-fx-background-color: #cecece");
+        pane.setStyle("-fx-background-color: #eeeeee");
 
         loginButton.setCursor(Cursor.HAND);
 

@@ -28,28 +28,28 @@ public class MenuPane
 
     public static class Events
     {
-        public static final EventType<Event> EVENT_SELECT = new EventType<Event>("onSelect");
+        public static final EventType<Event> EVENT_SELECT = new EventType<Event>( "onSelect" );
     }
-    
+
     private MenuItem selectedItem;
-    
+
     public MenuPane()
     {
         initComponents();
     }
 
-    private void selectMenuItem(MenuItem menuItem)
+    private void selectMenuItem( MenuItem menuItem )
     {
         selectedItem = menuItem;
-        
-        for (MenuItem item : menuItems)
+
+        for ( MenuItem item : menuItems )
         {
-            item.setSelected(item == menuItem);
+            item.setSelected( item == menuItem );
         }
-        
-        fireEvent(new Event(Events.EVENT_SELECT));
+
+        fireEvent( new Event( Events.EVENT_SELECT ) );
     }
-    
+
     public Node getSelectedPane()
     {
         return selectedItem != null ? selectedItem.getPane() : null;
@@ -57,27 +57,29 @@ public class MenuPane
 
     private void initComponents()
     {
-        setBackground(new Background(new BackgroundFill(Paint.valueOf("#333645"), CornerRadii.EMPTY, Insets.EMPTY)));
+        setBackground( new Background( new BackgroundFill( Paint.valueOf( "#333645" ), CornerRadii.EMPTY, Insets.EMPTY ) ) );
+        setPadding( new Insets( 15, 0, 15, 0 ) );
+        setMinWidth( 250 );
 
-        for (MenuItem menuItem : menuItems)
+        for ( MenuItem menuItem : menuItems )
         {
-            menuItem.setOnMouseClicked(new EventHandler<MouseEvent>()
+            menuItem.setOnMouseClicked( new EventHandler<MouseEvent>()
             {
                 @Override
-                public void handle(MouseEvent event)
+                public void handle( MouseEvent event )
                 {
-                    selectMenuItem(menuItem);
+                    selectMenuItem( menuItem );
                 }
-            });
+            } );
         }
 
-        getChildren().addAll(menuItems);
+        getChildren().addAll( menuItems );
     }
 
     private MenuItem[] menuItems = new MenuItem[]
     {
-        new MenuItem(null, null, "Cadastro"),
-        new MenuItem(null, null, "Pesquisas"),
-        new MenuItem(null, null, "Análises"),
+        new MenuItem( null, "menu_user.png", "CADASTRO" ),
+        new MenuItem( null, "menu_user.png", "PESQUISAS" ),
+        new MenuItem( null, "menu_user.png", "ANÁLISES" ),
     };
 }
