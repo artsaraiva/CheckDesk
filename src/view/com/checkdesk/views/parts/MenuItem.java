@@ -49,10 +49,14 @@ public class MenuItem
         if ( selected )
         {
             setBackground( new Background( new BackgroundFill( Paint.valueOf( "#20202c" ), CornerRadii.EMPTY, Insets.EMPTY ) ) );
+            iconView.setImage( new Image( ResourceLocator.getInstance().getImageResource( icon + "_s" ) ) );
+            label.getStyleClass().add("menu-label-selected");
         }
         else
         {
             setBackground( null );
+            iconView.setImage( new Image( ResourceLocator.getInstance().getImageResource( icon ) ) );
+            label.getStyleClass().remove("menu-label-selected");
         }
     }
 
@@ -60,7 +64,6 @@ public class MenuItem
     {
         iconView.setFitHeight( 15 );
         iconView.setFitWidth( 15 );
-        iconView.setImage( new Image( ResourceLocator.getInstance().getImageResource( icon ) ) );
 
         label.setText( name );
         label.getStyleClass().add( "menu-label" );

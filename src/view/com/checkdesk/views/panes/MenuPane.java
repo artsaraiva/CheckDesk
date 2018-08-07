@@ -74,12 +74,14 @@ public class MenuPane
         }
 
         getChildren().addAll( menuItems );
+        selectMenuItem( menuItems[0] );
     }
 
     private MenuItem[] menuItems = new MenuItem[]
     {
-        new MenuItem( null, "menu_user.png", "CADASTRO" ),
+        new MenuItem( null, "mp_home", "HOME" ),
         new MenuItem( null, "menu_user.png", "PESQUISAS" ),
         new MenuItem( null, "menu_user.png", "ANÁLISES" ),
+        new MenuItem( null, "menu_user.png", "CONFIGURAÇÕES" )
     };
 }

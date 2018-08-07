@@ -18,6 +18,27 @@ and open the template in the editor.
 {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
+    -fx-text-fill: #868181;
+    -fx-font-family: "Arial Black";
+}
+
+.menu-label-selected
+{
+    -fx-text-fill: #ffffff !important;
+}
+
+.header-user-perfil
+{
+    -fx-font-size: 12px;
+    -fx-text-fill: #CBC4C4;
+    -fx-font-weight: lighter;
+    -fx-font-family: "Arial Black";
+}
+
+.header-user-name
+{
+    -fx-font-size: 16px;
     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
     -fx-font-family: "Arial Black";
 }

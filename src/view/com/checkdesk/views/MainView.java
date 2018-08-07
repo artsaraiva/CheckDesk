@@ -6,18 +6,13 @@
 package com.checkdesk.views;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.MenuPane;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 /**
@@ -46,11 +41,11 @@ public class MainView
 
     private void initComponents()
     {
-        HBox hbox = new HBox();
+        /*HBox hbox = new HBox();
         hbox.setBackground( new Background( new BackgroundFill( Paint.valueOf( "#000000" ), CornerRadii.EMPTY, Insets.EMPTY) ) );
-        hbox.setPrefHeight( 100 );
+        hbox.setPrefHeight( 100 );*/
         
-        borderPane.setTop( hbox );
+        borderPane.setTop( headerPane );
         borderPane.setLeft( menuPane );
         
         menuPane.addEventHandler( MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
@@ -67,4 +62,5 @@ public class MainView
     private BorderPane borderPane = new BorderPane();
     private Scene scene = new Scene( borderPane );
     private MenuPane menuPane = new MenuPane();
+    private HeaderPane headerPane = new HeaderPane();
 }

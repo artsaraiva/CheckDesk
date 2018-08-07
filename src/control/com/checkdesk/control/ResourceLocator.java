@@ -40,6 +40,10 @@ public class ResourceLocator
 
     public String getImageResource( String name )
     {
+        if(!name.endsWith(".png"))
+        {
+            name += ".png";
+        }
         return imagesPath + name;
     }
 
