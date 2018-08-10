@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.checkdesk.control.data.Logs" table="logs" schema="public" optimistic-lock="version">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="users" class="com.checkdesk.control.data.Users" fetch="select">
+            <column name="ref_user" not-null="true" />
+        </many-to-one>
+        <property name="event" type="int">
+            <column name="event" not-null="true" />
+        </property>
+        <property name="objectName" type="string">
+            <column name="object_name" length="200" not-null="true" />
+        </property>
+        <property name="objectClass" type="string">
+            <column name="object_class" length="200" not-null="true" />
+        </property>
+        <property name="command" type="string">
+            <column name="command" not-null="true" />
+        </property>
+        <property name="date" type="timestamp">
+            <column name="date" length="29" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

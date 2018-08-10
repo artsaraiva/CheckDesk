@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.checkdesk.control.data.Surveys" table="surveys" schema="public" optimistic-lock="version">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="categories" class="com.checkdesk.control.data.Categories" fetch="select">
+            <column name="ref_category" not-null="true" />
+        </many-to-one>
+        <many-to-one name="forms" class="com.checkdesk.control.data.Forms" fetch="select">
+            <column name="ref_form" not-null="true" />
+        </many-to-one>
+        <many-to-one name="userGroupsByRefParticipants" class="com.checkdesk.control.data.UserGroups" fetch="select">
+            <column name="ref_participants" />
+        </many-to-one>
+        <many-to-one name="userGroupsByRefViewers" class="com.checkdesk.control.data.UserGroups" fetch="select">
+            <column name="ref_viewers" />
+        </many-to-one>
+        <many-to-one name="users" class="com.checkdesk.control.data.Users" fetch="select">
+            <column name="ref_user" not-null="true" />
+        </many-to-one>
+        <property name="title" type="string">
+            <column name="title" length="200" not-null="true" />
+        </property>
+        <property name="info" type="string">
+            <column name="info" not-null="true" />
+        </property>
+        <property name="dtCreated" type="date">
+            <column name="dt_created" length="13" not-null="true" />
+        </property>
+        <property name="type" type="int">
+            <column name="type" not-null="true" />
+        </property>
+        <set name="answerses" table="answers" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_survey" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.Answers" />
+        </set>
+    </class>
+</hibernate-mapping>

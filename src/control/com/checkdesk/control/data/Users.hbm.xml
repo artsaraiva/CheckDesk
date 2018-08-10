@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.checkdesk.control.data.Users" table="users" schema="public" optimistic-lock="version">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="name" type="string">
+            <column name="name" length="200" not-null="true" />
+        </property>
+        <property name="login" type="string">
+            <column name="login" length="100" not-null="true" />
+        </property>
+        <property name="email" type="string">
+            <column name="email" length="200" not-null="true" />
+        </property>
+        <property name="password" type="string">
+            <column name="password" length="100" not-null="true" />
+        </property>
+        <property name="phone" type="string">
+            <column name="phone" length="20" not-null="true" />
+        </property>
+        <property name="type" type="int">
+            <column name="type" not-null="true" />
+        </property>
+        <set name="categorieses" table="categories" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.Categories" />
+        </set>
+        <set name="surveyses" table="surveys" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.Surveys" />
+        </set>
+        <set name="logses" table="logs" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.Logs" />
+        </set>
+        <set name="answerses" table="answers" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.Answers" />
+        </set>
+        <set name="rankStatementses" table="rank_statements" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <one-to-many class="com.checkdesk.control.data.RankStatements" />
+        </set>
+        <set name="userGroupses" table="group_mappings" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="ref_user" not-null="true" />
+            </key>
+            <many-to-many entity-name="com.checkdesk.control.data.UserGroups">
+                <column name="ref_group" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

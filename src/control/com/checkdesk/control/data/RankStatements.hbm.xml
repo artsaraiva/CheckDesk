@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.checkdesk.control.data.RankStatements" table="rank_statements" schema="public" optimistic-lock="version">
+        <composite-id name="id" class="com.checkdesk.control.data.RankStatementsId">
+            <key-property name="refAnswers" type="int">
+                <column name="ref_answers" />
+            </key-property>
+            <key-property name="refUser" type="int">
+                <column name="ref_user" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="answers" class="com.checkdesk.control.data.Answers" update="false" insert="false" fetch="select">
+            <column name="ref_answers" not-null="true" />
+        </many-to-one>
+        <many-to-one name="users" class="com.checkdesk.control.data.Users" update="false" insert="false" fetch="select">
+            <column name="ref_user" not-null="true" />
+        </many-to-one>
+        <property name="score" type="big_decimal">
+            <column name="score" precision="10" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
