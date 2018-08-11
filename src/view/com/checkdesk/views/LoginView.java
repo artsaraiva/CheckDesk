@@ -6,6 +6,7 @@
 package com.checkdesk.views;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.db.service.EntityService;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -30,12 +31,20 @@ import javafx.stage.Stage;
 public class LoginView
         extends Application
 {
-
     private Stage stage;
 
     public static void main(String[] args)
     {
-        launch(args);
+        try
+        {
+            //First transaction
+            EntityService.getInstance();
+            launch(args);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -69,7 +78,7 @@ public class LoginView
         }
         catch (Exception e)
         {
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
 
     }
@@ -103,7 +112,6 @@ public class LoginView
             @Override
             public void handle(ActionEvent event)
             {
-
                 validateLogin();
             }
 
@@ -111,7 +119,6 @@ public class LoginView
 
         pane.setOnKeyPressed(new EventHandler<KeyEvent>()
         {
-
             @Override
             public void handle(KeyEvent event)
             {
@@ -119,12 +126,9 @@ public class LoginView
                 {
                     validateLogin();
                 }
-                else
+                else if (event.getCode().equals(KeyCode.ESCAPE))
                 {
-                    if (event.getCode().equals(KeyCode.ESCAPE))
-                    {
-                        System.exit(0);
-                    }
+                    System.exit(0);
                 }
             }
 

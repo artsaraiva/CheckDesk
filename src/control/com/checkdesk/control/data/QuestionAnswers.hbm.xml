@@ -1,25 +1,24 @@
-<?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="com.checkdesk.control.data.QuestionAnswers" table="question_answers" schema="public" optimistic-lock="version">
-        <composite-id name="id" class="com.checkdesk.control.data.QuestionAnswersId">
-            <key-property name="refQuestion" type="int">
-                <column name="ref_question" />
-            </key-property>
-            <key-property name="refAnswer" type="int">
-                <column name="ref_answer" />
-            </key-property>
-        </composite-id>
-        <many-to-one name="answers" class="com.checkdesk.control.data.Answers" update="false" insert="false" fetch="select">
-            <column name="ref_answer" not-null="true" />
-        </many-to-one>
-        <many-to-one name="questions" class="com.checkdesk.control.data.Questions" update="false" insert="false" fetch="select">
-            <column name="ref_question" not-null="true" />
-        </many-to-one>
-        <property name="value" type="string">
-            <column name="value" length="200" not-null="true" />
-        </property>
-    </class>
+  <class name="com.checkdesk.control.data.QuestionAnswer" optimistic-lock="version" schema="public" table="question_answers">
+    <composite-id class="com.checkdesk.control.data.QuestionAnswerId" name="id">
+      <key-property name="questionId" type="int">
+        <column name="ref_question"/>
+      </key-property>
+      <key-property name="answerId" type="int">
+        <column name="ref_answer"/>
+      </key-property>
+    </composite-id>
+    <many-to-one class="com.checkdesk.control.data.Answer" fetch="select" insert="false" name="answer" update="false">
+      <column name="ref_answer" not-null="true"/>
+    </many-to-one>
+    <many-to-one class="com.checkdesk.control.data.Question" fetch="select" insert="false" name="question" update="false">
+      <column name="ref_question" not-null="true"/>
+    </many-to-one>
+    <property name="value" type="string">
+      <column length="200" name="value" not-null="true"/>
+    </property>
+  </class>
 </hibernate-mapping>

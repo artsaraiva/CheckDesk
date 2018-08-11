@@ -46,18 +46,18 @@ Contributor(s):
     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/checkdesk</property>
     <property name="hibernate.connection.username">postgres</property>
     <property name="hibernate.connection.password">postgres</property>
+    <mapping resource="com/checkdesk/control/data/Categories.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Questions.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/QuestionAnswers.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/RankStatements.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/Permissions.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/UserGroups.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Forms.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Logs.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Answers.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Categories.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Questions.hbm.xml"/>
-    <mapping resource="com/checkdesk/control/data/Surveys.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/OptionItens.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Surveys.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/Users.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Forms.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Groups.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Answers.hbm.xml"/>
+    <mapping resource="com/checkdesk/control/data/Logs.hbm.xml"/>
     <mapping resource="com/checkdesk/control/data/Options.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

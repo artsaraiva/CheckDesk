@@ -1,33 +1,32 @@
-<?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="com.checkdesk.control.data.Questions" table="questions" schema="public" optimistic-lock="version">
-        <id name="id" type="int">
-            <column name="id" />
-            <generator class="assigned" />
-        </id>
-        <many-to-one name="forms" class="com.checkdesk.control.data.Forms" fetch="select">
-            <column name="ref_form" not-null="true" />
-        </many-to-one>
-        <many-to-one name="options" class="com.checkdesk.control.data.Options" fetch="select">
-            <column name="ref_options" />
-        </many-to-one>
-        <property name="name" type="string">
-            <column name="name" length="200" not-null="true" />
-        </property>
-        <property name="type" type="int">
-            <column name="type" not-null="true" />
-        </property>
-        <property name="range" type="string">
-            <column name="range" length="200" not-null="true" />
-        </property>
-        <set name="questionAnswerses" table="question_answers" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="ref_question" not-null="true" />
-            </key>
-            <one-to-many class="com.checkdesk.control.data.QuestionAnswers" />
-        </set>
-    </class>
+  <class name="com.checkdesk.control.data.Question" optimistic-lock="version" schema="public" table="questions">
+    <id name="id" type="int">
+      <column name="id"/>
+      <generator class="assigned"/>
+    </id>
+    <many-to-one class="com.checkdesk.control.data.Form" fetch="select" name="form">
+      <column name="ref_form" not-null="true"/>
+    </many-to-one>
+    <many-to-one class="com.checkdesk.control.data.Option" fetch="select" name="option">
+      <column name="ref_options"/>
+    </many-to-one>
+    <property name="name" type="string">
+      <column length="200" name="name" not-null="true"/>
+    </property>
+    <property name="type" type="int">
+      <column name="type" not-null="true"/>
+    </property>
+    <property name="constraints" type="string">
+      <column length="200" name="constraints" not-null="true"/>
+    </property>
+    <set fetch="select" inverse="true" lazy="true" name="questionAnswers" table="question_answers">
+      <key>
+        <column name="ref_question" not-null="true"/>
+      </key>
+      <one-to-many class="com.checkdesk.control.data.QuestionAnswer"/>
+    </set>
+  </class>
 </hibernate-mapping>

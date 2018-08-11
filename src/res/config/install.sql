@@ -8,8 +8,8 @@
  * Created: Aug 4, 2018
  */
 
--- group
-create table "group"
+-- groups
+create table "groups"
 (
     id   serial not null,
     name varchar(200) not null,

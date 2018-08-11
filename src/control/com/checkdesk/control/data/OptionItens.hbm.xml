@@ -1,21 +1,20 @@
-<?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 09/08/2018 21:08:04 by Hibernate Tools 4.3.1 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="com.checkdesk.control.data.OptionItens" table="option_itens" schema="public" optimistic-lock="version">
-        <id name="id" type="int">
-            <column name="id" />
-            <generator class="assigned" />
-        </id>
-        <many-to-one name="options" class="com.checkdesk.control.data.Options" fetch="select">
-            <column name="ref_option" not-null="true" />
-        </many-to-one>
-        <property name="name" type="string">
-            <column name="name" length="200" not-null="true" />
-        </property>
-        <property name="value" type="string">
-            <column name="value" length="200" not-null="true" />
-        </property>
-    </class>
+  <class name="com.checkdesk.control.data.OptionItem" optimistic-lock="version" schema="public" table="option_itens">
+    <id name="id" type="int">
+      <column name="id"/>
+      <generator class="assigned"/>
+    </id>
+    <many-to-one class="com.checkdesk.control.data.Option" fetch="select" name="option">
+      <column name="ref_option" not-null="true"/>
+    </many-to-one>
+    <property name="name" type="string">
+      <column length="200" name="name" not-null="true"/>
+    </property>
+    <property name="value" type="string">
+      <column length="200" name="value" not-null="true"/>
+    </property>
+  </class>
 </hibernate-mapping>
