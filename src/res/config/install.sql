@@ -14,7 +14,7 @@ create table "groups"
     id   serial not null,
     name varchar(200) not null,
 
-    constraint pk_group primary key (id)
+    constraint pk_groups primary key (id)
 );
 
 -- users
@@ -54,7 +54,7 @@ create table permissions
     ref_viewers int null,
 
     constraint pk_permissions         primary key (id),
-    constraint fk_permissions_viewers foreign key (ref_viewers) references "group"(id)
+    constraint fk_permissions_viewers foreign key (ref_viewers) references "groups"(id)
 );
 
 -- forms
@@ -66,7 +66,7 @@ create table forms
     ref_viewers int null,
 
     constraint pk_forms         primary key (id),
-    constraint fk_forms_viewers foreign key (ref_viewers) references "group"(id)
+    constraint fk_forms_viewers foreign key (ref_viewers) references "groups"(id)
 );
 
 -- options
@@ -78,18 +78,18 @@ create table options
     ref_viewers int null,
 
     constraint pk_options         primary key (id),
-    constraint fk_options_viewers foreign key (ref_viewers) references "group"(id)
+    constraint fk_options_viewers foreign key (ref_viewers) references "groups"(id)
 );
 
--- group_mappings
-create table group_mappings
+-- groups_mappings
+create table groups_mappings
 (
     ref_user  int not null,
-    ref_group int not null,
+    ref_groups int not null,
 
-    constraint pk_group_mappings       primary key (ref_user, ref_group),
-    constraint fk_group_mappings_user  foreign key (ref_user) references users(id),
-    constraint fk_group_mappings_group foreign key (ref_group) references "group"(id)
+    constraint pk_groups_mappings       primary key (ref_user, ref_groups),
+    constraint fk_groups_mappings_user  foreign key (ref_user) references users(id),
+    constraint fk_groups_mappings_groups foreign key (ref_groups) references "groups"(id)
 );
 
 -- categories
@@ -104,7 +104,7 @@ create table categories
 
     constraint pk_categories         primary key (id),
     constraint fk_categories_parent  foreign key (ref_parent) references categories(id),
-    constraint fk_categories_viewers foreign key (ref_viewers) references "group"(id),
+    constraint fk_categories_viewers foreign key (ref_viewers) references "groups"(id),
     constraint fk_categories_user    foreign key (ref_user) references users(id)
 );
 
@@ -152,8 +152,8 @@ create table surveys
     constraint pk_surveys             primary key (id),
     constraint fk_survey_user         foreign key (ref_user) references users(id),
     constraint fk_survey_category     foreign key (ref_category) references categories(id),
-    constraint fk_survey_viewers      foreign key (ref_viewers) references "group"(id),
-    constraint fk_survey_participants foreign key (ref_participants) references "group"(id),
+    constraint fk_survey_viewers      foreign key (ref_viewers) references "groups"(id),
+    constraint fk_survey_participants foreign key (ref_participants) references "groups"(id),
     constraint fk_survey_form         foreign key (ref_form) references forms(id)
 );
 
