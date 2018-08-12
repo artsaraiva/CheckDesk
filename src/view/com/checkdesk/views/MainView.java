@@ -11,8 +11,12 @@ import com.checkdesk.views.panes.MenuPane;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -53,7 +57,10 @@ public class MainView
             @Override
             public void handle( Event event )
             {
-                borderPane.setCenter( menuPane.getSelectedPane() );
+                Node selected = menuPane.getSelectedPane();
+                HBox.setHgrow(selected, Priority.ALWAYS);
+                VBox.setVgrow(selected, Priority.ALWAYS);
+                borderPane.setCenter( selected );
             }
 
         } );

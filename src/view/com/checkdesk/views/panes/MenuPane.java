@@ -79,9 +79,9 @@ public class MenuPane
 
     private MenuItem[] menuItems = new MenuItem[]
     {
-        new MenuItem( null, "mp_home", "HOME" ),
-        new MenuItem( null, "menu_user.png", "PESQUISAS" ),
-        new MenuItem( null, "menu_user.png", "ANÁLISES" ),
-        new MenuItem( null, "menu_user.png", "CONFIGURAÇÕES" )
+        new MenuItem( new HomePane(), "mp_home", "HOME" ),
+        new MenuItem( null, "mp_survey", "PESQUISAS" ),
+        new MenuItem( null, "mp_analysis", "ANÁLISES" ),
+        new MenuItem( null, "mp_config", "CONFIGURAÇÕES" )
     };
 }

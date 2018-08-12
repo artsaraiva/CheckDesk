@@ -62,8 +62,8 @@ public class MenuItem
 
     private void initComponents()
     {
-        iconView.setFitHeight( 15 );
-        iconView.setFitWidth( 15 );
+        iconView.setFitHeight( 25 );
+        iconView.setFitWidth( 25 );
 
         label.setText( name );
         label.getStyleClass().add( "menu-label" );
