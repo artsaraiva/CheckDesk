@@ -11,6 +11,11 @@ import java.util.Set;
 public class Survey
         implements java.io.Serializable
 {
+    public static final int TYPE_PUBLIC    = 0;
+    public static final int TYPE_PRIVATE   = 1;
+    public static final int TYPE_ANONYMOUS = 2;
+    public static final int TYPE_TOTEM     = 3;
+    
     private int id;
     private Category category;
     private Form form;
