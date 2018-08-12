@@ -6,7 +6,7 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
-import com.checkdesk.control.data.Survey;
+import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

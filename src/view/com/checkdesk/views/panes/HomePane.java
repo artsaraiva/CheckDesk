@@ -5,7 +5,7 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.data.Survey;
+import com.checkdesk.model.data.Survey;
 import com.checkdesk.views.parts.HomeTable;
 import java.util.Date;
 import javafx.collections.FXCollections;

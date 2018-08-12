@@ -5,7 +5,7 @@
  */
 package com.checkdesk.views.parts;
 
-import com.checkdesk.control.data.Survey;
+import com.checkdesk.model.data.Survey;
 import java.util.Date;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListCell;
