@@ -2,12 +2,12 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-  <class name="com.checkdesk.control.data.Option" optimistic-lock="version" schema="public" table="options">
+  <class name="com.checkdesk.model.data.Option" optimistic-lock="version" schema="public" table="options">
     <id name="id" type="int">
       <column name="id"/>
       <generator class="assigned"/>
     </id>
-    <many-to-one class="com.checkdesk.control.data.Group" fetch="select" name="viewers">
+    <many-to-one class="com.checkdesk.model.data.Group" fetch="select" name="viewers">
       <column name="ref_viewers"/>
     </many-to-one>
     <property name="name" type="string">
@@ -20,13 +20,13 @@
       <key>
         <column name="ref_option" not-null="true"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.OptionItem"/>
+      <one-to-many class="com.checkdesk.model.data.OptionItem"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="questions" table="questions">
       <key>
         <column name="ref_options"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Question"/>
+      <one-to-many class="com.checkdesk.model.data.Question"/>
     </set>
   </class>
 </hibernate-mapping>

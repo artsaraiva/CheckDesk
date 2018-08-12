@@ -2,24 +2,24 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-  <class name="com.checkdesk.control.data.Survey" optimistic-lock="version" schema="public" table="surveys">
+  <class name="com.checkdesk.model.data.Survey" optimistic-lock="version" schema="public" table="surveys">
     <id name="id" type="int">
       <column name="id"/>
       <generator class="assigned"/>
     </id>
-    <many-to-one class="com.checkdesk.control.data.Category" fetch="select" name="category">
+    <many-to-one class="com.checkdesk.model.data.Category" fetch="select" name="category">
       <column name="ref_category" not-null="true"/>
     </many-to-one>
-    <many-to-one class="com.checkdesk.control.data.Form" fetch="select" name="form">
+    <many-to-one class="com.checkdesk.model.data.Form" fetch="select" name="form">
       <column name="ref_form" not-null="true"/>
     </many-to-one>
-    <many-to-one class="com.checkdesk.control.data.Group" fetch="select" name="viewers">
+    <many-to-one class="com.checkdesk.model.data.Group" fetch="select" name="viewers">
       <column name="ref_viewers"/>
     </many-to-one>
-    <many-to-one class="com.checkdesk.control.data.Group" fetch="select" name="participants">
+    <many-to-one class="com.checkdesk.model.data.Group" fetch="select" name="participants">
       <column name="ref_participants"/>
     </many-to-one>
-    <many-to-one class="com.checkdesk.control.data.User" fetch="select" name="owner">
+    <many-to-one class="com.checkdesk.model.data.User" fetch="select" name="owner">
       <column name="ref_user" not-null="true"/>
     </many-to-one>
     <property name="title" type="string">
@@ -38,7 +38,7 @@
       <key>
         <column name="ref_survey" not-null="true"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Answer"/>
+      <one-to-many class="com.checkdesk.model.data.Answer"/>
     </set>
   </class>
 </hibernate-mapping>

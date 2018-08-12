@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-  <class name="com.checkdesk.control.data.Group" optimistic-lock="version" schema="public" table="groups">
+  <class name="com.checkdesk.model.data.Group" optimistic-lock="version" schema="public" table="groups">
     <id name="id" type="int">
       <column name="id"/>
       <generator class="assigned"/>
@@ -14,7 +14,7 @@
       <key>
         <column name="ref_group" not-null="true"/>
       </key>
-      <many-to-many entity-name="com.checkdesk.control.data.User">
+      <many-to-many entity-name="com.checkdesk.model.data.User">
         <column name="ref_user" not-null="true"/>
       </many-to-many>
     </set>
@@ -22,37 +22,37 @@
       <key>
         <column name="ref_viewers"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Option"/>
+      <one-to-many class="com.checkdesk.model.data.Option"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="surveysViewers" table="surveys">
       <key>
         <column name="ref_viewers"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Survey"/>
+      <one-to-many class="com.checkdesk.model.data.Survey"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="categories" table="categories">
       <key>
         <column name="ref_viewers"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Category"/>
+      <one-to-many class="com.checkdesk.model.data.Category"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="surveysParticipants" table="surveys">
       <key>
         <column name="ref_participants"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Survey"/>
+      <one-to-many class="com.checkdesk.model.data.Survey"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="permissions" table="permissions">
       <key>
         <column name="ref_viewers"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Permission"/>
+      <one-to-many class="com.checkdesk.model.data.Permission"/>
     </set>
     <set fetch="select" inverse="true" lazy="true" name="forms" table="forms">
       <key>
         <column name="ref_viewers"/>
       </key>
-      <one-to-many class="com.checkdesk.control.data.Form"/>
+      <one-to-many class="com.checkdesk.model.data.Form"/>
     </set>
   </class>
 </hibernate-mapping>
