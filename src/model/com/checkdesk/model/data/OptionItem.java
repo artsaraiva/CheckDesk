@@ -1,4 +1,4 @@
-package com.checkdesk.control.data;
+package com.checkdesk.model.data;
 // Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1
 
 /**

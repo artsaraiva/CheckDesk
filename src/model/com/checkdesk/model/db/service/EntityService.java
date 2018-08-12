@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.checkdesk.control.db.service;
+package com.checkdesk.model.db.service;
 
-import com.checkdesk.control.db.HibernateUtil;
+import com.checkdesk.model.db.HibernateUtil;
 import java.io.Serializable;
 import org.hibernate.Query;
 import org.hibernate.Session;

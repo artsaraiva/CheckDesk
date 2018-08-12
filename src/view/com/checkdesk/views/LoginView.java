@@ -6,7 +6,7 @@
 package com.checkdesk.views;
 
 import com.checkdesk.control.ResourceLocator;
-import com.checkdesk.control.db.service.EntityService;
+import com.checkdesk.model.db.service.EntityService;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
