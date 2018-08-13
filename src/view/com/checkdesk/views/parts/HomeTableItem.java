@@ -75,7 +75,7 @@ public class HomeTableItem
         chart.setLegendVisible(false);
         chart.setLabelsVisible(false);
         chart.setPrefSize(75, 75);*/
-        ProgressIndicator pi = new ProgressIndicator( Math.random() * 1);
+        ProgressIndicator pi = new ProgressIndicator(Math.random() * 1);
         getChildren().addAll(iconUser, surveyLabel, dueLabel, pi);
 
         widthProperty().addListener(new ChangeListener<Number>()

@@ -6,6 +6,7 @@
 package com.checkdesk.views.panes;
 
 import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -31,6 +32,7 @@ public class RegisterPane
 
         surveyButton.prefHeightProperty().bind(heightProperty());
         userButton.prefHeightProperty().bind(heightProperty());
+        
         surveyButton.setOnAction(new EventHandler<ActionEvent>()
         {
             @Override
@@ -40,6 +42,15 @@ public class RegisterPane
             }
         });
 
+        userButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                UserUtilities.addUser();
+            }
+        });
+        
         widthProperty().addListener(new ChangeListener<Number>()
         {
             @Override
