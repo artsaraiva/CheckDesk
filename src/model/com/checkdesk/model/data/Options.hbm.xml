@@ -5,7 +5,7 @@
   <class name="com.checkdesk.model.data.Option" optimistic-lock="version" schema="public" table="options">
     <id name="id" type="int">
       <column name="id"/>
-      <generator class="assigned"/>
+      <generator class="identity"/>
     </id>
     <many-to-one class="com.checkdesk.model.data.Group" fetch="select" name="viewers">
       <column name="ref_viewers"/>

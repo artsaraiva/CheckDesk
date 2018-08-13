@@ -5,7 +5,7 @@
   <class name="com.checkdesk.model.data.Question" optimistic-lock="version" schema="public" table="questions">
     <id name="id" type="int">
       <column name="id"/>
-      <generator class="assigned"/>
+      <generator class="identity"/>
     </id>
     <many-to-one class="com.checkdesk.model.data.Form" fetch="select" name="form">
       <column name="ref_form" not-null="true"/>

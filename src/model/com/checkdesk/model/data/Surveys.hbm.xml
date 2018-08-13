@@ -5,7 +5,7 @@
   <class name="com.checkdesk.model.data.Survey" optimistic-lock="version" schema="public" table="surveys">
     <id name="id" type="int">
       <column name="id"/>
-      <generator class="assigned"/>
+      <generator class="identity"/>
     </id>
     <many-to-one class="com.checkdesk.model.data.Category" fetch="select" name="category">
       <column name="ref_category" not-null="true"/>
