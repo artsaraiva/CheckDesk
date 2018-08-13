@@ -7,6 +7,7 @@ package com.checkdesk.views;
 
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.panes.HeaderPane;
+import com.checkdesk.views.panes.HomePane;
 import com.checkdesk.views.panes.MenuPane;
 import javafx.application.Application;
 import javafx.event.Event;
@@ -14,9 +15,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -51,6 +49,7 @@ public class MainView
         
         borderPane.setTop( headerPane );
         borderPane.setLeft( menuPane );
+        borderPane.setCenter( homePane );
         
         menuPane.addEventHandler( MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
         {
@@ -58,8 +57,8 @@ public class MainView
             public void handle( Event event )
             {
                 Node selected = menuPane.getSelectedPane();
-                HBox.setHgrow(selected, Priority.ALWAYS);
-                VBox.setVgrow(selected, Priority.ALWAYS);
+                //HBox.setHgrow(selected, Priority.ALWAYS);
+               // VBox.setVgrow(selected, Priority.ALWAYS);
                 borderPane.setCenter( selected );
             }
 
@@ -70,4 +69,5 @@ public class MainView
     private Scene scene = new Scene( borderPane );
     private MenuPane menuPane = new MenuPane();
     private HeaderPane headerPane = new HeaderPane();
+    private HomePane homePane = new HomePane();
 }

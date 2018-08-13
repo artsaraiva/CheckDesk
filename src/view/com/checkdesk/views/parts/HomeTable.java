@@ -27,14 +27,14 @@ public class HomeTable
     
     private void initComponents()
     {
-       // setMinWidth( 560 );
+        setMinWidth( 560 );
         setCellFactory(new CellFactory());
         
-        setItems(FXCollections.observableArrayList(
+     /*  setItems(FXCollections.observableArrayList(
                 new Survey(0, null, null, null, "Pesquisa de Satisfação", "", new Date(), 0),
                 new Survey(0, null, null, null, "Pesquisa de Teste", "", new Date(), 0),
                 new Survey(0, null, null, null, "Pesquisa de TCC", "", new Date(), 0)
-        ));
+        ));*/
     }
     
     private class CellFactory
