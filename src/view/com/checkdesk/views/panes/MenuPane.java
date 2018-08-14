@@ -28,7 +28,7 @@ public class MenuPane
 
     public static class Events
     {
-        public static final EventType<Event> EVENT_SELECT = new EventType<Event>( "onSelect" );
+        public static final EventType<Event> EVENT_SELECT = new EventType<Event>( "onSelectItem" );
     }
 
     private MenuItem selectedItem;

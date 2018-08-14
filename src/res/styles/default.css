@@ -56,3 +56,18 @@ and open the template in the editor.
     -fx-font-weight: normal;
     -fx-font-family: "Arial";
 }
+
+.answer-progress-graph .percentage
+{
+    -fx-fill: null;
+}
+
+.tooltip-progress-graph
+{
+    -fx-background-color: rgba(130,130,130,0.8);
+}
+
+.home-cell-selected {
+    -fx-background-color: #B0B0B0;
+    -fx-text-fill: white;
+}

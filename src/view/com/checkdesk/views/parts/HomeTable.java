@@ -6,63 +6,144 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.model.data.Survey;
-import java.util.Date;
-import javafx.collections.FXCollections;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.util.Callback;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventType;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 /**
  *
  * @author arthu
  */
 public class HomeTable
-    extends ListView<Survey>
+        extends ScrollPane
 {
+
+    public static final EventType SELECT = new EventType("onSelect");
+
+    private String title;
+    
+    private HomeTableItem selected;
+    private Set<HomeTable> bindedTables = new HashSet<>();
 
     public HomeTable()
     {
-       initComponents();
+        this(null);
+    }
+
+    public HomeTable(String title)
+    {
+        initComponents();
+        
+        this.title = title;
+        updateTitle();
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+        updateTitle();
+    }
+
+    public Survey getSurvey()
+    {
+        Survey result = null;
+
+        if (selected != null)
+        {
+            result = selected.getSurvey();
+        }
+
+        return result;
+    }
+
+    public void setSurveys(List<Survey> surveys)
+    {
+        getVBoxChildren().clear();
+
+        for (Survey s : surveys)
+        {
+            getVBoxChildren().add(createItem(s));
+        }
+        
+        updateTitle();
+    }
+
+    public void bindSelection(HomeTable table)
+    {
+        bindedTables.add(table);
+    }
+
+    private HomeTableItem createItem(Survey survey)
+    {
+        final HomeTableItem item = new HomeTableItem(survey);
+        item.getStyleClass().add("home-cell");
+
+        item.setOnMouseClicked((MouseEvent event) ->
+        {
+            setSelected(item);
+        });
+
+        return item;
+    }
+
+    protected ObservableList<Node> getVBoxChildren()
+    {
+        return vbox.getChildren();
+    }
+
+    public void setSelected(HomeTableItem selected)
+    {
+        this.selected = selected;
+
+        List<Node> nodes = new ArrayList<>(getVBoxChildren());
+        
+        for (HomeTable table : bindedTables)
+        {
+            nodes.addAll(table.getVBoxChildren());
+        }
+        
+        for (Node node : nodes)
+        {
+            node.getStyleClass().remove("home-cell-selected");
+        }
+
+        selected.getStyleClass().add("home-cell-selected");
+
+        fireEvent(new Event(SELECT));
+    }
+    
+    private void updateTitle()
+    {
+        getVBoxChildren().remove(titleLabel);
+        
+        if (title != null && !title.isEmpty())
+        {
+            titleLabel.setText(title);
+            
+            getVBoxChildren().add(0, titleLabel);
+        }
     }
     
     private void initComponents()
     {
-        setMinWidth( 560 );
-        setCellFactory(new CellFactory());
-        
-     /*  setItems(FXCollections.observableArrayList(
-                new Survey(0, null, null, null, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(0, null, null, null, "Pesquisa de Teste", "", new Date(), 0),
-                new Survey(0, null, null, null, "Pesquisa de TCC", "", new Date(), 0)
-        ));*/
+        titleLabel.getStyleClass().add("home-table-title");
+        setStyle("-fx-background-insets: 0;-fx-padding: 0;");
+        setContent(vbox);
+        HBox.setHgrow(vbox, Priority.ALWAYS);
+        HBox.setHgrow(this, Priority.ALWAYS);
     }
     
-    private class CellFactory
-        implements Callback<ListView<Survey>,ListCell<Survey>>
-    {
-        @Override
-        public ListCell<Survey> call(ListView<Survey> param)
-        {
-            return new ListCell<Survey>()
-            {
-                @Override
-                protected void updateItem(Survey item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                        setTextFill(null);
-                        setGraphic(null);
-                    }
-                    
-                    else
-                    {
-                        setGraphic(new HomeTableItem(item));
-                    }
-                }
-            };
-        }
-    }
+    private VBox vbox = new VBox();
+    private Label titleLabel = new Label();
 }

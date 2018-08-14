@@ -57,8 +57,6 @@ public class MainView
             public void handle( Event event )
             {
                 Node selected = menuPane.getSelectedPane();
-                //HBox.setHgrow(selected, Priority.ALWAYS);
-               // VBox.setVgrow(selected, Priority.ALWAYS);
                 borderPane.setCenter( selected );
             }
 
