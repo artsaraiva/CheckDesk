@@ -67,7 +67,26 @@ and open the template in the editor.
     -fx-background-color: rgba(130,130,130,0.8);
 }
 
-.home-cell-selected {
+.home-cell-selected
+{
     -fx-background-color: #B0B0B0;
     -fx-text-fill: white;
+}
+
+.editor-button
+{
+    -fx-background-color: #FFFFFF;
+    -fx-border-width: 2;
+    -fx-border-color: #CDCDCD;
+    -fx-border-style: solid;
+}
+
+.table-item:selected
+{
+    -fx-background-color: #B0B0B0;
+}
+
+.table-item:selected .label
+{
+    -fx-text-fill: #FFFFFF;
 }
