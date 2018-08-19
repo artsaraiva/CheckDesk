@@ -5,7 +5,10 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -26,21 +29,26 @@ import javafx.scene.shape.Circle;
 public class UserPane
         extends HBox
 {
-
     public UserPane()
     {
         initComponents();
     }
 
+    private void updateUser()
+    {
+        User activeUser = ApplicationController.getInstance().getActiveUser();
+
+        perfilUser.setText(UserUtilities.getType(activeUser.getType()).getLabel());
+        nameUser.setText(activeUser.getName());
+        iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource("test_user")));
+    }
+    
     private void initComponents()
     {
-        VBox vbox = new VBox();
-
-        perfilUser.setText("Administrador");
-        nameUser.setText("Arthur");
+        updateUser();
+        
         perfilUser.getStyleClass().add("header-user-perfil");
         nameUser.getStyleClass().add("header-user-name");
-        iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource("test_user")));
         iconUser.setClip(new Circle(38, 38, 36, Paint.valueOf("#425FA4")));
         
         vbox.getChildren().addAll(perfilUser, nameUser);
@@ -51,11 +59,10 @@ public class UserPane
         getStyleClass().add("menu-item");
         setMinWidth( 250 );
         
-        //javafx.scene.text.Font.getFamilies();
-        
         getChildren().addAll(iconUser, vbox);
     }
 
+    private VBox vbox = new VBox();
     private Label perfilUser = new Label();
     private Label nameUser = new Label();
     private ImageView iconUser = new ImageView();

@@ -5,19 +5,9 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.ResourceLocator;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 
 /**
  *
@@ -26,17 +16,21 @@ import javafx.scene.shape.Circle;
 public class HeaderPane
         extends HBox
 {
-
     public HeaderPane()
     {
         initComponents();
     }
 
-    private void initComponents()
+    public ObservableValue getUserPaneWidth()
     {
-       getChildren().addAll( userPane );
+        return userPane.widthProperty();
     }
 
-    VBox vbox = new VBox();
-    UserPane userPane = new UserPane();
+    private void initComponents()
+    {
+        getChildren().addAll(userPane);
+    }
+
+    private VBox vbox = new VBox();
+    private UserPane userPane = new UserPane();
 }

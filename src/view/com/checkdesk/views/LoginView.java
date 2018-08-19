@@ -5,11 +5,12 @@
  */
 package com.checkdesk.views;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.views.util.Prompts;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -23,6 +24,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -32,6 +34,7 @@ public class LoginView
         extends Application
 {
     private Stage stage;
+    private boolean login = false;
 
     public static void main(String[] args)
     {
@@ -43,7 +46,7 @@ public class LoginView
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            ApplicationController.logException(e);
         }
     }
 
@@ -70,28 +73,37 @@ public class LoginView
 
     private void validateLogin()
     {
-        try
+        if (login = ApplicationController.getInstance().login(loginField.getText(), passwordField.getText()) != null)
         {
-            //To Do criar método de validação de login  
-            new MainView().start(new Stage());
-            stage.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            try
+            {
+                new MainView().start(new Stage());
+                stage.close();
+            }
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
         }
 
+        else
+        {
+            Prompts.info("Login Inválido", "Usuário/E-mail e senha não estão corretos. \nTente outra vez !");
+
+            passwordField.setText("");
+            passwordField.requestFocus();
+        }
     }
 
     private void initComponents()
     {
-        emailField.setPromptText("Usuário ou E-mail");
+        loginField.setPromptText("Usuário ou E-mail");
         passwordField.setPromptText("Senha");
 
         pane.setPrefSize(400, 300);
         icon.setFitHeight(200);
         icon.setFitWidth(200);
-        emailField.setPrefWidth(200);
+        loginField.setPrefWidth(200);
         passwordField.setPrefWidth(200);
         loginButton.setPrefWidth(200);
 
@@ -100,38 +112,43 @@ public class LoginView
         vbox.autosize();
         vbox.setSpacing(5);
         vbox.setAlignment(Pos.CENTER);
-        vbox.getChildren().addAll(icon, emailField, passwordField, loginButton);
+        vbox.getChildren().addAll(icon, loginField, passwordField, loginButton);
 
         pane.getChildren().add(vbox);
         pane.setStyle("-fx-background-color: #eeeeee");
 
         loginButton.setCursor(Cursor.HAND);
 
-        loginButton.setOnAction(new EventHandler<ActionEvent>()
+        loginButton.setOnAction((ActionEvent event) ->
         {
-            @Override
-            public void handle(ActionEvent event)
+            validateLogin();
+        });
+
+        pane.setOnKeyPressed((KeyEvent event) ->
+        {
+            if (event.getCode().equals(KeyCode.ENTER))
             {
                 validateLogin();
             }
-
+            else if (event.getCode().equals(KeyCode.ESCAPE))
+            {
+                System.exit(0);
+            }
         });
 
-        pane.setOnKeyPressed(new EventHandler<KeyEvent>()
+        stage.setOnCloseRequest((WindowEvent t) ->
         {
-            @Override
-            public void handle(KeyEvent event)
+            if (!login)
             {
-                if (event.getCode().equals(KeyCode.ENTER))
+                try
                 {
-                    validateLogin();
+                    EntityService.getInstance().close();
                 }
-                else if (event.getCode().equals(KeyCode.ESCAPE))
+                catch (Exception e)
                 {
-                    System.exit(0);
+                    ApplicationController.logException(e);
                 }
             }
-
         });
     }
 
@@ -139,7 +156,7 @@ public class LoginView
     private Scene scene = new Scene(pane);
 
     private ImageView icon = new ImageView();
-    private TextField emailField = new TextField();
+    private TextField loginField = new TextField();
     private PasswordField passwordField = new PasswordField();
 
     private Button loginButton = new Button("Entrar");

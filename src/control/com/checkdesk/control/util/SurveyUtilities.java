@@ -5,6 +5,7 @@
  */
 package com.checkdesk.control.util;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.editors.SurveyEditor;
@@ -40,9 +41,9 @@ public class SurveyUtilities
                     EntityService.getInstance().save(getSource());
                 }
                 
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    e.printStackTrace();
+                    ApplicationController.logException(e);
                 }
             }
         }).show();

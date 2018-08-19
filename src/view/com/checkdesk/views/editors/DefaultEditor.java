@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.editors;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Prompts;
 import javafx.event.Event;
@@ -22,83 +23,86 @@ import javafx.util.Callback;
 public class DefaultEditor<T>
         extends Dialog<T>
 {
-    public static final EventType ACCEPT_INPUT = new EventType( "acceptInput" );
-    
+    public static final EventType ACCEPT_INPUT = new EventType("acceptInput");
+
     protected EditorCallback callback;
     protected T source;
-    private ButtonType btSave   = new ButtonType( "Salvar",   ButtonBar.ButtonData.OK_DONE );
-    private ButtonType btCancel = new ButtonType( "Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE );
+    private ButtonType btSave = new ButtonType("Salvar", ButtonBar.ButtonData.OK_DONE);
+    private ButtonType btCancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
     private ButtonType selectedButton;
-    
-    public DefaultEditor( EditorCallback<T> callback )
+
+    public DefaultEditor(EditorCallback<T> callback)
     {
         this.callback = callback;
         this.source = callback.getSource();
-        
+
         initComponents();
     }
-    
+
     public boolean onSave()
     {
         try
         {
-            if ( validateInput() )
+            if (validateInput())
             {
                 obtainInput();
 
-                callback.handle( new Event( source, this, ACCEPT_INPUT ) );
-                
+                callback.handle(new Event(source, this, ACCEPT_INPUT));
+
                 return true;
             }
-            
-            Prompts.info( "Existem campos com erros!" );
+
+            Prompts.info("Existem campos com erros!");
         }
-        
-        catch ( Exception e )
+
+        catch (Exception e)
         {
-            e.printStackTrace();
+            ApplicationController.logException(e);
         }
-        
+
         return false;
     }
-    
+
     protected boolean validateInput()
     {
         return true;
     }
-    
+
     protected void obtainInput()
     {
     }
-    
+
     private void initComponents()
     {
-        setResizable( false );
-        
-        getDialogPane().getButtonTypes().addAll( btCancel, btSave );
-        
-        setOnCloseRequest( new EventHandler()
+        setResizable(false);
+
+        getDialogPane().getButtonTypes().addAll(btCancel, btSave);
+
+        setOnCloseRequest(new EventHandler()
         {
             @Override
-            public void handle( Event t ) 
+            public void handle(Event t)
             {
-                if ( selectedButton == btSave )
+                if (selectedButton == btSave)
                 {
-                    if ( !onSave() )
+                    if (!onSave())
                     {
                         t.consume();
                     }
                 }
             }
-        } );
 
-        setResultConverter( new Callback() 
+        });
+
+        setResultConverter(new Callback()
         {
             @Override
-            public Object call(  Object p ) 
+            public Object call(Object p)
             {
                 return selectedButton = (ButtonType) p;
             }
-        } );
+
+        });
     }
+
 }

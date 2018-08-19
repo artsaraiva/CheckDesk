@@ -59,7 +59,6 @@ public class MenuPane
     {
         setBackground( new Background( new BackgroundFill( Paint.valueOf( "#333645" ), CornerRadii.EMPTY, Insets.EMPTY ) ) );
         setPadding( new Insets( 15, 0, 15, 0 ) );
-        setMinWidth( 250 );
 
         for ( MenuItem menuItem : menuItems )
         {

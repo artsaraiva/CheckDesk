@@ -5,7 +5,9 @@
  */
 package com.checkdesk.views;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.HomePane;
 import com.checkdesk.views.panes.MenuPane;
@@ -16,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -43,13 +46,11 @@ public class MainView
 
     private void initComponents()
     {
-        /*HBox hbox = new HBox();
-        hbox.setBackground( new Background( new BackgroundFill( Paint.valueOf( "#000000" ), CornerRadii.EMPTY, Insets.EMPTY) ) );
-        hbox.setPrefHeight( 100 );*/
-        
         borderPane.setTop( headerPane );
         borderPane.setLeft( menuPane );
         borderPane.setCenter( homePane );
+        
+        menuPane.prefWidthProperty().bind(headerPane.getUserPaneWidth());
         
         menuPane.addEventHandler( MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
         {
@@ -61,6 +62,18 @@ public class MainView
             }
 
         } );
+        
+        stage.setOnCloseRequest((WindowEvent t) ->
+        {
+            try
+            {
+                EntityService.getInstance().close();
+            }
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        });
     }
 
     private BorderPane borderPane = new BorderPane();

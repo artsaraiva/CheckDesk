@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.editors;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
@@ -63,18 +64,7 @@ public class UserEditor
         source.setLogin(loginField.getText());
         source.setEmail(emailField.getText());
         source.setPhone(phoneField.getText());
-        String password = passwordField.getText();
-        try
-        {
-            MessageDigest message = MessageDigest.getInstance("SHA1");
-            password = "<" + String.format("%040x", new BigInteger(message.digest(password.getBytes())).abs()) + ">";
-            source.setPassword(password);
-        }
-        catch (Exception ex)
-        {
-            printStackTrace();
-        }
-
+        source.setPassword(ApplicationController.hash(passwordField.getText()));
         source.setType(typeField.getValue().getValue());
     }
 
