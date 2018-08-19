@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.model.data.Permission;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -25,6 +26,12 @@ public class PermissionDescription
         initComponents();
     }
 
+    public void setSource(Permission permission)
+    {
+        if(permission != null)
+        testLabel.setText(permission.toString());
+    }
+    
     private void initComponents()
     {
         ObservableList<String> items = FXCollections.observableArrayList(
@@ -32,7 +39,7 @@ public class PermissionDescription
         testList.setItems(items);
         testLabel.setText("PERMISSÂO 1");
         testButton.setText("BOTão 1");
-        getChildren().addAll(testLabel,testButton,testList);
+        getChildren().addAll(testLabel, testButton, testList);
     }
     private ListView testList = new ListView();
     private Label testLabel = new Label();

@@ -9,6 +9,9 @@ import com.checkdesk.model.data.Permission;
 import com.checkdesk.views.parts.PermissionDescription;
 import com.checkdesk.views.parts.PermissionTable;
 import java.util.Arrays;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -19,17 +22,17 @@ import javafx.scene.layout.Priority;
 public class PermissionPane
         extends HBox
 {
+
     public PermissionPane()
     {
         initComponents();
         refreshContent();
     }
-    
+
     public void refreshContent()
     {
         permissionList.setPermissions(Arrays.asList(
-            
-            new Permission(1, "Cadastrar pesquisas"),
+                new Permission(1, "Cadastrar pesquisas"),
                 new Permission(1, "Responder pesquisas"),
                 new Permission(1, "Editar pesquisas"),
                 new Permission(1, "Inspecionar pesquisas"),
@@ -38,14 +41,25 @@ public class PermissionPane
                 new Permission(1, "Excluir usuários")
         ));
     }
-    
+
     private void initComponents()
     {
         HBox.setHgrow(permissionList, Priority.ALWAYS);
         HBox.setHgrow(permissionDescription, Priority.ALWAYS);
-        getChildren().addAll(permissionList,permissionDescription);
+        getChildren().addAll(permissionList, permissionDescription);
+
+        permissionList.addEventHandler(PermissionTable.SELECT, new EventHandler<Event>()
+        {
+            @Override
+            public void handle(Event event)
+            {
+                Permission selected = permissionList.getSelectedPermission();
+                System.out.println(selected);
+                permissionDescription.setSource(selected);
+            }
+        });
     }
-    
+
     private PermissionTable permissionList = new PermissionTable("Permissões");
     private PermissionDescription permissionDescription = new PermissionDescription();
 }

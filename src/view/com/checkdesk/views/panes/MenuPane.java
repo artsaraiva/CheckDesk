@@ -81,7 +81,7 @@ public class MenuPane
     {
         new MenuItem( new HomePane(), "mp_home", "HOME" ),
         new MenuItem( null, "mp_survey", "PESQUISAS" ),
-        new MenuItem( new RegisterPane(), "mp_analysis", "ANÁLISES" ),
+        new MenuItem( new PermissionPane(), "mp_analysis", "ANÁLISES" ),
         new MenuItem( new RegisterPane(), "mp_config", "CONFIGURAÇÕES" )
     };
 }

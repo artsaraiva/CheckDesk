@@ -28,10 +28,11 @@ public class RegisterPane
 
     private void initComponents()
     {
-        getChildren().addAll(userButton, surveyButton);
+        getChildren().addAll(userButton, surveyButton,permissionButton);
 
         surveyButton.prefHeightProperty().bind(heightProperty());
         userButton.prefHeightProperty().bind(heightProperty());
+        permissionButton.prefHeightProperty().bind(heightProperty());
         
         surveyButton.setOnAction(new EventHandler<ActionEvent>()
         {
@@ -51,6 +52,15 @@ public class RegisterPane
             }
         });
         
+        permissionButton.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                //mostrar pane das permissões
+            }
+        });
+       
         widthProperty().addListener(new ChangeListener<Number>()
         {
             @Override
@@ -58,6 +68,7 @@ public class RegisterPane
             {
                 surveyButton.setPrefWidth(t1.doubleValue() / 2);
                 userButton.setPrefWidth(t1.doubleValue() / 2);
+                permissionButton.setPrefWidth(t1.doubleValue() / 2);
             }
         });
     }

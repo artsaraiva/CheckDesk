@@ -6,35 +6,32 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.model.data.Permission;
-import com.checkdesk.model.data.Survey;
-import java.util.ArrayList;
+import com.checkdesk.views.panes.MenuPane;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
 /**
  *
  * @author arthu
  */
 public class PermissionTable
-        extends ScrollPane
+        extends ListView<Permission>
 {
-    public static final EventType SELECT = new EventType("onSelectpPermission");
 
-    private String title;
-    
-    private PermissionTableItem selected;
-    private Set<PermissionTable> bindedTables = new HashSet<>();
+    public static final EventType SELECT = new EventType("onSelectpPermission");
+    private Permission selected;
 
     public PermissionTable()
     {
@@ -44,107 +41,66 @@ public class PermissionTable
     public PermissionTable(String title)
     {
         initComponents();
-        
-        this.title = title;
-        updateTitle();
     }
 
-    public void setTitle(String title)
+    public Permission getSelectedPermission()
     {
-        this.title = title;
-        updateTitle();
-    }
-
-    public Permission getSurvey()
-    {
-        Permission result = null;
-
-        if (selected != null)
-        {
-            result = selected.getPermission();
-        }
-
-        return result;
+        return selected != null ? selected : null;
     }
 
     public void setPermissions(List<Permission> permissions)
     {
-        getVBoxChildren().clear();
-
-        for (Permission p : permissions)
-        {
-            getVBoxChildren().add(createItem(p));
-        }
-        
-        updateTitle();
+        ObservableList<Permission> items = FXCollections.observableArrayList(permissions);
+        this.setItems(items);
     }
 
-    public void bindSelection(PermissionTable table)
+    private void selectPermission(Permission permission)
     {
-        bindedTables.add(table);
-    }
-
-    private PermissionTableItem createItem(Permission permission)
-    {
-        final PermissionTableItem item = new PermissionTableItem(permission);
-        item.getStyleClass().add("home-cell");
-
-        item.setOnMouseClicked((MouseEvent event) ->
-        {
-            setSelected(item);
-        });
-
-        return item;
-    }
-
-    protected ObservableList<Node> getVBoxChildren()
-    {
-        return vbox.getChildren();
-    }
-
-    public void setSelected(PermissionTableItem selected)
-    {
-        this.selected = selected;
-
-        List<Node> nodes = new ArrayList<>(getVBoxChildren());
-        
-        for (PermissionTable table : bindedTables)
-        {
-            nodes.addAll(table.getVBoxChildren());
-        }
-        
-        for (Node node : nodes)
-        {
-            node.getStyleClass().remove("home-cell-selected");
-        }
-
-        selected.getStyleClass().add("home-cell-selected");
-
+        this.selected = permission;
         fireEvent(new Event(SELECT));
     }
-    
-    private void updateTitle()
-    {
-        getVBoxChildren().remove(titleLabel);
-        
-        if (title != null && !title.isEmpty())
-        {
-            titleLabel.setText(title);
-            
-            getVBoxChildren().add(0, titleLabel);
-        }
-    }
-    
+
     private void initComponents()
     {
-        titleLabel.getStyleClass().add("home-table-title");
-        setStyle("-fx-background-insets: 0;-fx-padding: 0;");
+        //this.getStyleClass().add("list-view");
+        /*setStyle("-fx-background-insets: 0;-fx-padding: 0;");
         setContent(vbox);
         HBox.setHgrow(vbox, Priority.ALWAYS);
-        HBox.setHgrow(this, Priority.ALWAYS);
+        HBox.setHgrow(this, Priority.ALWAYS);*/
+
+        this.setCellFactory(new Callback<ListView<Permission>, ListCell<Permission>>()
+        {
+            @Override
+            public ListCell<Permission> call(ListView<Permission> param)
+            {
+                return new ListCell<Permission>()
+                {
+                    @Override
+                    protected void updateItem(Permission item, boolean empty)
+                    {
+                        super.updateItem(item, empty);
+                        if (item == null || empty)
+                        {
+                            setText(null);
+                        }
+                        else
+                        {
+                            setText(item.toString());
+                            getStyleClass().add("permission-list-cell");
+                        }
+
+                    }
+                };
+            }
+        });
+
+        this.setOnMouseClicked(new EventHandler<MouseEvent>()
+        {
+            @Override
+            public void handle(MouseEvent event)
+            {
+                selectPermission(getSelectionModel().getSelectedItem());
+            }
+        });
     }
-    
-    private VBox vbox = new VBox();
-    private Label titleLabel = new Label();
-    
 }
