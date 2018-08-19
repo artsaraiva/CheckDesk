@@ -8,17 +8,14 @@ package com.checkdesk.views.parts;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.chart.PieChart;
+import javafx.geometry.HPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -28,21 +25,14 @@ import javafx.scene.shape.Circle;
  * @author arthu
  */
 public class HomeTableItem
-        extends HBox
+        extends GridPane
 {
-
     private Survey survey;
 
     public HomeTableItem(Survey survey)
     {
         setSource(survey);
         initComponents();
-    }
-
-    @Override
-    public void setWidth(double value)
-    {
-        super.setWidth(value);
     }
 
     private void setSource(Survey survey)
@@ -54,7 +44,15 @@ public class HomeTableItem
 
         DateFormat df = DateFormat.getDateInstance();
         dueLabel.setText(df.format(survey.getCreatedDate()));
-
+        
+        double randomValue = Math.random();
+        progressIndicator.setProgress(randomValue);
+        tooltip.setText(String.format("%.2f%%", randomValue * 100));
+    }
+    
+    public Survey getSurvey()
+    {
+        return survey;
     }
 
     private void initComponents()
@@ -63,33 +61,28 @@ public class HomeTableItem
 
         surveyLabel.getStyleClass().add("home-table-survey");
         dueLabel.getStyleClass().add("home-table-item");
+        progressIndicator.getStyleClass().add("answer-progress-graph");
+        tooltip.getStyleClass().add("tooltip-progress-graph");
 
-        setSpacing(20);
-        setAlignment(Pos.CENTER_LEFT);
-        setHgrow(surveyLabel, Priority.ALWAYS);
-        /*ObservableList<PieChart.Data> pieChartData
-                = FXCollections.observableArrayList(
-                        new PieChart.Data("", 25),
-                        new PieChart.Data("", 75));
-        final PieChart chart = new PieChart(pieChartData);
-        chart.setLegendVisible(false);
-        chart.setLabelsVisible(false);
-        chart.setPrefSize(75, 75);*/
-        ProgressIndicator pi = new ProgressIndicator(Math.random() * 1);
-        getChildren().addAll(iconUser, surveyLabel, dueLabel, pi);
+        progressIndicator.setTooltip(tooltip);
+        addRow(0, iconUser, surveyLabel, dueLabel, progressIndicator);
 
-        widthProperty().addListener(new ChangeListener<Number>()
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
-            {
-                //surveyLabel.setMinWidth((newValue.intValue()) - 80 - 100);
-            }
-        });
+        ColumnConstraints c1 = new ColumnConstraints();
+        ColumnConstraints c2 = new ColumnConstraints();
+        ColumnConstraints c3 = new ColumnConstraints();
+        ColumnConstraints c4 = new ColumnConstraints();
+
+        c1.setMinWidth(90);
+        c2.setHgrow(Priority.ALWAYS);
+        c4.setMinWidth(90);
+        c4.setHalignment(HPos.RIGHT);
+
+        getColumnConstraints().addAll(c1, c2, c3, c4);
     }
 
     private ImageView iconUser = new ImageView();
     private Label surveyLabel = new Label();
     private Label dueLabel = new Label();
-    //GRÁFICO
+    private ProgressIndicator progressIndicator = new ProgressIndicator();
+    private Tooltip tooltip = new Tooltip();
 }

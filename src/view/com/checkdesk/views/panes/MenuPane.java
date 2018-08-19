@@ -28,7 +28,7 @@ public class MenuPane
 
     public static class Events
     {
-        public static final EventType<Event> EVENT_SELECT = new EventType<Event>( "onSelect" );
+        public static final EventType<Event> EVENT_SELECT = new EventType<Event>( "onSelectItem" );
     }
 
     private MenuItem selectedItem;
@@ -81,7 +81,7 @@ public class MenuPane
     {
         new MenuItem( new HomePane(), "mp_home", "HOME" ),
         new MenuItem( null, "mp_survey", "PESQUISAS" ),
-        new MenuItem( null, "mp_analysis", "ANÁLISES" ),
+        new MenuItem( new RegisterPane(), "mp_analysis", "ANÁLISES" ),
         new MenuItem( new RegisterPane(), "mp_config", "CONFIGURAÇÕES" )
     };
 }

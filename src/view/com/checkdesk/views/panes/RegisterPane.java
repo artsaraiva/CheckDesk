@@ -64,4 +64,5 @@ public class RegisterPane
 
     private Button userButton = new Button("Usuario");
     private Button surveyButton = new Button("Pesquisa");
+    private Button permissionButton = new Button("Permissões");
 }

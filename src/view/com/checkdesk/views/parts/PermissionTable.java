@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.model.data.Permission;
 import com.checkdesk.model.data.Survey;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,23 +26,22 @@ import javafx.scene.layout.VBox;
  *
  * @author arthu
  */
-public class HomeTable
+public class PermissionTable
         extends ScrollPane
 {
-
-    public static final EventType SELECT = new EventType("onSelect");
+    public static final EventType SELECT = new EventType("onSelectpPermission");
 
     private String title;
     
-    private HomeTableItem selected;
-    private Set<HomeTable> bindedTables = new HashSet<>();
+    private PermissionTableItem selected;
+    private Set<PermissionTable> bindedTables = new HashSet<>();
 
-    public HomeTable()
+    public PermissionTable()
     {
         this(null);
     }
 
-    public HomeTable(String title)
+    public PermissionTable(String title)
     {
         initComponents();
         
@@ -55,38 +55,38 @@ public class HomeTable
         updateTitle();
     }
 
-    public Survey getSurvey()
+    public Permission getSurvey()
     {
-        Survey result = null;
+        Permission result = null;
 
         if (selected != null)
         {
-            result = selected.getSurvey();
+            result = selected.getPermission();
         }
 
         return result;
     }
 
-    public void setSurveys(List<Survey> surveys)
+    public void setPermissions(List<Permission> permissions)
     {
         getVBoxChildren().clear();
 
-        for (Survey s : surveys)
+        for (Permission p : permissions)
         {
-            getVBoxChildren().add(createItem(s));
+            getVBoxChildren().add(createItem(p));
         }
         
         updateTitle();
     }
 
-    public void bindSelection(HomeTable table)
+    public void bindSelection(PermissionTable table)
     {
         bindedTables.add(table);
     }
 
-    private HomeTableItem createItem(Survey survey)
+    private PermissionTableItem createItem(Permission permission)
     {
-        final HomeTableItem item = new HomeTableItem(survey);
+        final PermissionTableItem item = new PermissionTableItem(permission);
         item.getStyleClass().add("home-cell");
 
         item.setOnMouseClicked((MouseEvent event) ->
@@ -102,13 +102,13 @@ public class HomeTable
         return vbox.getChildren();
     }
 
-    public void setSelected(HomeTableItem selected)
+    public void setSelected(PermissionTableItem selected)
     {
         this.selected = selected;
 
         List<Node> nodes = new ArrayList<>(getVBoxChildren());
         
-        for (HomeTable table : bindedTables)
+        for (PermissionTable table : bindedTables)
         {
             nodes.addAll(table.getVBoxChildren());
         }
@@ -146,4 +146,5 @@ public class HomeTable
     
     private VBox vbox = new VBox();
     private Label titleLabel = new Label();
+    
 }
