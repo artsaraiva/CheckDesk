@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -34,14 +35,9 @@ public class PermissionDescription
     
     private void initComponents()
     {
-        ObservableList<String> items = FXCollections.observableArrayList(
-                "Single", "Double", "Suite", "Family App");
-        testList.setItems(items);
-        testLabel.setText("PERMISSÂO 1");
-        testButton.setText("BOTão 1");
-        getChildren().addAll(testLabel, testButton, testList);
+        setVgrow(userTable, Priority.ALWAYS);
+        getChildren().addAll(testLabel, userTable);
     }
-    private ListView testList = new ListView();
+    private GroupTable userTable = new GroupTable();
     private Label testLabel = new Label();
-    private Button testButton = new Button();
 }

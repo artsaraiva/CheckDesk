@@ -54,7 +54,6 @@ public class PermissionPane
             public void handle(Event event)
             {
                 Permission selected = permissionList.getSelectedPermission();
-                System.out.println(selected);
                 permissionDescription.setSource(selected);
             }
         });

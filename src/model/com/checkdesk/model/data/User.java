@@ -190,4 +190,10 @@ public class User
     {
         this.groups = groups;
     }
+    
+    @Override
+    public String toString()
+    {
+        return this.getName();
+    }
 }
