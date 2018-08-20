@@ -6,14 +6,22 @@
 package com.checkdesk.views.editors;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.views.util.EditorButton;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Prompts;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 
 /**
@@ -27,8 +35,10 @@ public class DefaultEditor<T>
 
     protected EditorCallback callback;
     protected T source;
-    private ButtonType btSave = new ButtonType("Salvar", ButtonBar.ButtonData.OK_DONE);
-    private ButtonType btCancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+    protected ButtonType btSave = new ButtonType("Salvar", ButtonBar.ButtonData.OK_DONE);
+    protected ButtonType btCancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+    protected ButtonType btNext = new ButtonType("Próximo", ButtonBar.ButtonData.NEXT_FORWARD);
+    protected ButtonType btPrevious = new ButtonType("Voltar", ButtonBar.ButtonData.BACK_PREVIOUS);
     private ButtonType selectedButton;
 
     public DefaultEditor(EditorCallback<T> callback)
@@ -72,8 +82,33 @@ public class DefaultEditor<T>
     {
     }
 
+    protected void nextPage()
+    {
+    }
+
+    protected void previousPage()
+    {
+    }
+
+    protected void addButton(ButtonType type)
+    {
+        getDialogPane().getButtonTypes().add(type);
+    }
+
+    protected void removeButton(ButtonType type)
+    {
+        getDialogPane().getButtonTypes().remove(type);
+    }
+    
+    protected EditorButton getButton(ButtonType type)
+    {
+        return (EditorButton) getDialogPane().lookupButton(type);
+    }
+
     private void initComponents()
     {
+        setDialogPane(new Pane());
+        getDialogPane().getStylesheets().add(ResourceLocator.getInstance().getStyleResource("default.css"));
         setResizable(false);
 
         getDialogPane().getButtonTypes().addAll(btCancel, btSave);
@@ -90,6 +125,18 @@ public class DefaultEditor<T>
                         t.consume();
                     }
                 }
+
+                else if (selectedButton == btNext)
+                {
+                    t.consume();
+                    nextPage();
+                }
+
+                else if (selectedButton == btPrevious)
+                {
+                    t.consume();
+                    previousPage();
+                }
             }
 
         });
@@ -105,4 +152,20 @@ public class DefaultEditor<T>
         });
     }
 
+    private class Pane
+            extends DialogPane
+    {
+        @Override
+        protected Node createButton(ButtonType bt)
+        {
+            final Button button = (Button) super.createButton(bt);
+            EditorButton editorButton = new EditorButton(bt);
+            editorButton.setOnMouseClicked((MouseEvent t) ->
+            {
+                button.fire();
+            });
+
+            return editorButton;
+        }
+    }
 }

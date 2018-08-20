@@ -19,25 +19,25 @@ public class EntityService
 {
     public static EntityService getInstance() throws Exception
     {
-        if ( defaultInstance == null )
+        if (defaultInstance == null)
         {
             defaultInstance = new EntityService();
         }
-        
+
         return defaultInstance;
     }
-    
+
     private static EntityService defaultInstance = null;
-    
+
     private EntityService() throws Exception
     {
         initialTransaction();
     }
-    
+
     private void initialTransaction() throws Exception
     {
         Session session = getSession();
-        
+
         try
         {
             session.beginTransaction();
@@ -49,17 +49,17 @@ public class EntityService
             session.close();
         }
     }
-    
-    public void save( Serializable entity ) throws Exception
+
+    public void save(Serializable entity) throws Exception
     {
         Session session = getSession();
-        
+
         try
         {
             Transaction t = session.beginTransaction();
-            
-            session.save( entity );
-            
+
+            session.save(entity);
+
             t.commit();
         }
         finally
@@ -67,17 +67,35 @@ public class EntityService
             session.close();
         }
     }
-    
-    public void update( Serializable entity ) throws Exception
+
+    public void update(Serializable entity) throws Exception
     {
         Session session = getSession();
-        
+
         try
         {
             Transaction t = session.beginTransaction();
-            
-            session.update( entity );
-            
+
+            session.update(entity);
+
+            t.commit();
+        }
+        finally
+        {
+            session.close();
+        }
+    }
+
+    public void delete(Serializable entity) throws Exception
+    {
+        Session session = getSession();
+
+        try
+        {
+            Transaction t = session.beginTransaction();
+
+            session.delete(entity);
+
             t.commit();
         }
         finally

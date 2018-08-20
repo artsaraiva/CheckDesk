@@ -79,18 +79,24 @@ public class DefaultTable<T>
 
                     HBox hbox = new HBox();
 
-                    ImageView image = new ImageView(new Image(ResourceLocator.getInstance().getImageResource("context.png")));
-                    image.setCursor(Cursor.HAND);
-                    image.setFitHeight(24);
-                    image.setFitWidth(24);
-                    image.setOnMouseClicked((MouseEvent t) ->
-                    {
-                        new ContextMenu(actions).show(this, Side.BOTTOM, 0, 0);
-                    });
-
                     Label label = new Label(item.toString());
                     label.getStyleClass().add("table-label");
-                    hbox.getChildren().addAll(label, image);
+
+                    hbox.getChildren().add(label);
+                    
+                    if (actions.length != 0)
+                    {
+                        ImageView image = new ImageView(new Image(ResourceLocator.getInstance().getImageResource("context.png")));
+                        image.setCursor(Cursor.HAND);
+                        image.setFitHeight(24);
+                        image.setFitWidth(24);
+                        image.setOnMouseClicked((MouseEvent t) ->
+                        {
+                            new ContextMenu(actions).show(this, Side.BOTTOM, 0, 0);
+                        });
+
+                        hbox.getChildren().add(image);
+                    }
 
                     hbox.setSpacing(3);
                     hbox.setAlignment(Pos.CENTER);
