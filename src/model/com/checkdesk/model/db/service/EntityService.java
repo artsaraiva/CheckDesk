@@ -86,6 +86,11 @@ public class EntityService
         }
     }
     
+    public void close() throws Exception
+    {
+        HibernateUtil.getSessionFactory().close();
+    }
+    
     private Session getSession() throws Exception
     {
         return HibernateUtil.getSessionFactory().openSession();

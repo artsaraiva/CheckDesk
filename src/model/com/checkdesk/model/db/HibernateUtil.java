@@ -5,6 +5,7 @@
  */
 package com.checkdesk.model.db;
 
+import com.checkdesk.control.ApplicationController;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.SessionFactory;
 
@@ -28,6 +29,7 @@ public class HibernateUtil
         catch (Throwable ex)
         {
             // Log the exception. 
+            ApplicationController.logException(ex);
             System.err.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }

@@ -5,6 +5,7 @@
  */
 package com.checkdesk.control.util;
 
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.editors.UserEditor;
@@ -40,7 +41,7 @@ public class UserUtilities
 
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    ApplicationController.logException(e);
                 }
             }
         }).show();
