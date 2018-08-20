@@ -8,6 +8,8 @@ package com.checkdesk.views.parts;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -58,8 +60,9 @@ public class HomeTableItem
     private void initComponents()
     {
         iconUser.setClip(new Circle(38, 38, 36, Paint.valueOf("#FFFFFF")));
-
-        surveyLabel.getStyleClass().add("home-table-survey");
+       // iconUser.getStyleClass().add("home-table-survey");
+        surveyLabel.getStyleClass().add("home-table-survey-label");
+        //surveyLabel.setPrefWidth(250);
         dueLabel.getStyleClass().add("home-table-item");
         progressIndicator.getStyleClass().add("answer-progress-graph");
         tooltip.getStyleClass().add("tooltip-progress-graph");
@@ -74,10 +77,12 @@ public class HomeTableItem
 
         c1.setMinWidth(90);
         c2.setHgrow(Priority.ALWAYS);
+        c3.setMinWidth(110);
         c4.setMinWidth(90);
         c4.setHalignment(HPos.RIGHT);
-
+        
         getColumnConstraints().addAll(c1, c2, c3, c4);
+        setMinWidth(450);
     }
 
     private ImageView iconUser = new ImageView();

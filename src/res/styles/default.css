@@ -43,11 +43,17 @@ and open the template in the editor.
     -fx-font-family: "Arial Black";
 }
 
-.home-table-survey
+.home-table-survey-label
 {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-padding: 15 15 15 15;
+}
+
+.home-table-user-icon
+{
+    -fx-padding: 15 15 15 15;
 }
 
 .home-table-item
@@ -55,6 +61,7 @@ and open the template in the editor.
     -fx-font-size: 16px;
     -fx-font-weight: normal;
     -fx-font-family: "Arial";
+    -fx-padding: 15 15 15 0;
 }
 
 .answer-progress-graph .percentage
@@ -62,6 +69,26 @@ and open the template in the editor.
     -fx-fill: null;
 }
 
+.answer-progress-graph
+{
+    -fx-padding: 5 0 -5 0;
+}
+
+.home-table
+{
+    -fx-background-insets: 0;
+    -fx-padding: 0 15 0 15;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}    
+
+.home-table-scroll
+{
+    -fx-border-color: #807B7B;
+    -fx-border-width: 3;
+    -fx-border-style: solid; 
+    -fx-background-color:transparent;
+}
 .tooltip-progress-graph
 {
     -fx-background-color: rgba(130,130,130,0.8);
@@ -69,7 +96,6 @@ and open the template in the editor.
 
 .home-cell-selected
 {
-
     -fx-background-color: #B0B0B0;
     -fx-text-fill: white;
 }
@@ -95,4 +121,14 @@ and open the template in the editor.
 .table-item:selected .table-label
 {
     -fx-text-fill: #FFFFFF;
+}
+
+.home-table-title
+{
+    -fx-padding: 5;  
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: normal;
+    -fx-font-family: "Calibri";
+    -fx-background-color: #807B7B;
 }

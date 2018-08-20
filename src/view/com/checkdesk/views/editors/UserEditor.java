@@ -9,12 +9,8 @@ import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.util.EditorCallback;
-import static com.sun.corba.se.impl.util.Utility.printStackTrace;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -72,7 +68,7 @@ public class UserEditor
         }
         catch (Exception ex)
         {
-            printStackTrace();
+            ex.printStackTrace();
         }
 
         source.setType(typeField.getValue().getValue());

@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -26,13 +29,13 @@ import javafx.scene.layout.VBox;
  * @author arthu
  */
 public class HomeTable
-        extends ScrollPane
+        extends VBox
 {
 
     public static final EventType SELECT = new EventType("onSelect");
 
     private String title;
-    
+
     private HomeTableItem selected;
     private Set<HomeTable> bindedTables = new HashSet<>();
 
@@ -44,7 +47,7 @@ public class HomeTable
     public HomeTable(String title)
     {
         initComponents();
-        
+
         this.title = title;
         updateTitle();
     }
@@ -75,7 +78,7 @@ public class HomeTable
         {
             getVBoxChildren().add(createItem(s));
         }
-        
+
         updateTitle();
     }
 
@@ -88,7 +91,15 @@ public class HomeTable
     {
         final HomeTableItem item = new HomeTableItem(survey);
         item.getStyleClass().add("home-cell");
-
+        scrollPane.viewportBoundsProperty().addListener(new ChangeListener<Bounds>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue)
+            {
+                item.setPrefWidth(scrollPane.getViewportBounds().getWidth());
+            }
+        });
+        
         item.setOnMouseClicked((MouseEvent event) ->
         {
             setSelected(item);
@@ -107,12 +118,12 @@ public class HomeTable
         this.selected = selected;
 
         List<Node> nodes = new ArrayList<>(getVBoxChildren());
-        
+
         for (HomeTable table : bindedTables)
         {
             nodes.addAll(table.getVBoxChildren());
         }
-        
+
         for (Node node : nodes)
         {
             node.getStyleClass().remove("home-cell-selected");
@@ -122,28 +133,32 @@ public class HomeTable
 
         fireEvent(new Event(SELECT));
     }
-    
+
     private void updateTitle()
     {
         getVBoxChildren().remove(titleLabel);
-        
+
         if (title != null && !title.isEmpty())
         {
             titleLabel.setText(title);
-            
-            getVBoxChildren().add(0, titleLabel);
+
+            //getVBoxChildren().add(0, titleLabel);
         }
     }
-    
+
     private void initComponents()
     {
+        getStyleClass().add("home-table");
+        scrollPane.getStyleClass().add("home-table-scroll");
         titleLabel.getStyleClass().add("home-table-title");
-        setStyle("-fx-background-insets: 0;-fx-padding: 0;");
-        setContent(vbox);
+        
         HBox.setHgrow(vbox, Priority.ALWAYS);
-        HBox.setHgrow(this, Priority.ALWAYS);
+        titleLabel.prefWidthProperty().bind(widthProperty());
+        scrollPane.setContent(vbox);
+        getChildren().addAll(titleLabel, scrollPane);
     }
-    
+
     private VBox vbox = new VBox();
+    private ScrollPane scrollPane = new ScrollPane();
     private Label titleLabel = new Label();
 }
