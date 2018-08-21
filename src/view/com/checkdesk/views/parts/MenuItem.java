@@ -6,6 +6,7 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.views.panes.DefaultPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -26,11 +27,11 @@ import javafx.scene.paint.Paint;
 public class MenuItem
         extends HBox
 {
-    private Node pane;
+    private DefaultPane pane;
     private String icon;
     private String name;
 
-    public MenuItem( Node pane, String icon, String name )
+    public MenuItem( DefaultPane pane, String icon, String name )
     {
         this.pane = pane;
         this.icon = icon;
@@ -39,7 +40,7 @@ public class MenuItem
         initComponents();
     }
 
-    public Node getPane()
+    public DefaultPane getPane()
     {
         return pane;
     }

@@ -30,14 +30,20 @@ public class PermissionDescription
     public void setSource(Permission permission)
     {
         if(permission != null)
-        testLabel.setText(permission.toString());
+        {
+            permissionLabel.setText(permission.toString());
+            userTable.setGroup(permission.getViewers());
+        }
     }
     
     private void initComponents()
     {
+        permissionLabel.getStyleClass().add("title-table");
+                
         setVgrow(userTable, Priority.ALWAYS);
-        getChildren().addAll(testLabel, userTable);
+        permissionLabel.prefWidthProperty().bind(widthProperty());
+        getChildren().addAll(permissionLabel, userTable);
     }
     private GroupTable userTable = new GroupTable();
-    private Label testLabel = new Label();
+    private Label permissionLabel = new Label();
 }

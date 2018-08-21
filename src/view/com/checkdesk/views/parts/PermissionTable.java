@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -94,10 +96,10 @@ public class PermissionTable
             }
         });
 
-        this.setOnMouseClicked(new EventHandler<MouseEvent>()
+        this.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Permission>()
         {
             @Override
-            public void handle(MouseEvent event)
+            public void changed(ObservableValue<? extends Permission> observable, Permission oldValue, Permission newValue)
             {
                 selectPermission(getSelectionModel().getSelectedItem());
             }

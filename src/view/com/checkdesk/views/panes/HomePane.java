@@ -18,16 +18,22 @@ import javafx.scene.layout.Priority;
  * @author arthu
  */
 public class HomePane
-        extends HBox
+        extends DefaultPane
 {
 
     public HomePane()
     {
         initComponents();
-        // MUDAR
-        refreshContent();
     }
 
+    @Override
+    protected void resize()
+    {
+        pendingList.setPrefWidth(getWidth() / 2);
+        createdList.setPrefWidth(getWidth() / 2);
+    }
+
+    @Override
     public void refreshContent()
     {
         User user1 = new User();
@@ -40,43 +46,43 @@ public class HomePane
         user4.setLogin("test_user");
 
         pendingList.setSurveys(Arrays.asList(
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-            new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-            new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-            new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0)
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
+                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
+                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
+                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0)
         ));
 
         createdList.setSurveys(Arrays.asList(
-            new Survey(4, null, null, user4, "Pesquisa de IBGE", "", new Date(), 0)
+                new Survey(4, null, null, user4, "Pesquisa de IBGE", "", new Date(), 0)
         ));
     }
 
@@ -85,8 +91,6 @@ public class HomePane
         pendingList.bindSelection(createdList);
         createdList.bindSelection(pendingList);
 
-        HBox.setHgrow(pendingList, Priority.ALWAYS);
-        HBox.setHgrow(createdList, Priority.ALWAYS);
         getChildren().addAll(pendingList, createdList);
     }
 

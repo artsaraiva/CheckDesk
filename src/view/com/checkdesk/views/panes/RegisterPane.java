@@ -7,6 +7,7 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.views.parts.BrowseButton;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -19,61 +20,38 @@ import javafx.scene.layout.HBox;
  * @author MNicaretta
  */
 public class RegisterPane
-        extends HBox
+        extends DefaultPane
 {
+    private DefaultPane selectedPane = null;
+    
     public RegisterPane()
     {
         initComponents();
     }
 
-    private void initComponents()
+    @Override
+    protected void resize()
     {
-        getChildren().addAll(userButton, surveyButton,permissionButton);
-
-        surveyButton.prefHeightProperty().bind(heightProperty());
-        userButton.prefHeightProperty().bind(heightProperty());
-        permissionButton.prefHeightProperty().bind(heightProperty());
-        
-        surveyButton.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent t)
-            {
-                SurveyUtilities.addSurvey();
-            }
-        });
-
-        userButton.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent event)
-            {
-                UserUtilities.addUser();
-            }
-        });
-        
-        permissionButton.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent event)
-            {
-                //mostrar pane das permissões
-            }
-        });
-       
-        widthProperty().addListener(new ChangeListener<Number>()
-        {
-            @Override
-            public void changed(ObservableValue<? extends Number> ov, Number t, Number t1)
-            {
-                surveyButton.setPrefWidth(t1.doubleValue() / 2);
-                userButton.setPrefWidth(t1.doubleValue() / 2);
-                permissionButton.setPrefWidth(t1.doubleValue() / 2);
-            }
-        });
+        selectedPane.setPrefSize(getWidth(), getHeight());
+        selectedPane.resize();
     }
 
-    private Button userButton = new Button("Usuario");
-    private Button surveyButton = new Button("Pesquisa");
-    private Button permissionButton = new Button("Permissões");
+    @Override
+    public void refreshContent()
+    {
+        selectedPane.refreshContent();
+    }
+    
+    private void initComponents()
+    {
+        browsePane.setButtons(userButton, surveyButton, permissionButton);
+        selectedPane = browsePane;
+        
+        getChildren().add(browsePane);
+    }
+
+    private BrowsePane browsePane = new BrowsePane();
+    private BrowseButton userButton = new BrowseButton(null, "Usuario", "login1.png");
+    private BrowseButton surveyButton = new BrowseButton(null, "Pesquisa", "login1.png");
+    private BrowseButton permissionButton = new BrowseButton(null, "Permissões", "login1.png");
 }

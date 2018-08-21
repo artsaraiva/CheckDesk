@@ -50,7 +50,7 @@ public class MenuPane
         fireEvent( new Event( Events.EVENT_SELECT ) );
     }
 
-    public Node getSelectedPane()
+    public DefaultPane getSelectedPane()
     {
         return selectedItem != null ? selectedItem.getPane() : null;
     }

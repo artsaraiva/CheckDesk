@@ -132,3 +132,18 @@ and open the template in the editor.
     -fx-font-family: "Calibri";
     -fx-background-color: #807B7B;
 }
+
+.title-table
+{
+    -fx-padding: 10;  
+    -fx-font-size: 24px;
+    -fx-text-fill: #0066CC;
+    -fx-font-weight: normal;
+    -fx-font-family: 'san-serif';
+    -fx-background-color: #CCCCCC;
+}
+
+.default-pane
+{
+    -fx-background-color: #E6E6E6;
+}

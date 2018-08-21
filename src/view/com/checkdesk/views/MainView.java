@@ -8,6 +8,7 @@ package com.checkdesk.views;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.views.panes.DefaultPane;
 import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.HomePane;
 import com.checkdesk.views.panes.MenuPane;
@@ -27,18 +28,19 @@ import javafx.stage.WindowEvent;
 public class MainView
         extends Application
 {
+
     private Stage stage;
 
     @Override
-    public void start( Stage stage ) throws Exception
+    public void start(Stage stage) throws Exception
     {
         this.stage = stage;
 
         initComponents();
-        scene.getStylesheets().add( ResourceLocator.getInstance().getStyleResource( "default.css" ) );
-        stage.setTitle( "CheckDesk" );
-        stage.setScene( scene );
-        stage.setMaximized( true );
+        scene.getStylesheets().add(ResourceLocator.getInstance().getStyleResource("default.css"));
+        stage.setTitle("CheckDesk");
+        stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
 
         //resize();
@@ -46,23 +48,23 @@ public class MainView
 
     private void initComponents()
     {
-        borderPane.setTop( headerPane );
-        borderPane.setLeft( menuPane );
-        borderPane.setCenter( homePane );
-        
+        borderPane.setTop(headerPane);
+        borderPane.setLeft(menuPane);
+        borderPane.setCenter(homePane);
+
         menuPane.prefWidthProperty().bind(headerPane.getUserPaneWidth());
-        
-        menuPane.addEventHandler( MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
+
+        menuPane.addEventHandler(MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
         {
             @Override
-            public void handle( Event event )
+            public void handle(Event event)
             {
                 Node selected = menuPane.getSelectedPane();
                 borderPane.setCenter( selected );
             }
 
-        } );
-        
+        });
+
         stage.setOnCloseRequest((WindowEvent t) ->
         {
             try
@@ -77,7 +79,7 @@ public class MainView
     }
 
     private BorderPane borderPane = new BorderPane();
-    private Scene scene = new Scene( borderPane );
+    private Scene scene = new Scene(borderPane);
     private MenuPane menuPane = new MenuPane();
     private HeaderPane headerPane = new HeaderPane();
     private HomePane homePane = new HomePane();
