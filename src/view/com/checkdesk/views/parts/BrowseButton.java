@@ -7,18 +7,14 @@ package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.panes.DefaultPane;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 /**
@@ -49,7 +45,7 @@ public class BrowseButton
     private void resize()
     {
         double imageSize = getWidth() * 0.6;
-        double labelSize = getWidth() * 0.2;
+        double labelSize = getWidth() * 0.15;
         double padding = getWidth() * 0.05;
         
         image.setFitHeight(imageSize);
@@ -62,13 +58,11 @@ public class BrowseButton
     
     private void initComponents()
     {
+        setCursor(Cursor.HAND);
         label.setText(title);
         image.setImage(new Image(ResourceLocator.getInstance().getImageResource(icon)));
         
         setAlignment(Pos.CENTER);
-        setBackground(new Background(new BackgroundFill(Paint.valueOf("#000000"),
-                                                        CornerRadii.EMPTY,
-                                                        Insets.EMPTY)));
         getChildren().addAll(image, label);
         
         widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->

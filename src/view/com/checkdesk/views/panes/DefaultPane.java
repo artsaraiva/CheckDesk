@@ -26,7 +26,7 @@ public abstract class DefaultPane
     
     private void initComponets()
     {
-        getStylesheets().add("default-pane");
+        getStyleClass().add("default-pane");
         
         widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
         {

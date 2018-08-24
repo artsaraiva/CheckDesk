@@ -20,7 +20,6 @@ import javafx.scene.layout.Priority;
 public class HomePane
         extends DefaultPane
 {
-
     public HomePane()
     {
         initComponents();
@@ -31,6 +30,8 @@ public class HomePane
     {
         pendingList.setPrefWidth(getWidth() / 2);
         createdList.setPrefWidth(getWidth() / 2);
+        pendingList.setPrefHeight(getHeight());
+        createdList.setPrefHeight(getHeight());
     }
 
     @Override
@@ -91,9 +92,13 @@ public class HomePane
         pendingList.bindSelection(createdList);
         createdList.bindSelection(pendingList);
 
-        getChildren().addAll(pendingList, createdList);
+        HBox.setHgrow(pendingList, Priority.ALWAYS);
+        HBox.setHgrow(createdList, Priority.ALWAYS);
+        hbox.getChildren().addAll(pendingList, createdList);
+        getChildren().add(hbox);
     }
 
+    private HBox hbox = new HBox();
     private HomeTable pendingList = new HomeTable("Pesquisas pendentes");
     private HomeTable createdList = new HomeTable("Pesquisas criadas");
 }

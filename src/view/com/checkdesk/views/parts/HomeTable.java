@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -91,13 +92,13 @@ public class HomeTable
     {
         final HomeTableItem item = new HomeTableItem(survey);
         item.getStyleClass().add("home-cell");
-        scrollPane.viewportBoundsProperty().addListener(new ChangeListener<Bounds>()
+        
+        scrollPane.prefWidthProperty().bind(widthProperty());
+        scrollPane.prefHeightProperty().bind(heightProperty());
+        
+        scrollPane.viewportBoundsProperty().addListener((ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) ->
         {
-            @Override
-            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue)
-            {
-                item.setPrefWidth(scrollPane.getViewportBounds().getWidth());
-            }
+            item.setPrefWidth(scrollPane.getViewportBounds().getWidth());
         });
         
         item.setOnMouseClicked((MouseEvent event) ->

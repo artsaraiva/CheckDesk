@@ -13,6 +13,8 @@ import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.HomePane;
 import com.checkdesk.views.panes.MenuPane;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -36,33 +38,36 @@ public class MainView
     {
         this.stage = stage;
 
+        Thread.setDefaultUncaughtExceptionHandler((t, e) ->
+        {
+            ApplicationController.logException(e);
+        });
+
         initComponents();
         scene.getStylesheets().add(ResourceLocator.getInstance().getStyleResource("default.css"));
         stage.setTitle("CheckDesk");
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
-
-        //resize();
     }
 
     private void initComponents()
     {
         borderPane.setTop(headerPane);
         borderPane.setLeft(menuPane);
-        borderPane.setCenter(homePane);
 
         menuPane.prefWidthProperty().bind(headerPane.getUserPaneWidth());
 
-        menuPane.addEventHandler(MenuPane.Events.EVENT_SELECT, new EventHandler<Event>()
+        menuPane.addEventHandler(MenuPane.Events.EVENT_SELECT, (Event event) ->
         {
-            @Override
-            public void handle(Event event)
+            DefaultPane selected = menuPane.getSelectedPane();
+
+            if (selected != null)
             {
-                Node selected = menuPane.getSelectedPane();
-                borderPane.setCenter( selected );
+                selected.refreshContent();
             }
 
+            borderPane.setCenter(selected);
         });
 
         stage.setOnCloseRequest((WindowEvent t) ->
@@ -76,6 +81,8 @@ public class MainView
                 ApplicationController.logException(e);
             }
         });
+
+        menuPane.refreshContent();
     }
 
     private BorderPane borderPane = new BorderPane();

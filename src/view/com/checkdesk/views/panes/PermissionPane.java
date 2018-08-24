@@ -24,19 +24,21 @@ import javafx.scene.layout.Priority;
 public class PermissionPane
         extends DefaultPane
 {
-
     public PermissionPane()
     {
         initComponents();
-        refreshContent();
     }
     
     @Override
     protected void resize()
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        permissionList.setPrefWidth(getWidth()/2);
+        permissionDescription.setPrefWidth(getWidth()/2);
+        permissionList.setPrefHeight(getHeight());
+        permissionDescription.setPrefHeight(getHeight());
     }
 
+    @Override
     public void refreshContent()
     {
         int selectedIndex = permissionList.getSelectionModel().getSelectedIndex();
@@ -54,25 +56,18 @@ public class PermissionPane
 
     private void initComponents()
     {
-        getChildren().addAll(permissionList, permissionDescription);
-
-        widthProperty().addListener((ObservableValue<? extends Object> observable, Object oldValue, Object newValue) ->
-        {
-            permissionList.setPrefWidth(getWidth()/2);
-            permissionDescription.setPrefWidth(getWidth()/2);
-        });
+        hbox.getChildren().addAll(permissionList, permissionDescription);
         
-        permissionList.addEventHandler(PermissionTable.SELECT, new EventHandler<Event>()
+        getChildren().add(hbox);
+
+        permissionList.addEventHandler(PermissionTable.SELECT, (Event event) ->
         {
-            @Override
-            public void handle(Event event)
-            {
-                Permission selected = permissionList.getSelectedPermission();
-                permissionDescription.setSource(selected);
-            }
+            Permission selected = permissionList.getSelectedPermission();
+            permissionDescription.setSource(selected);
         });
     }
 
+    private HBox hbox = new HBox();
     private PermissionTable permissionList = new PermissionTable("Permissões");
     private PermissionDescription permissionDescription = new PermissionDescription();
 }

@@ -6,8 +6,9 @@
 package com.checkdesk.control;
 
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.db.service.UserService;
+import java.io.File;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
@@ -17,6 +18,7 @@ import java.security.MessageDigest;
  */
 public class ApplicationController
 {
+
     private static ApplicationController defaultInstance;
 
     public static ApplicationController getInstance()
@@ -31,7 +33,29 @@ public class ApplicationController
 
     public static void logException(Throwable e)
     {
-        e.printStackTrace();
+        try
+        {
+            e.printStackTrace();
+            File file = new File("C:\\Users\\arthu\\Desktop\\testeLog\\teste.txt");
+            file.getParentFile().mkdirs();
+
+            PrintWriter printWriter = new PrintWriter(file);
+
+            try
+            {
+                e.printStackTrace(printWriter);
+            }
+
+            finally
+            {
+                printWriter.close();
+            }
+        }
+
+        catch (Exception ex)
+        {
+            logException(ex);
+        }
     }
 
     public static String hash(String value)

@@ -9,13 +9,12 @@ import com.checkdesk.views.parts.BrowseButton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.geometry.Insets;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Paint;
 
 /**
  *
@@ -24,8 +23,16 @@ import javafx.scene.paint.Paint;
 public class BrowsePane
         extends DefaultPane
 {
+
+    public static class Events
+    {
+
+        public static final EventType ON_SELECT = new EventType("onBrowseSelect");
+    }
+
     private List<BrowseButton> buttons = new ArrayList<>();
-    
+    private BrowseButton selectedButton;
+
     public BrowsePane()
     {
         initComponents();
@@ -41,38 +48,59 @@ public class BrowsePane
         this.buttons = buttons;
         refreshContent();
     }
-    
+
     @Override
     protected void resize()
     {
         hbox.setPrefSize(getWidth(), getHeight());
-        int size = buttons.size();
-        
+        double width = (getWidth() / buttons.size()) - 20;
+        double height = getHeight();
+
+        double size = Math.min(width, height);
+
         for (BrowseButton bt : buttons)
         {
-            double width = (getWidth() / size) - 20;
-            double height = getHeight();
-            bt.setPrefSize(Math.min(width, height), Math.min(width, height));
+            bt.setPrefSize(size, size);
         }
     }
 
     @Override
     public void refreshContent()
     {
+        for (BrowseButton bt : buttons)
+        {
+            bt.setOnMouseClicked(onClick);
+        }
+
         hbox.getChildren().setAll(buttons);
     }
-    
+
+    public DefaultPane getSelectedPane()
+    {
+        DefaultPane selected = null;
+
+        if (selectedButton != null)
+        {
+            selected = selectedButton.getPane();
+        }
+
+        return selected;
+    }
+
     private void initComponents()
     {
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER);
-        
-        hbox.setBackground(new Background(new BackgroundFill(Paint.valueOf("#FF0000"),
-                                                        CornerRadii.EMPTY,
-                                                        Insets.EMPTY)));
-        
+        hbox.setFillHeight(false);
+
         getChildren().add(hbox);
     }
-    
+
     private HBox hbox = new HBox();
+    private EventHandler<MouseEvent> onClick = (MouseEvent event) ->
+    {
+        selectedButton = (BrowseButton) event.getSource();
+
+        fireEvent(new Event(Events.ON_SELECT));
+    };
 }

@@ -42,6 +42,9 @@ public class HomeTableItem
         this.survey = survey;
 
         iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource(survey.getOwner().getLogin())));
+        iconUser.setFitHeight(70);
+        iconUser.setFitWidth(70);
+        
         surveyLabel.setText(survey.getTitle());
 
         DateFormat df = DateFormat.getDateInstance();
@@ -59,13 +62,13 @@ public class HomeTableItem
 
     private void initComponents()
     {
-        iconUser.setClip(new Circle(38, 38, 36, Paint.valueOf("#FFFFFF")));
-       // iconUser.getStyleClass().add("home-table-survey");
+        iconUser.setClip(new Circle(35, 35, 35, Paint.valueOf("#FFFFFF")));
         surveyLabel.getStyleClass().add("home-table-survey-label");
-        //surveyLabel.setPrefWidth(250);
         dueLabel.getStyleClass().add("home-table-item");
         progressIndicator.getStyleClass().add("answer-progress-graph");
         tooltip.getStyleClass().add("tooltip-progress-graph");
+
+        progressIndicator.setPrefSize(70, 70);
 
         progressIndicator.setTooltip(tooltip);
         addRow(0, iconUser, surveyLabel, dueLabel, progressIndicator);
@@ -75,10 +78,13 @@ public class HomeTableItem
         ColumnConstraints c3 = new ColumnConstraints();
         ColumnConstraints c4 = new ColumnConstraints();
 
-        c1.setMinWidth(90);
+        c1.setMinWidth(70);
+        c1.setMaxWidth(70);
         c2.setHgrow(Priority.ALWAYS);
-        c3.setMinWidth(110);
-        c4.setMinWidth(90);
+        c3.setMinWidth(97);
+        c3.setMaxWidth(97);
+        c4.setMinWidth(70);
+        c4.setMaxWidth(70);
         c4.setHalignment(HPos.RIGHT);
         
         getColumnConstraints().addAll(c1, c2, c3, c4);
