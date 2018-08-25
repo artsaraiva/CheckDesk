@@ -132,29 +132,34 @@ public class DefaultTable<T>
         return list.getSelectionModel().getSelectedItem();
     }
 
+    public void setSelectedItem(T item)
+    {
+        list.getSelectionModel().select(item);
+    }
+
+    public int getSelectedIndex()
+    {
+        return list.getSelectionModel().getSelectedIndex();
+    }
+
+    public void setSelectedIndex(int index)
+    {
+        list.getSelectionModel().select(index);
+    }
+
     public void setActions(javafx.scene.control.MenuItem[] items)
     {
         this.actions = items;
     }
+    
+    public void setShowAddPane(boolean show)
+    {
+        setTop(show ? pane : null);
+    }
 
     private void initComponents()
     {
-        pane.setBorder(new Border(new BorderStroke(Paint.valueOf("#BDBDBD"),
-                                                   BorderStrokeStyle.DASHED,
-                                                   CornerRadii.EMPTY,
-                                                   new BorderWidths(5))));
-
-        pane.setBackground(new Background(new BackgroundFill(Paint.valueOf("#FFFFFF"),
-                                                             CornerRadii.EMPTY,
-                                                             Insets.EMPTY)));
-
-        pane.setAlignment(Pos.CENTER);
-        pane.setPadding(new Insets(10, 30, 10, 30));
-        pane.setCursor(Cursor.HAND);
-
-        addItem.setTextFill(Paint.valueOf("#BDBDBD"));
-        addItem.setStyle("-fx-font-size: 14;-fx-font-weight: bold;");
-
+        pane.getStyleClass().add("add-pane");
         pane.getChildren().add(addItem);
 
         list.setCellFactory(cellFactory());

@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.HomeTable;
@@ -89,6 +90,7 @@ public class HomePane
 
     private void initComponents()
     {
+        getStylesheets().add(ResourceLocator.getInstance().getStyleResource("homeview.css"));
         pendingList.bindSelection(createdList);
         createdList.bindSelection(pendingList);
 

@@ -5,9 +5,10 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.parts.BrowseButton;
+import com.checkdesk.views.parts.NavigationItem;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 
 /**
  *
@@ -16,8 +17,6 @@ import javafx.event.EventHandler;
 public class RegisterPane
         extends DefaultPane
 {
-    private DefaultPane selectedPane = null;
-    
     public RegisterPane()
     {
         initComponents();
@@ -26,39 +25,32 @@ public class RegisterPane
     @Override
     protected void resize()
     {
-        selectedPane.setPrefSize(getWidth(), getHeight());
-        selectedPane.resize();
+        browsePane.setPrefSize(getWidth(), getHeight());
+        browsePane.resize();
     }
 
     @Override
     public void refreshContent()
     {
-        selectPane(browsePane);
+        browsePane.refreshContent();
     }
-    
-    private void selectPane(DefaultPane pane)
+
+    @Override
+    public NavigationItem createNavigationItem(NavigationItem currentItem)
     {
-        selectedPane = pane;
-        
-        if (selectedPane == null)
-        {
-            selectedPane = browsePane;
-        }
-        
-        selectedPane.refreshContent();
-        getChildren().setAll(selectedPane);
-        resize();
+        return new NavigationItem(browsePane.getSelectedButton().getPane(), browsePane.getSelectedButton().getTitle(), currentItem);
     }
     
     private void initComponents()
     {
+        getStylesheets().add(ResourceLocator.getInstance().getStyleResource("registerview.css"));
         browsePane.setButtons(userButton, surveyButton, permissionButton, logsButton);
         
         getChildren().add(browsePane);
         
         browsePane.addEventHandler(BrowsePane.Events.ON_SELECT, (Event event) ->
         {
-            selectPane(browsePane.getSelectedPane());
+            fireEvent(new Event(Events.ON_CHANGE));
         });
     }
 

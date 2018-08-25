@@ -8,6 +8,7 @@ and open the template in the editor.
     Author     : arthu
 */
 
+/* -------- MENU -------- */
 .menu-item
 {
     -fx-padding: 15 25 15 25;
@@ -25,10 +26,11 @@ and open the template in the editor.
 
 .menu-label-selected
 {
-    -fx-text-fill: #ffffff !important;
+    -fx-text-fill: #FFFFFF !important;
 }
 
-.header-user-perfil
+/* -------- USER_PANE -------- */
+.user-perfil
 {
     -fx-font-size: 12px;
     -fx-text-fill: #CBC4C4;
@@ -36,7 +38,7 @@ and open the template in the editor.
     -fx-font-family: "Arial Black";
 }
 
-.header-user-name
+.user-name
 {
     -fx-font-size: 16px;
     -fx-text-fill: #ffffff;
@@ -44,68 +46,7 @@ and open the template in the editor.
     -fx-font-family: "Arial Black";
 }
 
-.home-table-survey-label
-{
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-font-family: "Arial";
-    -fx-padding: 15 15 15 15;
-}
-
-.home-table-user-icon
-{
-    -fx-padding: 15 15 15 15;
-}
-
-.home-table-item
-{
-    -fx-font-size: 16px;
-    -fx-font-weight: normal;
-    -fx-font-family: "Arial";
-    -fx-padding: 15 15 15 0;
-}
-
-.answer-progress-graph .percentage
-{
-    -fx-fill: null;
-}
-
-.answer-progress-graph
-{
-    -fx-padding: 5 0 -5 0;
-}
-
-.home-table
-{
-    -fx-background-insets: 0;
-    -fx-padding: 10 15 10 15;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-}    
-
-.home-table-scroll
-{
-    -fx-border-color: #807B7B;
-    -fx-border-width: 3;
-    -fx-border-style: solid; 
-    -fx-background-color:transparent;
-}
-.tooltip-progress-graph
-{
-    -fx-background-color: rgba(130,130,130,0.8);
-}
-
-.home-cell-selected
-{
-    -fx-background-color: #B0B0B0;
-    -fx-text-fill: white;
-}
-
-.permission-list-cell {
-    -fx-font-size: 12px;
-    -fx-font-family: "Arial";
-}
-
+/* -------- DEFAULT_EDITOR -------- */
 .editor-button
 {
     -fx-background-color: #FFFFFF;
@@ -114,6 +55,7 @@ and open the template in the editor.
     -fx-border-style: solid;
 }
 
+/* -------- DEFAULT_TABLE -------- */
 .table-item:selected
 {
     -fx-background-color: #B0B0B0;
@@ -124,27 +66,41 @@ and open the template in the editor.
     -fx-text-fill: #FFFFFF;
 }
 
-.home-table-title
+.add-pane
 {
-    -fx-padding: 5;  
-    -fx-font-size: 16px;
-    -fx-text-fill: white;
-    -fx-font-weight: normal;
-    -fx-font-family: "Calibri";
-    -fx-background-color: #807B7B;
+    -fx-border-color: #BDBDBD;
+    -fx-border-style: dashed;
+    -fx-border-width: 5;
+    -fx-background-color: #FFFFFF;
+    -fx-alignment: center;
+    -fx-padding: 10, 30, 10, 30;
+    -fx-cursor: hand;
 }
 
-.title-table
+.add-pane .label
 {
-    -fx-padding: 10;  
-    -fx-font-size: 24px;
-    -fx-text-fill: #0066CC;
-    -fx-font-weight: normal;
-    -fx-font-family: 'san-serif';
-    -fx-background-color: #CCCCCC;
+    -fx-text-fill: #BDBDBD;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
 }
 
+/* -------- DEFAULT_PANE -------- */
 .default-pane
 {
     -fx-background-color: #D9D9D9;
+}
+
+/* -------- NAVIGATION -------- */
+.navigation-pane
+{
+    -fx-background-color: #20202C;
+    -fx-padding: 20;
+}
+
+.navigation-item
+{
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 40;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial Black";
 }

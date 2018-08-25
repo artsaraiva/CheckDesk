@@ -8,9 +8,8 @@ package com.checkdesk.views.parts;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
@@ -86,6 +85,8 @@ public class HomeTableItem
         c4.setMinWidth(70);
         c4.setMaxWidth(70);
         c4.setHalignment(HPos.RIGHT);
+        
+        setValignment(progressIndicator, VPos.CENTER);
         
         getColumnConstraints().addAll(c1, c2, c3, c4);
         setMinWidth(450);

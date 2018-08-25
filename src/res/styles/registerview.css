@@ -1,0 +1,19 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 25, 2018, 1:02:10 PM
+    Author     : MNicaretta
+*/
+
+.details-title
+{
+    -fx-padding: 10;  
+    -fx-font-size: 24px;
+    -fx-text-fill: #0066CC;
+    -fx-font-weight: normal;
+    -fx-font-family: 'san-serif';
+    -fx-background-color: #CCCCCC;
+}

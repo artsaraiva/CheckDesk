@@ -59,9 +59,9 @@ public class MenuPane
         fireEvent(new Event(Events.EVENT_SELECT));
     }
 
-    public DefaultPane getSelectedPane()
+    public MenuItem getSelectedItem()
     {
-        return selectedItem != null ? selectedItem.getPane() : null;
+        return selectedItem;
     }
 
     private void initComponents()

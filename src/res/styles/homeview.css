@@ -1,0 +1,78 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 25, 2018, 12:53:34 PM
+    Author     : MNicaretta
+*/
+
+.home-table
+{
+    -fx-background-insets: 0;
+    -fx-padding: 10 15 10 15;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.home-table-title
+{
+    -fx-padding: 5;  
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: normal;
+    -fx-font-family: "Calibri";
+    -fx-background-color: #807B7B;
+}
+
+.home-table-scroll
+{
+    -fx-border-color: #807B7B;
+    -fx-border-width: 3;
+    -fx-border-style: solid; 
+    -fx-background-color:transparent;
+}
+
+.home-table-item
+{
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-font-family: "Arial";
+    -fx-padding: 15 15 15 0;
+}
+
+.home-cell-selected
+{
+    -fx-background-color: #B0B0B0;
+    -fx-text-fill: white;
+}
+
+.home-table-user-icon
+{
+    -fx-padding: 15 15 15 15;
+}
+
+.home-table-survey-label
+{
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+    -fx-padding: 15 15 15 15;
+}
+
+.answer-progress-graph .percentage
+{
+    -fx-font-size: 0;
+    -fx-fill: null;
+}
+
+.answer-progress-graph
+{
+    -fx-padding: 5 0 5 0;
+}
+
+.tooltip-progress-graph
+{
+    -fx-background-color: rgba(130,130,130,0.8);
+}

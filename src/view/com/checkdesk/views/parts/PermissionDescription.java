@@ -38,7 +38,7 @@ public class PermissionDescription
     
     private void initComponents()
     {
-        permissionLabel.getStyleClass().add("title-table");
+        permissionLabel.getStyleClass().add("details-title");
                 
         setVgrow(userTable, Priority.ALWAYS);
         permissionLabel.prefWidthProperty().bind(widthProperty());

@@ -5,8 +5,9 @@
  */
 package com.checkdesk.views.panes;
 
-import javafx.beans.value.ChangeListener;
+import com.checkdesk.views.parts.NavigationItem;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventType;
 import javafx.scene.layout.Pane;
 
 /**
@@ -16,6 +17,11 @@ import javafx.scene.layout.Pane;
 public abstract class DefaultPane
         extends Pane
 {
+    public static class Events
+    {
+        public static final EventType ON_CHANGE = new EventType("onPaneChange");
+    }
+    
     public DefaultPane()
     {
         initComponets();
@@ -23,6 +29,11 @@ public abstract class DefaultPane
     
     protected abstract void resize();
     public abstract void refreshContent();
+    
+    public NavigationItem createNavigationItem(NavigationItem currentItem)
+    {
+        return null;
+    }
     
     private void initComponets()
     {

@@ -54,7 +54,7 @@ public class ApplicationController
 
         catch (Exception ex)
         {
-            logException(ex);
+            e.printStackTrace();
         }
     }
 
