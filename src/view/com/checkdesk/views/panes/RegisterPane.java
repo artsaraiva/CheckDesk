@@ -58,5 +58,5 @@ public class RegisterPane
     private BrowseButton userButton = new BrowseButton(null, "Usuario", "login1.png");
     private BrowseButton surveyButton = new BrowseButton(null, "Formulário", "login1.png");
     private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
-    private BrowseButton logsButton = new BrowseButton(null, "Logs", "login1.png");
+    private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditoria", "login1.png");
 }

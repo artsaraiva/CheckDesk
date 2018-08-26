@@ -8,8 +8,11 @@ package com.checkdesk.control.util;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.Parameter;
 import com.checkdesk.views.editors.UserEditor;
 import com.checkdesk.views.util.EditorCallback;
+import java.util.Arrays;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -66,5 +69,20 @@ public class UserUtilities
         }
 
         return result;
+    }
+    
+    public static User login(String login, String password) throws Exception
+    {
+        List<Parameter> parameters = Arrays.asList( new Parameter("login",
+                                                                  User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+                                                                  login.toLowerCase(),
+                                                                  Parameter.COMPARATOR_LOWER_CASE),
+                                                    
+                                                    new Parameter("password",
+                                                                  User.class.getDeclaredField("password"),
+                                                                  password,
+                                                                  Parameter.COMPARATOR_EQUALS));
+        
+        return (User) EntityService.getInstance().getValue(User.class, parameters);
     }
 }

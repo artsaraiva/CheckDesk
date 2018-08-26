@@ -5,21 +5,8 @@
  */
 package com.checkdesk.views.util;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogEvent;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.HBox;
-import javafx.scene.web.HTMLEditor;
 
 /**
  *
@@ -40,5 +27,26 @@ public class Prompts
         dialogoInfo.setHeaderText( title == null ? "Informação" : title );
         dialogoInfo.setContentText( message );
         dialogoInfo.showAndWait();
+    }
+    
+    public static boolean confirm( String message )
+    {
+        return confirm( null, message );
+    }
+    
+    public static boolean confirm( String title, String message )
+    {
+        ButtonType btnSim = new ButtonType( "Sim" );
+        ButtonType btnNao = new ButtonType( "Não" );
+        
+        Alert dialogoConfirm = new Alert( Alert.AlertType.CONFIRMATION );
+        dialogoConfirm.getDialogPane().setPrefSize( 400,  200 );
+        dialogoConfirm.setTitle( "Confirmação" );
+        dialogoConfirm.setHeaderText( title == null ? "Você tem certeza ?" : title );
+        dialogoConfirm.setContentText( message );
+        dialogoConfirm.getButtonTypes().setAll( btnSim, btnNao );
+        dialogoConfirm.showAndWait();
+        
+        return dialogoConfirm.getResult() == btnSim;
     }
 }

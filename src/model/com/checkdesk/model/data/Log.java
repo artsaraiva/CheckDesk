@@ -9,6 +9,11 @@ import java.util.Date;
 public class Log
         implements java.io.Serializable
 {
+    public static final int EVENT_ADD         = 0;
+    public static final int EVENT_UPDATE      = 1;
+    public static final int EVENT_DELETE      = 2;
+    public static final int EVENT_ACTIVE_LOGS = 3;
+    
     private int id;
     private Date timestamp;
     private User user;

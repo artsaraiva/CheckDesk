@@ -6,6 +6,8 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
@@ -25,18 +26,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 
 /**
@@ -52,6 +44,7 @@ public class DefaultTable<T>
         public static final EventType ON_SELECT = new EventType("onSelectTableItem");
     }
 
+    private DateFormat df;
     private javafx.scene.control.MenuItem[] actions = new javafx.scene.control.MenuItem[0];
 
     public DefaultTable()
@@ -81,7 +74,14 @@ public class DefaultTable<T>
 
                     HBox hbox = new HBox();
 
-                    Label label = new Label(item.toString());
+                    String text = item.toString();
+                    
+                    if (item instanceof Date)
+                    {
+                        text = df.format((Date) item);
+                    }
+                    
+                    Label label = new Label(text);
                     label.getStyleClass().add("table-label");
 
                     hbox.getChildren().add(label);
@@ -145,6 +145,11 @@ public class DefaultTable<T>
     public void setSelectedIndex(int index)
     {
         list.getSelectionModel().select(index);
+    }
+    
+    public void clearSelection()
+    {
+        list.getSelectionModel().clearSelection();
     }
 
     public void setActions(javafx.scene.control.MenuItem[] items)

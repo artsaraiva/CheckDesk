@@ -5,9 +5,10 @@
  */
 package com.checkdesk.control;
 
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.UserService;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -20,6 +21,7 @@ public class ApplicationController
 {
 
     private static ApplicationController defaultInstance;
+    private static boolean activeLog;
 
     public static ApplicationController getInstance()
     {
@@ -38,9 +40,9 @@ public class ApplicationController
             e.printStackTrace();
             File file = new File("C:\\Users\\arthu\\Desktop\\testeLog\\teste.txt");
             file.getParentFile().mkdirs();
-
+            
             PrintWriter printWriter = new PrintWriter(file);
-
+            
             try
             {
                 e.printStackTrace(printWriter);
@@ -54,7 +56,7 @@ public class ApplicationController
 
         catch (Exception ex)
         {
-            e.printStackTrace();
+            ex.printStackTrace();
         }
     }
 
@@ -80,10 +82,22 @@ public class ApplicationController
         return value;
     }
 
+    public static boolean isActiveLog()
+    {
+        return activeLog;
+    }
+
+    public static void setActiveLog(boolean activeLog)
+    {
+        ApplicationController.activeLog = activeLog;
+        ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
+    }
+
     private User activeUser;
 
     private ApplicationController()
     {
+        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor");
     }
 
     public User getActiveUser()
@@ -95,7 +109,7 @@ public class ApplicationController
     {
         try
         {
-            activeUser = UserService.getInstance().login(login, hash(password));
+            activeUser = UserUtilities.login(login, hash(password));
         }
 
         catch (Exception e)
