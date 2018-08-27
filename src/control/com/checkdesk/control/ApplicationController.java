@@ -8,9 +8,12 @@ package com.checkdesk.control;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.UserService;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -36,10 +39,21 @@ public class ApplicationController
         try
         {
             e.printStackTrace();
-            File file = new File("C:\\Users\\arthu\\Desktop\\testeLog\\teste.txt");
-            file.getParentFile().mkdirs();
+            
+            File file = new File("config" + File.separator + "logs");
+            
+            if (!file.exists() || !file.isDirectory())
+            {
+                file.mkdirs();
+            }
+            
+            Date date = new Date();
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-            PrintWriter printWriter = new PrintWriter(file);
+            file = new File(file.getAbsolutePath() + File.separator + dateFormat.format(date) + ".txt");
+
+            PrintWriter printWriter = new PrintWriter(new FileOutputStream(file, true));
 
             try
             {
