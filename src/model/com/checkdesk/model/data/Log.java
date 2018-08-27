@@ -1,6 +1,9 @@
 package com.checkdesk.model.data;
 // Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1
 
+import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.util.LogUtilities;
+import com.checkdesk.model.db.service.EntityService;
 import java.util.Date;
 
 /**
@@ -104,5 +107,14 @@ public class Log
     public void setCommand(String command)
     {
         this.command = command;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return new StringBuilder().append(timestamp).append("|")
+                                  .append(LogUtilities.getUserLogin(this)).append("|")
+                                  .append(LogUtilities.getEvent(event)).append("|")
+                                  .append(objectClass).append(": ").append(objectName).toString();
     }
 }

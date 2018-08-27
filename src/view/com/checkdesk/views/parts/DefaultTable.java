@@ -44,7 +44,7 @@ public class DefaultTable<T>
         public static final EventType ON_SELECT = new EventType("onSelectTableItem");
     }
 
-    private DateFormat df;
+    private DateFormat df = DateFormat.getDateInstance();
     private javafx.scene.control.MenuItem[] actions = new javafx.scene.control.MenuItem[0];
 
     public DefaultTable()

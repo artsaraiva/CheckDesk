@@ -21,16 +21,16 @@ import javafx.event.Event;
  */
 public class SurveyUtilities
 {
-    private static final Item TYPE_PUBLIC    = new Item( "Pública", Survey.TYPE_PUBLIC );
-    private static final Item TYPE_PRIVATE   = new Item( "Privada", Survey.TYPE_PRIVATE );
-    private static final Item TYPE_ANONYMOUS = new Item( "Anônima", Survey.TYPE_ANONYMOUS );
-    private static final Item TYPE_TOTEM     = new Item( "Totem", Survey.TYPE_TOTEM );
-    
+    private static final Item TYPE_PUBLIC =    new Item("Pública", Survey.TYPE_PUBLIC);
+    private static final Item TYPE_PRIVATE =   new Item("Privada", Survey.TYPE_PRIVATE);
+    private static final Item TYPE_ANONYMOUS = new Item("Anônima", Survey.TYPE_ANONYMOUS);
+    private static final Item TYPE_TOTEM =     new Item("Totem",   Survey.TYPE_TOTEM);
+
     public static void addSurvey()
     {
         Survey survey = new Survey();
         survey.setCreatedDate(new Date(System.currentTimeMillis()));
-        
+
         new SurveyEditor(new EditorCallback<Survey>(survey)
         {
             @Override
@@ -40,24 +40,25 @@ public class SurveyUtilities
                 {
                     EntityService.getInstance().save(getSource());
                 }
-                
+
                 catch (Exception e)
                 {
                     ApplicationController.logException(e);
                 }
             }
+
         }).show();
     }
-    
+
     public static ObservableList<Item> getItems()
     {
-        return FXCollections.observableArrayList( TYPE_PUBLIC, TYPE_PRIVATE, TYPE_ANONYMOUS, TYPE_TOTEM );
+        return FXCollections.observableArrayList(TYPE_PUBLIC, TYPE_PRIVATE, TYPE_ANONYMOUS, TYPE_TOTEM);
     }
-    
+
     public static Item getType(int type)
     {
         Item result = null;
-        
+
         for (Item item : getItems())
         {
             if (item.getValue() == type)
@@ -66,7 +67,7 @@ public class SurveyUtilities
                 break;
             }
         }
-        
+
         return result;
     }
 }

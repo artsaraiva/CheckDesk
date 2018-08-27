@@ -23,8 +23,8 @@ import javafx.event.Event;
  */
 public class UserUtilities
 {
-    private static final Item TYPE_SUPER = new Item("Super", User.TYPE_SUPER);
-    private static final Item TYPE_ADMIN = new Item("Admin", User.TYPE_ADMIN);
+    private static final Item TYPE_SUPER    = new Item("Super",    User.TYPE_SUPER);
+    private static final Item TYPE_ADMIN    = new Item("Admin",    User.TYPE_ADMIN);
     private static final Item TYPE_OPERATOR = new Item("Operator", User.TYPE_OPERATOR);
     private static final Item TYPE_EXPLORER = new Item("Explorer", User.TYPE_EXPLORER);
 
@@ -70,19 +70,19 @@ public class UserUtilities
 
         return result;
     }
-    
+
     public static User login(String login, String password) throws Exception
     {
-        List<Parameter> parameters = Arrays.asList( new Parameter("login",
-                                                                  User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
-                                                                  login.toLowerCase(),
-                                                                  Parameter.COMPARATOR_LOWER_CASE),
-                                                    
-                                                    new Parameter("password",
-                                                                  User.class.getDeclaredField("password"),
-                                                                  password,
-                                                                  Parameter.COMPARATOR_EQUALS));
-        
+        List<Parameter> parameters = Arrays.asList(new Parameter("login",
+                                                                 User.class.getDeclaredField(login.contains("@") ?
+                                                                                             "email" : "login"),
+                                                                 login.toLowerCase(),
+                                                                 Parameter.COMPARATOR_LOWER_CASE),
+                                                   new Parameter("password",
+                                                                 User.class.getDeclaredField("password"),
+                                                                 password,
+                                                                 Parameter.COMPARATOR_EQUALS));
+
         return (User) EntityService.getInstance().getValue(User.class, parameters);
     }
 }

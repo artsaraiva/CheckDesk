@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 import javafx.application.Application;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -54,11 +53,6 @@ public class MainView
     
     private void selectMenuItem(MenuItem selected)
     {
-        if (selected.getPane() != null)
-        {
-            selected.getPane().refreshContent();
-        }
-
         headerPane.setNavigationItem(new NavigationItem(selected.getPane(), selected.getName()));
     }
 

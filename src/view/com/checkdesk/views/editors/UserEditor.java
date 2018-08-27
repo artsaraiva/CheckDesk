@@ -10,8 +10,6 @@ import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.util.EditorCallback;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;

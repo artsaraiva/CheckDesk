@@ -6,6 +6,8 @@
 package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.views.parts.BrowseButton;
 import com.checkdesk.views.parts.NavigationItem;
 import javafx.event.Event;
@@ -44,7 +46,7 @@ public class RegisterPane
     private void initComponents()
     {
         getStylesheets().add(ResourceLocator.getInstance().getStyleResource("registerview.css"));
-        browsePane.setButtons(userButton, surveyButton, permissionButton, logsButton);
+        browsePane.setButtons(userButton, formButton, permissionButton, logsButton);
         
         getChildren().add(browsePane);
         
@@ -55,8 +57,38 @@ public class RegisterPane
     }
 
     private BrowsePane browsePane = new BrowsePane();
-    private BrowseButton userButton = new BrowseButton(null, "Usuario", "login1.png");
-    private BrowseButton surveyButton = new BrowseButton(null, "Formulário", "login1.png");
+    private BrowseButton userButton = new BrowseButton(new UserPane(), "Usuario", "login1.png");
+    private BrowseButton formButton = new BrowseButton(new SurveyPane(), "Pesquisas", "login1.png");
     private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
     private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditoria", "login1.png");
+    
+    private class UserPane
+            extends DefaultPane
+    {
+        @Override
+        protected void resize()
+        {
+        }
+
+        @Override
+        public void refreshContent()
+        {
+            UserUtilities.addUser();
+        }
+    }
+    
+    private class SurveyPane
+            extends DefaultPane
+    {
+        @Override
+        protected void resize()
+        {
+        }
+
+        @Override
+        public void refreshContent()
+        {
+            SurveyUtilities.addSurvey();
+        }
+    }
 }
