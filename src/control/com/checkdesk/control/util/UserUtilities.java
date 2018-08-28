@@ -11,6 +11,7 @@ import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.views.editors.UserEditor;
 import com.checkdesk.views.util.EditorCallback;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -50,6 +51,26 @@ public class UserUtilities
         }).show();
     }
 
+    public static void editUser(User user)
+    {
+        new UserEditor(new EditorCallback<User>(user)
+        {
+            @Override
+            public void handle(Event t)
+            {
+                try
+                {
+                    EntityService.getInstance().update(getSource());
+                }
+
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
+            }
+        }).show();
+    }
+    
     public static ObservableList<Item> getItems()
     {
         return FXCollections.observableArrayList(TYPE_SUPER, TYPE_ADMIN, TYPE_OPERATOR, TYPE_EXPLORER);
@@ -84,5 +105,22 @@ public class UserUtilities
                                                                  Parameter.COMPARATOR_EQUALS));
 
         return (User) EntityService.getInstance().getValue(User.class, parameters);
+    }
+    
+    public static List<User> getUsers()
+    {
+        List<User> result = new ArrayList<>();
+        
+        try
+        {
+            result = EntityService.getInstance().getValues(User.class);
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
+        return result;
     }
 }

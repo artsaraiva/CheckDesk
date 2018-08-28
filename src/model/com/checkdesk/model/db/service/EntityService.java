@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import javassist.Modifier;
+import org.hibernate.CacheMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -37,7 +38,19 @@ public class EntityService
         return defaultInstance;
     }
 
+    private static Session getSession() throws Exception
+    {
+        if (defaultSession == null)
+        {
+            defaultSession = HibernateUtil.getSessionFactory().openSession();
+            defaultSession.setCacheMode(CacheMode.IGNORE);
+        }
+        
+        return defaultSession;
+    }
+
     private static EntityService defaultInstance = null;
+    private static Session defaultSession = null;
 
     private EntityService() throws Exception
     {
@@ -48,17 +61,8 @@ public class EntityService
     {
         Session session = getSession();
 
-        try
-        {
-            session.beginTransaction();
-            Query q = session.createSQLQuery("select current_date");
-            q.uniqueResult();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        Query q = session.createSQLQuery("select current_date");
+        q.uniqueResult();
     }
 
     public void save(Serializable entity) throws Exception
@@ -67,19 +71,10 @@ public class EntityService
 
         Session session = getSession();
 
-        try
-        {
-            Transaction t = session.beginTransaction();
-
-            session.save(entity);
-
-            t.commit();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        Transaction t = session.beginTransaction();
+        
+        session.save(entity);
+        t.commit();
     }
 
     public void update(Serializable entity) throws Exception
@@ -88,18 +83,10 @@ public class EntityService
 
         Session session = getSession();
 
-        try
-        {
-            Transaction t = session.beginTransaction();
+        Transaction t = session.beginTransaction();
 
-            session.update(entity);
-
-            t.commit();
-        }
-        finally
-        {
-            session.close();
-        }
+        session.update(entity);
+        t.commit();
     }
 
     public void delete(Serializable entity) throws Exception
@@ -108,63 +95,67 @@ public class EntityService
 
         Session session = getSession();
 
-        try
-        {
-            Transaction t = session.beginTransaction();
+        Transaction t = session.beginTransaction();
 
-            session.delete(entity);
-
-            t.commit();
-        }
-        finally
-        {
-            session.close();
-        }
+        session.delete(entity);
+        t.commit();
     }
 
     public Object getValue(Class type, int id) throws Exception
     {
         Session session = getSession();
 
-        try
-        {
-            Query query = session.createQuery("from " + type.getName() + " where id = :id");
-
-            query.setParameter("id", id);
-
-            return query.uniqueResult();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        return session.get(type, id);
     }
 
     public Object getValue(Class type, Serializable value) throws Exception
     {
-        Session session = getSession();
-
         try
         {
-            return session.get(type, value);
+            Method getter = new PropertyDescriptor("id", value.getClass()).getReadMethod();
+            
+            if (getter != null)
+            {
+                value = (Integer) getter.invoke(value);
+            }
+        }
+        
+        catch (Exception e)
+        {
+            //NADA
         }
 
-        finally
-        {
-            session.close();
-        }
+        return getValue(type, (int) value);
     }
-
-    public Object loadValue(Class type, Serializable value) throws Exception
+    
+    private Object loadValue(Class type, Serializable value) throws Exception
     {
-        Session session = getSession();
+        Session session = HibernateUtil.getSessionFactory().openSession();
 
         try
         {
-            return session.byId(type).getReference(value);
-        }
+            try
+            {
+                value = (Integer) new PropertyDescriptor("id", value.getClass()).getReadMethod().invoke(value);
+            }
 
+            catch (Exception e) { /*NADA*/ }
+            
+            Object result = session.get(type, value);
+            
+            for (Field field : result.getClass().getDeclaredFields())
+            {
+                try
+                {
+                    new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result);
+                }
+                
+                catch (Exception e) { /*NADA*/ }
+            }
+            
+            return result;
+        }
+        
         finally
         {
             session.close();
@@ -174,16 +165,8 @@ public class EntityService
     public Object getValue(Class type, List<Parameter> parameters) throws Exception
     {
         Session session = getSession();
-
-        try
-        {
-            return composeQuery(session, type, parameters).uniqueResult();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        
+        return composeQuery(session, type, parameters).uniqueResult();
     }
 
     public List getValues(Class type) throws Exception
@@ -195,15 +178,7 @@ public class EntityService
     {
         Session session = getSession();
 
-        try
-        {
-            return (List) composeQuery(session, type, parameters).list();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        return (List) composeQuery(session, type, parameters).list();
     }
 
     public List getFieldValues(Field field, Class type) throws Exception
@@ -215,15 +190,7 @@ public class EntityService
     {
         Session session = getSession();
 
-        try
-        {
-            return (List) composeQuery(field, session, type, parameters).list();
-        }
-
-        finally
-        {
-            session.close();
-        }
+        return (List) composeQuery(field, session, type, parameters).list();
     }
 
     private Query composeQuery(Session session, Class type, List<Parameter> parameters) throws Exception
@@ -256,12 +223,8 @@ public class EntityService
     
     public void close() throws Exception
     {
+        getSession().close();
         HibernateUtil.getSessionFactory().close();
-    }
-
-    private Session getSession() throws Exception
-    {
-        return HibernateUtil.getSessionFactory().openSession();
     }
 
     private void logEvent(int event, Serializable entity) throws Exception
@@ -296,7 +259,7 @@ public class EntityService
 
         if (event == Log.EVENT_UPDATE)
         {
-            oldValue = (Serializable) getValue(entity.getClass(), entity);
+            oldValue = (Serializable) loadValue(entity.getClass(), entity);
             builder.append("    <td></td>")
                    .append("    <td>")
                    .append("        Novos Valores:")

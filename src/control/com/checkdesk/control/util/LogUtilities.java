@@ -148,26 +148,4 @@ public class LogUtilities
 
         return result;
     }
-    
-    public static String getUserLogin(Log log)
-    {
-        String result = "";
-        
-        try
-        {
-            User user = (User) EntityService.getInstance().loadValue(User.class, log.getUser().getId());
-            
-            if (user != null)
-            {
-                result = user.getLogin();
-            }
-        }
-        
-        catch (Exception e)
-        {
-            ApplicationController.logException(e);
-        }
-        
-        return result;
-    }
 }
