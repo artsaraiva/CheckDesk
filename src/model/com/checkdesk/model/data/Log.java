@@ -1,6 +1,8 @@
 package com.checkdesk.model.data;
 // Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1
 
+import com.checkdesk.control.util.LogUtilities;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -9,6 +11,11 @@ import java.util.Date;
 public class Log
         implements java.io.Serializable
 {
+    public static final int EVENT_ADD         = 0;
+    public static final int EVENT_UPDATE      = 1;
+    public static final int EVENT_DELETE      = 2;
+    public static final int EVENT_ACTIVE_LOGS = 3;
+    
     private int id;
     private Date timestamp;
     private User user;
@@ -99,5 +106,14 @@ public class Log
     public void setCommand(String command)
     {
         this.command = command;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return new StringBuilder().append(DateFormat.getDateInstance().format(timestamp)).append("|")
+                                  .append(user != null ? user.getLogin() : "").append("|")
+                                  .append(LogUtilities.getEvent(event)).append("|")
+                                  .append(objectClass).toString();
     }
 }

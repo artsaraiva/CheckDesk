@@ -10,7 +10,6 @@ import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.util.EditorButton;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Prompts;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -21,7 +20,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 
 /**

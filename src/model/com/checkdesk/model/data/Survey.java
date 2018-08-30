@@ -168,4 +168,10 @@ public class Survey
     {
         this.answers = answers;
     }
+    
+    @Override
+    public String toString()
+    {
+        return title;
+    }
 }

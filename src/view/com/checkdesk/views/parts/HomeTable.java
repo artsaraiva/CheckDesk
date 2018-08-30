@@ -32,7 +32,6 @@ import javafx.scene.layout.VBox;
 public class HomeTable
         extends VBox
 {
-
     public static final EventType SELECT = new EventType("onSelect");
 
     private String title;
@@ -81,6 +80,7 @@ public class HomeTable
         }
 
         updateTitle();
+        HBox.setHgrow(vbox, Priority.ALWAYS);
     }
 
     public void bindSelection(HomeTable table)
@@ -105,7 +105,7 @@ public class HomeTable
         {
             setSelected(item);
         });
-
+        
         return item;
     }
 
@@ -142,8 +142,6 @@ public class HomeTable
         if (title != null && !title.isEmpty())
         {
             titleLabel.setText(title);
-
-            //getVBoxChildren().add(0, titleLabel);
         }
     }
 
@@ -153,7 +151,6 @@ public class HomeTable
         scrollPane.getStyleClass().add("home-table-scroll");
         titleLabel.getStyleClass().add("home-table-title");
         
-        HBox.setHgrow(vbox, Priority.ALWAYS);
         titleLabel.prefWidthProperty().bind(widthProperty());
         scrollPane.setContent(vbox);
         getChildren().addAll(titleLabel, scrollPane);

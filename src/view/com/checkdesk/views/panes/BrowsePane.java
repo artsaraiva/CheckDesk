@@ -75,16 +75,9 @@ public class BrowsePane
         hbox.getChildren().setAll(buttons);
     }
 
-    public DefaultPane getSelectedPane()
+    public BrowseButton getSelectedButton()
     {
-        DefaultPane selected = null;
-
-        if (selectedButton != null)
-        {
-            selected = selectedButton.getPane();
-        }
-
-        return selected;
+        return selectedButton;
     }
 
     private void initComponents()

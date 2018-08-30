@@ -41,6 +41,11 @@ public class BrowseButton
     {
         return pane;
     }
+
+    public String getTitle()
+    {
+        return title;
+    }
     
     private void resize()
     {

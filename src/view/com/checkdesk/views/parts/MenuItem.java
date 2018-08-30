@@ -45,6 +45,11 @@ public class MenuItem
         return pane;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
     public void setSelected( boolean selected )
     {
         if ( selected )

@@ -5,9 +5,11 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.views.parts.NavigationItem;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 
 /**
  *
@@ -25,12 +27,33 @@ public class HeaderPane
     {
         return userPane.widthProperty();
     }
+    
+    public void refreshContent()
+    {
+        userPane.refreshContent();
+    }
+    
+    public void setNavigationItem(NavigationItem item)
+    {
+        navigationPane.setItem(item);
+    }
+    
+    public NavigationItem getNavigationItem()
+    {
+        return navigationPane.getItem();
+    }
 
     private void initComponents()
     {
-        getChildren().addAll(userPane);
+        setHgrow(navigationPane, Priority.ALWAYS);
+        getChildren().addAll(userPane, navigationPane);
+        
+        navigationPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
+        {
+            fireEvent(event);
+        });
     }
 
-    private VBox vbox = new VBox();
     private UserPane userPane = new UserPane();
+    private NavigationPane navigationPane = new NavigationPane();
 }

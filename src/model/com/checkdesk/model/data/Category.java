@@ -122,4 +122,10 @@ public class Category
     {
         this.children = children;
     }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
 }

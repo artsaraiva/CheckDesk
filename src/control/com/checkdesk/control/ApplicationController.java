@@ -5,8 +5,10 @@
  */
 package com.checkdesk.control;
 
+import com.checkdesk.control.util.LogUtilities;
+import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.UserService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -23,6 +25,7 @@ public class ApplicationController
 {
 
     private static ApplicationController defaultInstance;
+    private static boolean activeLog;
 
     public static ApplicationController getInstance()
     {
@@ -54,7 +57,7 @@ public class ApplicationController
             file = new File(file.getAbsolutePath() + File.separator + dateFormat.format(date) + ".txt");
 
             PrintWriter printWriter = new PrintWriter(new FileOutputStream(file, true));
-
+            
             try
             {
                 e.printStackTrace(printWriter);
@@ -68,7 +71,7 @@ public class ApplicationController
 
         catch (Exception ex)
         {
-            logException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -94,10 +97,31 @@ public class ApplicationController
         return value;
     }
 
+    public static boolean isActiveLog()
+    {
+        return activeLog;
+    }
+
+    public static void setActiveLog(boolean activeLog)
+    {
+        ApplicationController.activeLog = activeLog;
+        ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
+        
+        Log log = new Log(0,
+                          getInstance().activeUser,
+                          Log.EVENT_ACTIVE_LOGS,
+                          activeLog ? "Ativar" : "Desativar",
+                          "Auditoria",
+                          "A auditoria foi " + (activeLog ? "ativada" : "desativada"));
+        
+        LogUtilities.addLog(log);
+    }
+
     private User activeUser;
 
     private ApplicationController()
     {
+        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor");
     }
 
     public User getActiveUser()
@@ -109,7 +133,7 @@ public class ApplicationController
     {
         try
         {
-            activeUser = UserService.getInstance().login(login, hash(password));
+            activeUser = UserUtilities.login(login, hash(password));
         }
 
         catch (Exception e)

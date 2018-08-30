@@ -40,8 +40,9 @@ public class LoginView
     {
         try
         {
-            //First transaction
+            //Inicialization
             EntityService.getInstance();
+            ApplicationController.getInstance();
             launch(args);
         }
         catch (Exception e)

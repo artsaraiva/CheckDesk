@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 /**
  *
@@ -34,31 +35,34 @@ public class UserPane
         initComponents();
     }
 
-    private void updateUser()
+    public void refreshContent()
     {
         User activeUser = ApplicationController.getInstance().getActiveUser();
 
         perfilUser.setText(UserUtilities.getType(activeUser.getType()).getLabel());
         nameUser.setText(activeUser.getName());
         iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource("test_user")));
+
+        vbox.setMinWidth(iconUser.getFitWidth() +
+                         Math.max(new Text(perfilUser.getText()).getLayoutBounds().getWidth(),
+                                  new Text(nameUser.getText()).getLayoutBounds().getWidth()));
     }
-    
+
     private void initComponents()
     {
-        updateUser();
-        
-        perfilUser.getStyleClass().add("header-user-perfil");
-        nameUser.getStyleClass().add("header-user-name");
-        iconUser.setClip(new Circle(38, 38, 36, Paint.valueOf("#425FA4")));
-        
+        perfilUser.getStyleClass().add("user-perfil");
+        nameUser.getStyleClass().add("user-name");
+        iconUser.setClip(new Circle(40, 40, 40, Paint.valueOf("#425FA4")));
+        iconUser.setFitWidth(80);
+        iconUser.setFitHeight(80);
+
         vbox.getChildren().addAll(perfilUser, nameUser);
         vbox.setAlignment(Pos.CENTER_LEFT);
-        
+
         setBackground(new Background(new BackgroundFill(Paint.valueOf("#9834CA"), CornerRadii.EMPTY, Insets.EMPTY)));
         setSpacing(20);
         getStyleClass().add("menu-item");
-        setMinWidth( 250 );
-        
+
         getChildren().addAll(iconUser, vbox);
     }
 

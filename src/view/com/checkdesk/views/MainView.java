@@ -10,14 +10,14 @@ import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.panes.DefaultPane;
 import com.checkdesk.views.panes.HeaderPane;
-import com.checkdesk.views.panes.HomePane;
 import com.checkdesk.views.panes.MenuPane;
+import com.checkdesk.views.panes.NavigationPane;
+import com.checkdesk.views.parts.MenuItem;
+import com.checkdesk.views.parts.NavigationItem;
+import java.util.HashSet;
+import java.util.Set;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -30,8 +30,8 @@ import javafx.stage.WindowEvent;
 public class MainView
         extends Application
 {
-
     private Stage stage;
+    private Set<DefaultPane> panesCache = new HashSet<>();
 
     @Override
     public void start(Stage stage) throws Exception
@@ -50,6 +50,31 @@ public class MainView
         stage.setMaximized(true);
         stage.show();
     }
+    
+    private void selectMenuItem(MenuItem selected)
+    {
+        headerPane.setNavigationItem(new NavigationItem(selected.getPane(), selected.getName()));
+    }
+
+    private void setCenter(final DefaultPane pane)
+    {
+        if (pane != null)
+        {
+            if (!panesCache.contains(pane))
+            {
+                pane.addEventHandler(DefaultPane.Events.ON_CHANGE, (Event t) ->
+                {
+                    headerPane.setNavigationItem(pane.createNavigationItem(headerPane.getNavigationItem()));
+                });
+
+                panesCache.add(pane);
+            }
+
+            pane.refreshContent();
+        }
+        
+        borderPane.setCenter(pane);
+    }
 
     private void initComponents()
     {
@@ -58,16 +83,19 @@ public class MainView
 
         menuPane.prefWidthProperty().bind(headerPane.getUserPaneWidth());
 
+        borderPane.prefWidthProperty().bind(stage.widthProperty());
+        borderPane.prefHeightProperty().bind(stage.heightProperty());
+
+        headerPane.prefWidthProperty().bind(borderPane.widthProperty());
+
         menuPane.addEventHandler(MenuPane.Events.EVENT_SELECT, (Event event) ->
         {
-            DefaultPane selected = menuPane.getSelectedPane();
-
-            if (selected != null)
-            {
-                selected.refreshContent();
-            }
-
-            borderPane.setCenter(selected);
+            selectMenuItem(menuPane.getSelectedItem());
+        });
+        
+        headerPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
+        {
+            setCenter(headerPane.getNavigationItem() != null ? headerPane.getNavigationItem().getPane() : null);
         });
 
         stage.setOnCloseRequest((WindowEvent t) ->
@@ -83,11 +111,11 @@ public class MainView
         });
 
         menuPane.refreshContent();
+        headerPane.refreshContent();
     }
 
     private BorderPane borderPane = new BorderPane();
     private Scene scene = new Scene(borderPane);
     private MenuPane menuPane = new MenuPane();
     private HeaderPane headerPane = new HeaderPane();
-    private HomePane homePane = new HomePane();
 }

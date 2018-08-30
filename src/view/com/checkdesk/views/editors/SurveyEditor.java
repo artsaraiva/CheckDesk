@@ -14,7 +14,6 @@ import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.util.EditorCallback;
-import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -54,7 +53,7 @@ public class SurveyEditor
         titleField.setText(value.getTitle());
         createdField.setDate(value.getCreatedDate());
         typeField.setValue(SurveyUtilities.getType(value.getType()));
-        infoField.setHtmlText(value.getInfo());
+        infoField.setHtmlText(value.getInfo() != null ? value.getInfo() : "");
         
         participantsTable.setGroup(value.getParticipants());
         viewersTable.setGroup(value.getViewers());

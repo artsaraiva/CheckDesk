@@ -39,7 +39,7 @@ create table logs
     object_name  varchar(200) not null,
     object_class varchar(200) not null,
     command      text not null,
-    timestamp         timestamp not null,
+    timestamp    timestamp not null,
     ref_user     int not null,
 
     constraint pk_logs      primary key (id),

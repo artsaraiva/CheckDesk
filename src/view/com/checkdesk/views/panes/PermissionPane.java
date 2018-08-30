@@ -5,17 +5,13 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Permission;
+import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.PermissionDescription;
-import com.checkdesk.views.parts.PermissionTable;
 import java.util.Arrays;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
 /**
  *
@@ -41,8 +37,9 @@ public class PermissionPane
     @Override
     public void refreshContent()
     {
-        int selectedIndex = permissionList.getSelectionModel().getSelectedIndex();
-        permissionList.setPermissions(Arrays.asList(
+        int selectedIndex = permissionList.getSelectedIndex();
+        
+        permissionList.setItems(Arrays.asList(
                 new Permission(1, "Cadastrar pesquisas"),
                 new Permission(1, "Responder pesquisas"),
                 new Permission(1, "Editar pesquisas"),
@@ -51,23 +48,26 @@ public class PermissionPane
                 new Permission(1, "Cadastrar usuários"),
                 new Permission(1, "Excluir usuários")
         ));
-        permissionList.getSelectionModel().select(selectedIndex < 0 ? 0 : selectedIndex);
+        
+        permissionList.setSelectedIndex(selectedIndex < 0 ? 0 : selectedIndex);
     }
 
     private void initComponents()
     {
+        permissionList.setShowAddPane(false);
+        
         hbox.getChildren().addAll(permissionList, permissionDescription);
         
         getChildren().add(hbox);
 
-        permissionList.addEventHandler(PermissionTable.SELECT, (Event event) ->
+        permissionList.addEventHandler(DefaultTable.Events.ON_SELECT, (Event event) ->
         {
-            Permission selected = permissionList.getSelectedPermission();
+            Permission selected = permissionList.getSelectedItem();
             permissionDescription.setSource(selected);
         });
     }
 
     private HBox hbox = new HBox();
-    private PermissionTable permissionList = new PermissionTable("Permissões");
+    private DefaultTable<Permission> permissionList = new DefaultTable<Permission>();
     private PermissionDescription permissionDescription = new PermissionDescription();
 }
