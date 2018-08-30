@@ -102,7 +102,7 @@ public class DetailsTable
         
         if (labelWidth > 0)
         {
-            labelColumn.setPrefWidth(labelWidth);
+            labelColumn.setMinWidth(labelWidth);
         }
         
         valueColumn.setHgrow(Priority.ALWAYS);

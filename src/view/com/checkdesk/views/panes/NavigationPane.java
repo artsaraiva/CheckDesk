@@ -27,11 +27,13 @@ import javafx.scene.layout.HBox;
 public class NavigationPane
         extends ScrollPane
 {
+
     public static class Events
     {
+
         public static final EventType ON_SELECT = new EventType("onNavigationSelect");
     }
-    
+
     private static final String SEPARATOR_ICON = ResourceLocator.getInstance().getImageResource("ni_separator.png");
 
     private NavigationItem currentItem;
@@ -76,7 +78,11 @@ public class NavigationPane
 
         for (NavigationItem item : items)
         {
-            hbox.getChildren().addAll(item, new ImageView(new Image(SEPARATOR_ICON)));
+            ImageView imageView = new ImageView(new Image(SEPARATOR_ICON));
+            imageView.setFitHeight(24);
+            imageView.setFitWidth(24);
+
+            hbox.getChildren().addAll(item, imageView);
             item.setOnMouseClicked(new EventHandler<MouseEvent>()
             {
                 @Override
@@ -84,14 +90,14 @@ public class NavigationPane
                 {
                     fireEvent(new Event(Events.ON_SELECT));
                 }
-            } );
+            });
         }
 
         if (!hbox.getChildren().isEmpty())
         {
             hbox.getChildren().remove(hbox.getChildren().size() - 1);
         }
-        
+
         fireEvent(new Event(Events.ON_SELECT));
     }
 
@@ -106,10 +112,10 @@ public class NavigationPane
 
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER_LEFT);
-        
+
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);
-        
+
         setPannable(true);
         setContent(hbox);
 

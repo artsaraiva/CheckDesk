@@ -23,8 +23,15 @@ and open the template in the editor.
     font-size: 12px;
 }
 
+.details-html .log-command td
+{
+    white-space: nowrap;
+}
+
 .details-html .log-command th
 {
+    white-space: nowrap;
+    text-align: left;
     font-weight: bold;
     font-size: 16px;
 }

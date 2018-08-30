@@ -44,11 +44,11 @@ public class LogDetails
         {
             vbox.getChildren().addAll(
                 new DetailsCaption(source.toString()),
-                new DetailsTable().addItem("Ação", LogUtilities.getEvent(source.getEvent()))
-                                  .addItem("Data", source.getTimestamp())
-                                  .addItem("Usuário", source.getUser())
-                                  .addItem("Objeto", source.getObjectClass() + " - " + source.getObjectName())
-                                  .addItemHtml("Mudanças", source.getCommand()));
+                new DetailsTable(75).addItem("Ação", LogUtilities.getEvent(source.getEvent()))
+                                    .addItem("Data", source.getTimestamp())
+                                    .addItem("Usuário", source.getUser())
+                                    .addItem("Objeto", source.getObjectClass() + " - " + source.getObjectName())
+                                    .addItemHtml("Mudanças", source.getCommand()));
         }
     }
     
