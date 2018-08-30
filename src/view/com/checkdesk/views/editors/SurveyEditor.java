@@ -53,7 +53,7 @@ public class SurveyEditor
         titleField.setText(value.getTitle());
         createdField.setDate(value.getCreatedDate());
         typeField.setValue(SurveyUtilities.getType(value.getType()));
-        infoField.setHtmlText(value.getInfo());
+        infoField.setHtmlText(value.getInfo() != null ? value.getInfo() : "");
         
         participantsTable.setGroup(value.getParticipants());
         viewersTable.setGroup(value.getViewers());

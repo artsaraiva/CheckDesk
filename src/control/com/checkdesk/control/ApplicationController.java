@@ -5,7 +5,9 @@
  */
 package com.checkdesk.control;
 
+import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -91,6 +93,15 @@ public class ApplicationController
     {
         ApplicationController.activeLog = activeLog;
         ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
+        
+        Log log = new Log(0,
+                          getInstance().activeUser,
+                          Log.EVENT_ACTIVE_LOGS,
+                          activeLog ? "Ativar" : "Desativar",
+                          "Auditoria",
+                          "A auditoria foi " + (activeLog ? "ativada" : "desativada"));
+        
+        LogUtilities.addLog(log);
     }
 
     private User activeUser;

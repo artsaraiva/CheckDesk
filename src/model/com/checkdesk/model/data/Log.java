@@ -2,6 +2,7 @@ package com.checkdesk.model.data;
 // Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1
 
 import com.checkdesk.control.util.LogUtilities;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -110,9 +111,9 @@ public class Log
     @Override
     public String toString()
     {
-        return new StringBuilder().append(timestamp).append("|")
+        return new StringBuilder().append(DateFormat.getDateInstance().format(timestamp)).append("|")
                                   .append(user != null ? user.getLogin() : "").append("|")
                                   .append(LogUtilities.getEvent(event)).append("|")
-                                  .append(objectClass).append(": ").append(objectName).toString();
+                                  .append(objectClass).toString();
     }
 }

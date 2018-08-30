@@ -48,7 +48,6 @@ public class RegisterPane
     
     private void initComponents()
     {
-        getStylesheets().add(ResourceLocator.getInstance().getStyleResource("registerview.css"));
         browsePane.setButtons(userButton, formButton, permissionButton, logsButton);
         
         getChildren().add(browsePane);

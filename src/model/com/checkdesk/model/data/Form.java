@@ -97,4 +97,10 @@ public class Form
     {
         this.questions = questions;
     }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
 }

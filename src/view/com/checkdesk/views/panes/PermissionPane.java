@@ -54,7 +54,6 @@ public class PermissionPane
 
     private void initComponents()
     {
-        getStylesheets().add(ResourceLocator.getInstance().getStyleResource("registerview.css"));
         permissionList.setShowAddPane(false);
         
         hbox.getChildren().addAll(permissionList, permissionDescription);

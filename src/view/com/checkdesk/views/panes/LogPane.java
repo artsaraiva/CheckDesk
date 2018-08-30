@@ -9,6 +9,7 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.model.data.Log;
+import com.checkdesk.views.details.LogDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.util.Prompts;
@@ -45,7 +46,8 @@ public class LogPane
     @Override
     public void refreshContent()
     {
-//        detailsPane.setSelected(table.getSelectedItem());
+        table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
+        detailsPane.refreshContent();
     }
     
     private void initComponents()
@@ -73,6 +75,7 @@ public class LogPane
         filterOption.valueProperty().addListener((ObservableValue<? extends Item> ov, Item t, Item t1) ->
         {
             filterSelector.setItems(LogUtilities.filtersFor(t1));
+            table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
         });
         
         filterSelector.addEventHandler(ItemSelector.Events.ON_SELECT, (Event t) ->
@@ -82,7 +85,7 @@ public class LogPane
         
         table.addEventHandler(DefaultTable.Events.ON_SELECT, (Event t) ->
         {
-            refreshContent();
+            detailsPane.setSource(table.getSelectedItem());
         });
         
         checkbox.setOnAction((ActionEvent t) ->
@@ -97,6 +100,7 @@ public class LogPane
             {
                 checkbox.setSelected(!checkbox.isSelected());
                 ApplicationController.setActiveLog(checkbox.isSelected());
+                refreshContent();
             }
         });
     }
@@ -112,16 +116,5 @@ public class LogPane
     
     private VBox detailsBox = new VBox();
     private CheckBox checkbox = new CheckBox("Ativar/Desativar auditoria");
-    private DefaultPane detailsPane = new DefaultPane()
-    {
-        @Override
-        protected void resize()
-        {
-        }
-
-        @Override
-        public void refreshContent()
-        {
-        }
-    };
+    private LogDetails detailsPane = new LogDetails();
 }

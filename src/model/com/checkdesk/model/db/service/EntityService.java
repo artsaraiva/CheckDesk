@@ -147,7 +147,7 @@ public class EntityService
             {
                 try
                 {
-                    new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result);
+                    new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result).toString();
                 }
                 
                 catch (Exception e) { /*NADA*/ }
@@ -248,22 +248,22 @@ public class EntityService
         StringBuilder builder = new StringBuilder();
         Serializable oldValue = null;
 
-        builder.append("<table>")
+        builder.append("<table class=\"log-command\">")
                .append("    <tr>")
-               .append("        <td>")
+               .append("        <th>")
                .append("            Campo:")
-               .append("        </td>")
-               .append("        <td>")
+               .append("        </th>")
+               .append("        <th>")
                .append(             event == Log.EVENT_UPDATE ? "Valores Anteriores:" : "Valores:")
-               .append("        </td>");
+               .append("        </th>");
 
         if (event == Log.EVENT_UPDATE)
         {
             oldValue = (Serializable) loadValue(entity.getClass(), entity);
-            builder.append("    <td></td>")
-                   .append("    <td>")
+            builder.append("    <th> --> </th>")
+                   .append("    <th>")
                    .append("        Novos Valores:")
-                   .append("    </td>");
+                   .append("    </th>");
         }
 
         builder.append("    </tr>");

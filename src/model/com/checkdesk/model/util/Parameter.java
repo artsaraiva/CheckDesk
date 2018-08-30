@@ -6,6 +6,9 @@
 package com.checkdesk.model.util;
 
 import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -15,12 +18,15 @@ public class Parameter
 {
     public static final int COMPARATOR_EQUALS = 0;
     public static final int COMPARATOR_LOWER_CASE = 1;
-    
-    private final String key;
-    private final Field field;
-    private final Object value;
-    private final int comparator;
+    public static final int COMPARATOR_DATE = 2;
 
+    private  DateFormat df = DateFormat.getDateInstance();
+    
+    private String key;
+    private Field field;
+    private Object value;
+    private int comparator;
+    
     public Parameter(String key, Field field, Object value, int comparator) throws Exception
     {
         this.key = key;
@@ -41,24 +47,44 @@ public class Parameter
 
     public Object getValue()
     {
-        return value;
+        Object result = value;
+
+        switch (comparator)
+        {
+            case COMPARATOR_LOWER_CASE:
+                result = value.toString().toLowerCase();
+                break;
+
+            case COMPARATOR_DATE:
+                if (value instanceof Date)
+                {
+                    result = df.format((Date) value);
+                }
+                break;
+        }
+
+        return result;
     }
-    
+
     public String getCondition()
     {
         String result = null;
-        
+
         switch (comparator)
         {
             case COMPARATOR_EQUALS:
                 result = field.getName() + " = :" + key;
                 break;
-                
+
             case COMPARATOR_LOWER_CASE:
                 result = "lower(" + field.getName() + ") like :" + key;
                 break;
+
+            case COMPARATOR_DATE:
+                result = "to_char(" + field.getName() + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') = :" + key;
+                break;
         }
-        
+
         return result;
     }
 }

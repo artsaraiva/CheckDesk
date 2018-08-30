@@ -13,6 +13,7 @@ import com.checkdesk.model.util.Parameter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -33,6 +34,19 @@ public class LogUtilities
     private static final int OPTION_DATE   = 1;
     private static final int OPTION_ACTION = 2;
 
+    public static void addLog(Log log)
+    {
+        try
+        {
+            EntityService.getInstance().save(log);
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+    }
+    
     public static ObservableList<Item> getFilterOptions()
     {
         return FXCollections.observableArrayList(new Item("Usuário", OPTION_USER),
@@ -72,11 +86,26 @@ public class LogUtilities
 
     private static List<Date> getDateList()
     {
-        List objects = new ArrayList();
+        List<Date> objects = new ArrayList<>();
 
         try
         {
-            objects = EntityService.getInstance().getFieldValues(Log.class.getDeclaredField("timestamp"), Log.class);
+            List<Date> dates = EntityService.getInstance().getFieldValues(Log.class.getDeclaredField("timestamp"), Log.class);
+            
+            for (Date d : dates)
+            {
+                Calendar c = Calendar.getInstance();
+                c.setTime(d);
+                c.set(Calendar.HOUR, 0);
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MILLISECOND, 0);
+                
+                if (!objects.contains(c.getTime()))
+                {
+                    objects.add(c.getTime());
+                }
+            }
         }
 
         catch (Exception e)
@@ -84,7 +113,7 @@ public class LogUtilities
             ApplicationController.logException(e);
         }
 
-        return (List<Date>) objects;
+        return objects;
     }
 
     private static List<Item> getEventsList()
@@ -112,33 +141,36 @@ public class LogUtilities
     {
         List<Log> result = new ArrayList<>();
 
-        Field field = null;
+        List<Parameter> parameters = new ArrayList<>();
 
         try
         {
-            switch (item.getValue())
+            if (item != null && value != null)
             {
-                case OPTION_USER:
-                    field = Log.class.getDeclaredField("user");
-                    break;
+                Field field = null;
+                int comparator = Parameter.COMPARATOR_EQUALS;
+                
+                switch (item.getValue())
+                {
+                    case OPTION_USER:
+                        field = Log.class.getDeclaredField("user");
+                        break;
 
-                case OPTION_DATE:
-                    field = Log.class.getDeclaredField("timestamp");
-                    break;
+                    case OPTION_DATE:
+                        field = Log.class.getDeclaredField("timestamp");
+                        comparator = Parameter.COMPARATOR_DATE;
+                        break;
 
-                case OPTION_ACTION:
-                    field = Log.class.getDeclaredField("event");
-                    value = value instanceof Item ? ((Item) value).getValue() : value;
-                    break;
+                    case OPTION_ACTION:
+                        field = Log.class.getDeclaredField("event");
+                        value = value instanceof Item ? ((Item) value).getValue() : value;
+                        break;
+                }
+
+                parameters = Arrays.asList(new Parameter(field.getName(), field, value, comparator));
             }
-
-            if (field != null)
-            {
-                result = EntityService.getInstance().getValues(Log.class, Arrays.asList(new Parameter(field.getName(),
-                                                                                                      field,
-                                                                                                      value,
-                                                                                                      Parameter.COMPARATOR_EQUALS)));
-            }
+            
+            result = EntityService.getInstance().getValues(Log.class, parameters);
         }
 
         catch (Exception e)
@@ -146,6 +178,23 @@ public class LogUtilities
             ApplicationController.logException(e);
         }
 
+        return result;
+    }
+    
+    public static Log getLog(int logId)
+    {
+        Log result = null;
+        
+        try
+        {
+            result = (Log) EntityService.getInstance().getValue(Log.class, logId);
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
         return result;
     }
 }

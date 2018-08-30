@@ -6,7 +6,9 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.views.pickers.ItemPicker;
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import javafx.event.Event;
 import javafx.event.EventType;
@@ -27,6 +29,7 @@ public class ItemSelector<T>
         public static final EventType<Event> ON_SELECT = new EventType<Event>("onSelectorSelect");
     }
 
+    private DateFormat df = DateFormat.getDateInstance();
     private T selected;
 
     public ItemSelector()
@@ -63,7 +66,19 @@ public class ItemSelector<T>
     {
         this.selected = value;
 
-        setText(selected != null ? selected.toString() : "");
+        String string = "";
+        
+        if (selected != null)
+        {
+            string = selected.toString();
+            
+            if (selected instanceof Date)
+            {
+                string = df.format((Date) selected);
+            }
+        }
+        
+        setText(string);
         setFocused(false);
 
         if (fireEvent)
