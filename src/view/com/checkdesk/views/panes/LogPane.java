@@ -12,6 +12,7 @@ import com.checkdesk.model.data.Log;
 import com.checkdesk.views.details.LogDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.ItemSelector;
+import com.checkdesk.views.parts.NavigationItem;
 import com.checkdesk.views.util.Prompts;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -29,6 +30,8 @@ import javafx.scene.layout.VBox;
 public class LogPane
         extends DefaultPane
 {
+    private Object context;
+    
     public LogPane()
     {
         initComponents();
@@ -46,8 +49,36 @@ public class LogPane
     @Override
     public void refreshContent()
     {
+        if (context != null)
+        {
+            table.clearSelection();
+        }
+        
         table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
         detailsPane.refreshContent();
+    }
+
+    @Override
+    public void setContext(Object context)
+    {
+        if (context instanceof Log)
+        {
+            this.context = context;
+            detailsPane.setSource((Log) context);
+        }
+    }
+
+    @Override
+    public NavigationItem createNavigationItem(NavigationItem currentItem)
+    {
+        Log log = table.getSelectedItem();
+        
+        if (log != null)
+        {
+            return new NavigationItem(new LogPane(), log.toString(), log, currentItem);
+        }
+        
+        return super.createNavigationItem(currentItem);
     }
     
     private void initComponents()
@@ -85,7 +116,7 @@ public class LogPane
         
         table.addEventHandler(DefaultTable.Events.ON_SELECT, (Event t) ->
         {
-            detailsPane.setSource(table.getSelectedItem());
+            fireEvent(new Event(Events.ON_CHANGE));
         });
         
         checkbox.setOnAction((ActionEvent t) ->

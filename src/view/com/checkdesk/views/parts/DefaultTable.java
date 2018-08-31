@@ -173,27 +173,17 @@ public class DefaultTable<T>
         setTop(pane);
         setCenter(list);
 
-        pane.setOnMouseClicked(new EventHandler<MouseEvent>()
+        pane.setOnMouseClicked((MouseEvent t) ->
         {
-            @Override
-            public void handle(MouseEvent t)
+            if (t.getButton() == MouseButton.PRIMARY)
             {
-                if (t.getButton() == MouseButton.PRIMARY)
-                {
-                    fireEvent(new Event(Events.ON_ADD));
-                }
+                fireEvent(new Event(Events.ON_ADD));
             }
-
         });
 
-        list.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<T>()
+        list.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends T> ov, T t, T t1) ->
         {
-            @Override
-            public void changed(ObservableValue<? extends T> ov, T t, T t1)
-            {
-                fireEvent(new Event(Events.ON_SELECT));
-            }
-
+            fireEvent(new Event(Events.ON_SELECT));
         });
     }
 

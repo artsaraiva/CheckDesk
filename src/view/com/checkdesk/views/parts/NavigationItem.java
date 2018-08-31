@@ -18,16 +18,16 @@ public class NavigationItem
     private DefaultPane pane;
     private String label;
     private NavigationItem previousItem;
-    private Object source;
+    private Object context;
 
     public NavigationItem(DefaultPane pane, String label)
     {
         this(pane, label, null, null);
     }
 
-    public NavigationItem(DefaultPane pane, String label, Object source)
+    public NavigationItem(DefaultPane pane, String label, Object context)
     {
-        this(pane, label, source, null);
+        this(pane, label, context, null);
     }
 
     public NavigationItem(DefaultPane pane, String label, NavigationItem previousItem)
@@ -35,12 +35,12 @@ public class NavigationItem
         this(pane, label, null, previousItem);
     }
 
-    public NavigationItem(DefaultPane pane, String label, Object source, NavigationItem previousItem)
+    public NavigationItem(DefaultPane pane, String label, Object context, NavigationItem previousItem)
     {
         this.pane = pane;
         this.label = label.toUpperCase();
         this.previousItem = previousItem;
-        this.source = source;
+        this.context = context;
         
         initComponents();
     }
@@ -60,9 +60,9 @@ public class NavigationItem
         this.previousItem = previousItem;
     }
 
-    public Object getSource()
+    public Object getContext()
     {
-        return source;
+        return context;
     }
     
     private void initComponents()

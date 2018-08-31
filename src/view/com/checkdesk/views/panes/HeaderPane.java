@@ -50,7 +50,7 @@ public class HeaderPane
         
         navigationPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
         {
-            fireEvent(event);
+//            fireEvent(event);
         });
     }
 

@@ -7,9 +7,9 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.views.parts.MenuItem;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -71,10 +71,9 @@ public class MenuPane
 
         for (MenuItem menuItem : menuItems)
         {
-            menuItem.setOnMouseClicked(new EventHandler<MouseEvent>()
+            menuItem.setOnMouseClicked((MouseEvent event) ->
             {
-                @Override
-                public void handle(MouseEvent event)
+                if (event.getButton() == MouseButton.PRIMARY)
                 {
                     selectMenuItem(menuItem);
                 }
@@ -88,7 +87,20 @@ public class MenuPane
     {
         new MenuItem(new HomePane(), "mp_home", "HOME"),
         new MenuItem(null, "mp_survey", "PESQUISAS"),
-        new MenuItem(null, "mp_analysis", "ANÁLISES"),
+        new MenuItem(new DefaultPane()
+        {
+            @Override
+            protected void resize()
+            {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void refreshContent()
+            {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        }, "mp_analysis", "ANÁLISES"),
         new MenuItem(new RegisterPane(), "mp_config", "CONFIGURAÇÕES")
     };
 }

@@ -5,12 +5,11 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.BrowseButton;
-import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.parts.NavigationItem;
 import com.checkdesk.views.pickers.ItemPicker;
 import javafx.event.Event;
@@ -43,7 +42,24 @@ public class RegisterPane
     @Override
     public NavigationItem createNavigationItem(NavigationItem currentItem)
     {
-        return new NavigationItem(browsePane.getSelectedButton().getPane(), browsePane.getSelectedButton().getTitle(), currentItem);
+        BrowseButton button = browsePane.getSelectedButton();
+        
+        if (button != null && button.getPane() != null)
+        {
+            try
+            {
+                DefaultPane pane = (DefaultPane) button.getPane().newInstance();
+
+                return new NavigationItem(pane, browsePane.getSelectedButton().getTitle(), currentItem);
+            }
+            
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        }
+        
+        return null;
     }
     
     private void initComponents()
@@ -59,10 +75,10 @@ public class RegisterPane
     }
 
     private BrowsePane browsePane = new BrowsePane();
-    private BrowseButton userButton = new BrowseButton(new UserPane(), "Usuario", "login1.png");
-    private BrowseButton formButton = new BrowseButton(new SurveyPane(), "Pesquisas", "login1.png");
-    private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
-    private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditoria", "login1.png");
+    private BrowseButton userButton = new BrowseButton(UserPane.class, "Usuario", "login1.png");
+    private BrowseButton formButton = new BrowseButton(SurveyPane.class, "Pesquisas", "login1.png");
+    private BrowseButton permissionButton = new BrowseButton(PermissionPane.class, "Permissões", "login1.png");
+    private BrowseButton logsButton = new BrowseButton(LogPane.class, "Auditoria", "login1.png");
     
     private class UserPane
             extends DefaultPane

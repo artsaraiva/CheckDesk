@@ -14,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -40,13 +43,26 @@ public class ApplicationController
         try
         {
             e.printStackTrace();
-            File file = new File("C:\\Users\\arthu\\Desktop\\testeLog\\teste.txt");
-            file.getParentFile().mkdirs();
-            
-            PrintWriter printWriter = new PrintWriter(file);
-            
+
+            File file = new File("config" + File.separator + "logs");
+
+            if (!file.exists() || !file.isDirectory())
+            {
+                file.mkdirs();
+            }
+
+            Date date = new Date();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+            file = new File(file.getAbsolutePath() + File.separator + dateFormat.format(date) + ".txt");
+
+            PrintWriter printWriter = new PrintWriter(new FileOutputStream(file, true));
+
             try
             {
+                printWriter.write(DateFormat.getDateTimeInstance().format(date) + "|" +
+                                  getInstance().getActiveUser().getLogin() + "|");
                 e.printStackTrace(printWriter);
             }
 
@@ -93,14 +109,14 @@ public class ApplicationController
     {
         ApplicationController.activeLog = activeLog;
         ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
-        
+
         Log log = new Log(0,
                           getInstance().activeUser,
                           Log.EVENT_ACTIVE_LOGS,
                           activeLog ? "Ativar" : "Desativar",
                           "Auditoria",
                           "A auditoria foi " + (activeLog ? "ativada" : "desativada"));
-        
+
         LogUtilities.addLog(log);
     }
 
