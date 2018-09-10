@@ -5,14 +5,9 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.control.util.SurveyUtilities;
-import com.checkdesk.control.util.UserUtilities;
-import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.BrowseButton;
-import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.parts.NavigationItem;
-import com.checkdesk.views.pickers.ItemPicker;
 import javafx.event.Event;
 
 /**
@@ -63,29 +58,6 @@ public class RegisterPane
     private BrowseButton formButton = new BrowseButton(new SurveyPane(), "Pesquisas", "login1.png");
     private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
     private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditoria", "login1.png");
-    
-    private class UserPane
-            extends DefaultPane
-    {
-        @Override
-        protected void resize()
-        {
-        }
-
-        @Override
-        public void refreshContent()
-        {
-            picker.setItems(UserUtilities.getUsers());
-            picker.open("Selecione um Usuário");
-            
-            if (picker.getSelected() != null)
-            {
-                UserUtilities.editUser(picker.getSelected());
-            }
-        }
-        
-        private ItemPicker<User> picker = new ItemPicker<>();
-    }
     
     private class SurveyPane
             extends DefaultPane

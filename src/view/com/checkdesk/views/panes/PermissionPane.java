@@ -5,7 +5,6 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.Permission;
 import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.PermissionDescription;

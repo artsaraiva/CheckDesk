@@ -34,6 +34,7 @@ import javafx.util.Callback;
 /**
  *
  * @author MNicaretta
+ * @param <T>
  */
 public class DefaultTable<T>
         extends BorderPane

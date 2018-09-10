@@ -6,11 +6,7 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.model.data.Permission;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 

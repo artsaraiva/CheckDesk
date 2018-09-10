@@ -54,6 +54,6 @@ public class HeaderPane
         });
     }
 
-    private UserPane userPane = new UserPane();
+    private LoggedUserPane userPane = new LoggedUserPane();
     private NavigationPane navigationPane = new NavigationPane();
 }

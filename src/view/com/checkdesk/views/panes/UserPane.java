@@ -5,69 +5,97 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.control.ApplicationController;
-import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
+import com.checkdesk.views.parts.DefaultTable;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.control.MenuItem;
 
 /**
  *
  * @author arthu
  */
 public class UserPane
-        extends HBox
+        extends DefaultPane
 {
+
     public UserPane()
     {
         initComponents();
     }
 
+    @Override
+    protected void resize()
+    {
+        userTable.setPrefHeight(getHeight());
+        userTable.setPrefWidth(getWidth());
+    }
+
+    @Override
     public void refreshContent()
     {
-        User activeUser = ApplicationController.getInstance().getActiveUser();
+        userTable.setItems(UserUtilities.getUsers());
+    }
 
-        perfilUser.setText(UserUtilities.getType(activeUser.getType()).getLabel());
-        nameUser.setText(activeUser.getName());
-        iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource("test_user")));
+    private void removeSelected()
+    {
+        UserUtilities.deleteUser(userTable.getSelectedItem());
+        refreshContent();
+    }
 
-        vbox.setMinWidth(iconUser.getFitWidth() +
-                         Math.max(new Text(perfilUser.getText()).getLayoutBounds().getWidth(),
-                                  new Text(nameUser.getText()).getLayoutBounds().getWidth()));
+    private void editSelected()
+    {
+        UserUtilities.editUser(userTable.getSelectedItem());
+        refreshContent();
+    }
+
+    private void addUser()
+    {
+        UserUtilities.addUser();
+        refreshContent();
     }
 
     private void initComponents()
     {
-        perfilUser.getStyleClass().add("user-perfil");
-        nameUser.getStyleClass().add("user-name");
-        iconUser.setClip(new Circle(40, 40, 40, Paint.valueOf("#425FA4")));
-        iconUser.setFitWidth(80);
-        iconUser.setFitHeight(80);
+        userTable.setActions(new MenuItem[]
+        {
+            edit, delete
+        });
+        getChildren().add(userTable);
 
-        vbox.getChildren().addAll(perfilUser, nameUser);
-        vbox.setAlignment(Pos.CENTER_LEFT);
-
-        setBackground(new Background(new BackgroundFill(Paint.valueOf("#9834CA"), CornerRadii.EMPTY, Insets.EMPTY)));
-        setSpacing(20);
-        getStyleClass().add("menu-item");
-
-        getChildren().addAll(iconUser, vbox);
+        userTable.addEventHandler(DefaultTable.Events.ON_ADD, new EventHandler()
+        {
+            @Override
+            public void handle(Event event)
+            {
+                addUser();
+            }
+        });
     }
 
-    private VBox vbox = new VBox();
-    private Label perfilUser = new Label();
-    private Label nameUser = new Label();
-    private ImageView iconUser = new ImageView();
+    private DefaultTable<User> userTable = new DefaultTable();
+
+    private MenuItem edit = new MenuItem("Editar");
+    private MenuItem delete = new MenuItem("Excluir");
+    {
+        delete.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                removeSelected();
+            }
+        });
+
+        edit.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                editSelected();
+            }
+        });
+    }
 }
