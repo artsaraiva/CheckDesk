@@ -10,6 +10,14 @@ import java.util.Set;
 public class Question
         implements java.io.Serializable
 {
+    public static final int TYPE_CATEGORY      = 0;
+    public static final int TYPE_SMALL_TEXT    = 1;
+    public static final int TYPE_LARGE_TEXT    = 2;
+    public static final int TYPE_SINGLE_CHOICE = 3;
+    public static final int TYPE_MULTI_CHOICE  = 4;
+    public static final int TYPE_DATE          = 5;
+    public static final int TYPE_NUMBER        = 6;
+    
     private int id;
     private Form form;
     private Option option;
@@ -20,6 +28,11 @@ public class Question
 
     public Question()
     {
+    }
+
+    public Question(Form form)
+    {
+        this.form = form;
     }
 
     public Question(int id, Form form, String name, int type, String constraints)
@@ -110,5 +123,11 @@ public class Question
     public void setQuestionAnswers(Set questionAnswers)
     {
         this.questionAnswers = questionAnswers;
+    }
+
+    @Override
+    public String toString()
+    {
+        return name;
     }
 }

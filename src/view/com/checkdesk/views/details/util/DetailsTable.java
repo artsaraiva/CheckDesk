@@ -92,6 +92,21 @@ public class DetailsTable
         result.getEngine().setUserStyleSheetLocation(ResourceLocator.getInstance().getStyleResource("details.css"));
         result.getEngine().loadContent("<body class=\"details-html\" contenteditable=\"false\">" + value + "</body>");
         
+        result.setPrefHeight(-1);
+        
+        //calc height
+        result.getEngine().documentProperty().addListener((obj, prev, newv) ->
+        {
+            String heightText = result.getEngine().executeScript(
+                    "var body = document.body," +
+                    "    html = document.documentElement;" +
+                    "Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);"
+            ).toString();
+
+            Double height = Double.parseDouble(heightText.replace("px", "")) + 15;
+            result.setPrefHeight(height);
+        });
+        
         return result;
     }
 

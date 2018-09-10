@@ -54,23 +54,8 @@ public class RegisterPane
     }
 
     private BrowsePane browsePane = new BrowsePane();
-    private BrowseButton userButton = new BrowseButton(new UserPane(), "Usuario", "login1.png");
-    private BrowseButton formButton = new BrowseButton(new SurveyPane(), "Pesquisas", "login1.png");
+    private BrowseButton userButton = new BrowseButton(new UserPane(), "Usuários", "login1.png");
+    private BrowseButton formButton = new BrowseButton(new FormPane(), "Formulários", "login1.png");
     private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
-    private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditoria", "login1.png");
-    
-    private class SurveyPane
-            extends DefaultPane
-    {
-        @Override
-        protected void resize()
-        {
-        }
-
-        @Override
-        public void refreshContent()
-        {
-            SurveyUtilities.addSurvey();
-        }
-    }
+    private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditorias", "login1.png");
 }

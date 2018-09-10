@@ -97,7 +97,7 @@ public class EntityService
 
         Transaction t = session.beginTransaction();
 
-        session.delete(entity);
+        session.delete(getValue(entity.getClass(), entity));
         t.commit();
     }
 
@@ -128,7 +128,7 @@ public class EntityService
         return getValue(type, (int) value);
     }
     
-    private Object loadValue(Class type, Serializable value) throws Exception
+    public Object loadValue(Class type, Serializable value) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -191,6 +191,36 @@ public class EntityService
         Session session = getSession();
 
         return (List) composeQuery(field, session, type, parameters).list();
+    }
+    
+    public List loadValues(Class type, List<Parameter> parameters) throws Exception
+    {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+
+        try
+        {
+            List result = (List) composeQuery(session, type, parameters).list();
+            
+            for (Object o : result)
+            {
+                for (Field field : o.getClass().getDeclaredFields())
+                {
+                    try
+                    {
+                        new PropertyDescriptor(field.getName(), o.getClass()).getReadMethod().invoke(o).toString();
+                    }
+
+                    catch (Exception e) { /*NADA*/ }
+                }
+            }
+            
+            return result;
+        }
+        
+        finally
+        {
+            session.close();
+        }
     }
 
     private Query composeQuery(Session session, Class type, List<Parameter> parameters) throws Exception

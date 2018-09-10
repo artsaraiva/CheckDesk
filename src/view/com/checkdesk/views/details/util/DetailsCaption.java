@@ -37,9 +37,9 @@ public class DetailsCaption
     
     private void initComponents()
     {
+        getStyleClass().add("details-title");
         titleLabel.setText(title);
         
-        titleLabel.getStyleClass().add("details-title");
         setHgrow(this, Priority.ALWAYS);
         setHgrow(titleLabel, Priority.ALWAYS);
         
