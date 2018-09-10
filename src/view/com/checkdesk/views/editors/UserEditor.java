@@ -26,7 +26,6 @@ import javafx.scene.layout.Priority;
 public class UserEditor
         extends DefaultEditor<User>
 {
-
     public UserEditor(EditorCallback<User> callback)
     {
         super(callback);

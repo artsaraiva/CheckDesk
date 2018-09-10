@@ -119,6 +119,7 @@ public class DefaultTable<T>
 
     public void setItems(List<T> items)
     {
+        list.setItems(FXCollections.observableArrayList());
         list.setItems(FXCollections.observableArrayList(items));
     }
     
