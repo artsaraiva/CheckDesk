@@ -57,7 +57,15 @@ public class UserEditor
         source.setLogin(loginField.getText());
         source.setEmail(emailField.getText());
         source.setPhone(phoneField.getText());
-        source.setPassword(ApplicationController.hash(passwordField.getText()));
+        
+        String password = passwordField.getText();
+        
+        if (!password.equals(source.getPassword()))
+        {
+            password = ApplicationController.hash(password);
+        }
+        
+        source.setPassword(password);
         source.setType(typeField.getValue().getValue());
     }
 

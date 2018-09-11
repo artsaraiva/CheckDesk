@@ -114,6 +114,6 @@ public class Log
         return new StringBuilder().append(DateFormat.getDateInstance().format(timestamp)).append("|")
                                   .append(user != null ? user.getLogin() : "").append("|")
                                   .append(LogUtilities.getEvent(event)).append("|")
-                                  .append(objectClass).toString();
+                                  .append(objectClass.substring(objectClass.lastIndexOf(".") + 1)).toString();
     }
 }

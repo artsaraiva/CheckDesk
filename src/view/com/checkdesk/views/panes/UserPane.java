@@ -7,11 +7,14 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
+import com.checkdesk.views.details.DetailsPane;
+import com.checkdesk.views.details.UserDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.HBox;
 
 /**
  *
@@ -30,7 +33,9 @@ public class UserPane
     protected void resize()
     {
         userTable.setPrefHeight(getHeight());
-        userTable.setPrefWidth(getWidth());
+        userTable.setPrefWidth(getWidth() / 3);
+        userDetails.setPrefHeight(getHeight());
+        userDetails.setPrefWidth(getWidth() * 2 / 3);
     }
 
     @Override
@@ -63,22 +68,30 @@ public class UserPane
         {
             edit, delete
         });
-        getChildren().add(userTable);
 
-        userTable.addEventHandler(DefaultTable.Events.ON_ADD, new EventHandler()
+        hbox.getChildren().addAll(userTable, userDetails);
+
+        getChildren().add(hbox);
+
+        userTable.addEventHandler(DefaultTable.Events.ON_ADD, (Event event) ->
         {
-            @Override
-            public void handle(Event event)
-            {
-                addUser();
-            }
+            addUser();
+        });
+
+        userTable.addEventHandler(DefaultTable.Events.ON_SELECT, (Event event) ->
+        {
+            userDetails.setSource(userTable.getSelectedItem());
         });
     }
 
+    private HBox hbox = new HBox();
     private DefaultTable<User> userTable = new DefaultTable();
+    private UserDetails userDetails = new UserDetails();
 
     private MenuItem edit = new MenuItem("Editar");
     private MenuItem delete = new MenuItem("Excluir");
+
+    
     {
         delete.setOnAction(new EventHandler<ActionEvent>()
         {

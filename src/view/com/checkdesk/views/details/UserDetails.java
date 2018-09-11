@@ -5,27 +5,23 @@
  */
 package com.checkdesk.views.details;
 
-import com.checkdesk.control.util.FormUtilities;
-import com.checkdesk.model.data.Form;
-import com.checkdesk.model.data.Question;
+import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.User;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
-import com.checkdesk.views.details.util.Table;
-import java.util.Set;
 import javafx.scene.Node;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
  *
- * @author MNicaretta
+ * @author arthu
  */
-public class FormDetails
-        extends DetailsPane<Form>
+public class UserDetails
+        extends DetailsPane<User>
 {
 
-    public FormDetails()
+    public UserDetails()
     {
         initComponents();
     }
@@ -33,7 +29,7 @@ public class FormDetails
     @Override
     public void setSource(int sourceId)
     {
-        setSource(FormUtilities.getValue(sourceId));
+        setSource(UserUtilities.getUser(sourceId));
     }
 
     @Override
@@ -59,24 +55,17 @@ public class FormDetails
         {
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
-                    new DetailsTable(75).addItemHtml("Informações", source.getInfo()));
-
-            Table table = new Table("Pergunta", "Tipo", "Opções");
-
-            for (Question question : (Set<Question>) source.getQuestions())
-            {
-                table.addRow(question.getName(),
-                        FormUtilities.getQuestionType(question.getType()),
-                        question.getOption());
-            }
-
-            vbox.getChildren().add(table);
+                    new DetailsTable(75).addItem("Login", source.getLogin())
+                            .addItem("E-mail", source.getEmail())
+                            .addItem("Telefone", source.getPhone())
+                            .addItem("Tipo", UserUtilities.getType(source.getType())));
         }
     }
 
     private void initComponents()
     {
         getChildren().add(vbox);
+
     }
 
     private VBox vbox = new VBox();

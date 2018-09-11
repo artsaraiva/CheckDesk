@@ -120,8 +120,10 @@ public class DefaultTable<T>
 
     public void setItems(List<T> items)
     {
+        T selected = getSelectedItem();
         list.setItems(FXCollections.observableArrayList());
         list.setItems(FXCollections.observableArrayList(items));
+        setSelectedItem(selected);
     }
     
      public List<T> getItems()

@@ -8,6 +8,8 @@ package com.checkdesk.views.details.util;
 import com.checkdesk.control.ResourceLocator;
 import java.text.DateFormat;
 import java.util.Date;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
@@ -123,5 +125,10 @@ public class DetailsTable
         valueColumn.setHgrow(Priority.ALWAYS);
         
         getColumnConstraints().addAll(labelColumn, valueColumn);
+        
+        widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
+        {
+            valueColumn.setMaxWidth(getWidth() - labelWidth);
+        });
     }
 }

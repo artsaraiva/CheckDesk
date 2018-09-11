@@ -37,8 +37,8 @@ public class LogPane
     @Override
     protected void resize()
     {
-        selectionBox.setPrefWidth(getWidth() / 3);
-        detailsBox.setPrefWidth(getWidth() * 2 / 3);
+        selectionBox.setPrefWidth(getWidth() / 4);
+        detailsBox.setMinWidth(getWidth() * 3 / 4);
         selectionBox.setPrefHeight(getHeight());
         detailsBox.setPrefHeight(getHeight());
     }
@@ -62,8 +62,6 @@ public class LogPane
         
         filterBox.getChildren().addAll(filterOption, filterSelector);
         selectionBox.getChildren().addAll(filterBox, table);
-        
-        selectionBox.setMinWidth(450);
         
         detailsBox.getChildren().addAll(checkbox, detailsPane);
         

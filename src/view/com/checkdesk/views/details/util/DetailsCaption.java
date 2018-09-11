@@ -6,6 +6,7 @@
 package com.checkdesk.views.details.util;
 
 import com.checkdesk.control.ResourceLocator;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -50,6 +51,18 @@ public class DetailsCaption
             iconView.setImage(new Image(ResourceLocator.getInstance().getImageResource(icon)));
             getChildren().add(iconView);
         }
+        
+        widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
+        {
+            double labelWidth = getWidth();
+            
+            if (icon != null)
+            {
+                labelWidth -= iconView.getFitWidth();
+            }
+            
+            titleLabel.setMaxWidth(labelWidth);
+        });
     }
     
     private Label titleLabel = new Label();

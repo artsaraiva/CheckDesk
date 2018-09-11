@@ -68,18 +68,18 @@ and open the template in the editor.
 
 .add-pane
 {
-    -fx-border-color: #BDBDBD;
+    -fx-border-color: #8A8A8A;
     -fx-border-style: dashed;
     -fx-border-width: 5;
     -fx-background-color: #FFFFFF;
     -fx-alignment: center;
-    -fx-padding: 10, 30, 10, 30;
+    -fx-padding: 10 30 10 30;
     -fx-cursor: hand;
 }
 
 .add-pane .label
 {
-    -fx-text-fill: #BDBDBD;
+    -fx-text-fill: #8A8A8A;
     -fx-font-size: 14;
     -fx-font-weight: bold;
 }

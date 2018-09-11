@@ -9,6 +9,8 @@ import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
+import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
@@ -33,6 +35,14 @@ public class LogDetails
     protected void resize()
     {
         vbox.setPrefSize(getWidth(), getHeight());
+        
+        for (Node node : vbox.getChildren())
+        {
+            if (node instanceof Region)
+            {
+                ((Region) node).setMaxWidth(getWidth());
+            }
+        }
     }
 
     @Override

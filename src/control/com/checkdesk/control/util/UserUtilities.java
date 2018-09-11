@@ -93,6 +93,22 @@ public class UserUtilities
     {
         return FXCollections.observableArrayList(TYPE_SUPER, TYPE_ADMIN, TYPE_OPERATOR, TYPE_EXPLORER);
     }
+    
+    public static User getUser(int id)
+    {
+        User user = null;
+        
+        try
+        {
+            user = (User) EntityService.getInstance().getValue(User.class, id);
+        }
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
+        return user;
+    }
 
     public static Item getType(int type)
     {
