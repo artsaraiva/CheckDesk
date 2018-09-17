@@ -30,12 +30,14 @@ public class MenuItem
     private DefaultPane pane;
     private String icon;
     private String name;
+    private String role;
 
-    public MenuItem( DefaultPane pane, String icon, String name )
+    public MenuItem( DefaultPane pane, String icon, String name, String role )
     {
         this.pane = pane;
         this.icon = icon;
         this.name = name;
+        this.role = role;
 
         initComponents();
     }
@@ -48,6 +50,11 @@ public class MenuItem
     public String getName()
     {
         return name;
+    }
+    
+     public String getRole()
+    {
+        return role;
     }
 
     public void setSelected( boolean selected )

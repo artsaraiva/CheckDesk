@@ -5,6 +5,8 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.views.details.FormDetails;
@@ -31,6 +33,7 @@ import javafx.scene.layout.VBox;
 public class FormPane
         extends DefaultPane
 {
+
     private List<Form> items = new ArrayList<>();
 
     public FormPane()
@@ -64,8 +67,11 @@ public class FormPane
 
         HBox.setHgrow(filterField, Priority.ALWAYS);
         VBox.setVgrow(table, Priority.ALWAYS);
-        
-        table.setActions(new MenuItem[]{editItem, deleteItem});
+
+        table.setActions(new MenuItem[]
+        {
+            editItem, deleteItem
+        });
         selectionBox.getChildren().addAll(filterBox, table);
 
         selectionBox.setMinWidth(450);
@@ -100,6 +106,9 @@ public class FormPane
 
             table.setItems(filterList);
         });
+
+        table.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "add.survey"));
     }
 
     private HBox hbox = new HBox();
@@ -112,16 +121,25 @@ public class FormPane
     private DefaultTable<Form> table = new DefaultTable<>();
 
     private FormDetails detailsPane = new FormDetails();
-    
+
     private MenuItem editItem = new MenuItem("Editar");
     private MenuItem deleteItem = new MenuItem("Excluir");
+
+    
     {
+
+        editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "edit.survey"));
+
+        deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "delete.survey"));
+
         editItem.setOnAction((ActionEvent t) ->
         {
             FormUtilities.editForm(table.getSelectedItem());
             refreshContent();
         });
-        
+
         deleteItem.setOnAction((ActionEvent t) ->
         {
             FormUtilities.deleteForm(table.getSelectedItem());

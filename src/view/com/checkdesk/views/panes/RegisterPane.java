@@ -5,8 +5,11 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.views.parts.BrowseButton;
+import com.checkdesk.views.parts.MenuItem;
 import com.checkdesk.views.parts.NavigationItem;
 import javafx.event.Event;
 
@@ -17,6 +20,7 @@ import javafx.event.Event;
 public class RegisterPane
         extends DefaultPane
 {
+
     public RegisterPane()
     {
         initComponents();
@@ -40,13 +44,24 @@ public class RegisterPane
     {
         return new NavigationItem(browsePane.getSelectedButton().getPane(), browsePane.getSelectedButton().getTitle(), currentItem);
     }
-    
+
     private void initComponents()
     {
-        browsePane.setButtons(userButton, formButton, permissionButton, logsButton);
-        
+        for (BrowseButton button : buttons)
+        {
+            boolean p = false;
+            if (!button.getRole().isEmpty())
+            {
+                p = !PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), button.getRole());
+                button.getStyleClass().add("navigation-pane-button");
+            }
+            button.setDisable(p);
+        }
+
+        browsePane.setButtons(buttons);
+
         getChildren().add(browsePane);
-        
+
         browsePane.addEventHandler(BrowsePane.Events.ON_SELECT, (Event event) ->
         {
             fireEvent(new Event(Events.ON_CHANGE));
@@ -54,8 +69,11 @@ public class RegisterPane
     }
 
     private BrowsePane browsePane = new BrowsePane();
-    private BrowseButton userButton = new BrowseButton(new UserPane(), "Usuários", "login1.png");
-    private BrowseButton formButton = new BrowseButton(new FormPane(), "Formulários", "login1.png");
-    private BrowseButton permissionButton = new BrowseButton(new PermissionPane(), "Permissões", "login1.png");
-    private BrowseButton logsButton = new BrowseButton(new LogPane(), "Auditorias", "login1.png");
+    private BrowseButton[] buttons = new BrowseButton[]
+    {
+        new BrowseButton(new UserPane(), "Usuários", "login1.png", "view.users"),
+        new BrowseButton(new FormPane(), "Formulários", "login1.png", "view.forms"),
+        new BrowseButton(new PermissionPane(), "Permissões", "login1.png", "view.permissions"),
+        new BrowseButton(new LogPane(), "Auditorias", "login1.png", "view.logs")
+    };
 }

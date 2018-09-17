@@ -28,6 +28,7 @@ import org.hibernate.Transaction;
  */
 public class EntityService
 {
+
     public static EntityService getInstance() throws Exception
     {
         if (defaultInstance == null)
@@ -45,7 +46,7 @@ public class EntityService
             defaultSession = HibernateUtil.getSessionFactory().openSession();
             defaultSession.setCacheMode(CacheMode.IGNORE);
         }
-        
+
         return defaultSession;
     }
 
@@ -72,7 +73,7 @@ public class EntityService
         Session session = getSession();
 
         Transaction t = session.beginTransaction();
-        
+
         session.save(entity);
         t.commit();
     }
@@ -113,13 +114,13 @@ public class EntityService
         try
         {
             Method getter = new PropertyDescriptor("id", value.getClass()).getReadMethod();
-            
+
             if (getter != null)
             {
                 value = (Integer) getter.invoke(value);
             }
         }
-        
+
         catch (Exception e)
         {
             //NADA
@@ -127,7 +128,14 @@ public class EntityService
 
         return getValue(type, (int) value);
     }
-    
+
+    public Object getValue(String sql) throws Exception
+    {
+        Session session = getSession();
+
+        return session.createSQLQuery(sql).uniqueResult();
+    }
+
     public Object loadValue(Class type, Serializable value) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -139,23 +147,27 @@ public class EntityService
                 value = (Integer) new PropertyDescriptor("id", value.getClass()).getReadMethod().invoke(value);
             }
 
-            catch (Exception e) { /*NADA*/ }
-            
+            catch (Exception e)
+            {
+                /*NADA*/ }
+
             Object result = session.get(type, value);
-            
+
             for (Field field : result.getClass().getDeclaredFields())
             {
                 try
                 {
                     new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result).toString();
                 }
-                
-                catch (Exception e) { /*NADA*/ }
+
+                catch (Exception e)
+                {
+                    /*NADA*/ }
             }
-            
+
             return result;
         }
-        
+
         finally
         {
             session.close();
@@ -165,7 +177,7 @@ public class EntityService
     public Object getValue(Class type, List<Parameter> parameters) throws Exception
     {
         Session session = getSession();
-        
+
         return composeQuery(session, type, parameters).uniqueResult();
     }
 
@@ -192,7 +204,7 @@ public class EntityService
 
         return (List) composeQuery(field, session, type, parameters).list();
     }
-    
+
     public List loadValues(Class type, List<Parameter> parameters) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -200,7 +212,7 @@ public class EntityService
         try
         {
             List result = (List) composeQuery(session, type, parameters).list();
-            
+
             for (Object o : result)
             {
                 for (Field field : o.getClass().getDeclaredFields())
@@ -210,13 +222,15 @@ public class EntityService
                         new PropertyDescriptor(field.getName(), o.getClass()).getReadMethod().invoke(o).toString();
                     }
 
-                    catch (Exception e) { /*NADA*/ }
+                    catch (Exception e)
+                    {
+                        /*NADA*/ }
                 }
             }
-            
+
             return result;
         }
-        
+
         finally
         {
             session.close();
@@ -240,8 +254,8 @@ public class EntityService
             }
         }
 
-        Query query = session.createQuery((field != null ? "select " + field.getName() + " " : "") + "from " + type.getName() +
-                                          conditions);
+        Query query = session.createQuery((field != null ? "select " + field.getName() + " " : "") + "from " + type.getName()
+                + conditions);
 
         for (Parameter parameter : parameters)
         {
@@ -250,7 +264,7 @@ public class EntityService
 
         return query;
     }
-    
+
     public void close() throws Exception
     {
         getSession().close();
@@ -279,21 +293,21 @@ public class EntityService
         Serializable oldValue = null;
 
         builder.append("<table class=\"log-command\">")
-               .append("    <tr>")
-               .append("        <th>")
-               .append("            Campo:")
-               .append("        </th>")
-               .append("        <th>")
-               .append(             event == Log.EVENT_UPDATE ? "Valores Anteriores:" : "Valores:")
-               .append("        </th>");
+                .append("    <tr>")
+                .append("        <th>")
+                .append("            Campo:")
+                .append("        </th>")
+                .append("        <th>")
+                .append(event == Log.EVENT_UPDATE ? "Valores Anteriores:" : "Valores:")
+                .append("        </th>");
 
         if (event == Log.EVENT_UPDATE)
         {
             oldValue = (Serializable) loadValue(entity.getClass(), entity);
             builder.append("    <th> --> </th>")
-                   .append("    <th>")
-                   .append("        Novos Valores:")
-                   .append("    </th>");
+                    .append("    <th>")
+                    .append("        Novos Valores:")
+                    .append("    </th>");
         }
 
         builder.append("    </tr>");
@@ -303,24 +317,24 @@ public class EntityService
             if (!Modifier.isStatic(field.getModifiers()))
             {
                 Method getter = new PropertyDescriptor(field.getName(), entity.getClass()).getReadMethod();
-                
+
                 builder.append("<tr>")
-                       .append("    <td>")
-                       .append(         field.getName()).append(": ")
-                       .append("    </td>");
+                        .append("    <td>")
+                        .append(field.getName()).append(": ")
+                        .append("    </td>");
 
                 if (event == Log.EVENT_UPDATE)
                 {
                     builder.append("<td>")
-                           .append(     getter.invoke(oldValue))
-                           .append("</td>")
-                           .append("<td> --> </td>");
+                            .append(getter.invoke(oldValue))
+                            .append("</td>")
+                            .append("<td> --> </td>");
                 }
 
                 builder.append("    <td>")
-                       .append(         getter.invoke(entity))
-                       .append("    </td>")
-                       .append("</tr>");
+                        .append(getter.invoke(entity))
+                        .append("    </td>")
+                        .append("</tr>");
             }
         }
 

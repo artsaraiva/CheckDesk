@@ -24,19 +24,22 @@ import javafx.scene.text.Font;
 public class BrowseButton
         extends VBox
 {
+
     private DefaultPane pane;
     private String title;
     private String icon;
+    private String role;
 
-    public BrowseButton(DefaultPane pane, String title, String icon)
+    public BrowseButton(DefaultPane pane, String title, String icon, String role)
     {
         this.pane = pane;
         this.title = title;
         this.icon = icon;
-        
+        this.role = role;
+
         initComponents();
     }
-    
+
     public DefaultPane getPane()
     {
         return pane;
@@ -46,41 +49,45 @@ public class BrowseButton
     {
         return title;
     }
-    
+
+    public String getRole()
+    {
+        return role;
+    }
+
     private void resize()
     {
         double imageSize = getWidth() * 0.6;
         double labelSize = getWidth() * 0.15;
         double padding = getWidth() * 0.05;
-        
+
         image.setFitHeight(imageSize);
         image.setFitWidth(imageSize);
-        
+
         label.setFont(new Font(labelSize));
-        
+
         setPadding(new Insets(padding));
     }
-    
+
     private void initComponents()
     {
         setCursor(Cursor.HAND);
         label.setText(title);
         image.setImage(new Image(ResourceLocator.getInstance().getImageResource(icon)));
-        
         setAlignment(Pos.CENTER);
         getChildren().addAll(image, label);
-        
+
         widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
         {
             resize();
         });
-        
+
         heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
         {
             resize();
         });
     }
-    
+
     private ImageView image = new ImageView();
     private Label label = new Label();
 }

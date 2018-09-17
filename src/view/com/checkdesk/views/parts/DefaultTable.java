@@ -39,8 +39,10 @@ import javafx.util.Callback;
 public class DefaultTable<T>
         extends BorderPane
 {
+
     public static class Events
     {
+
         public static final EventType ON_ADD = new EventType("onAddItem");
         public static final EventType ON_SELECT = new EventType("onSelectTableItem");
     }
@@ -76,17 +78,17 @@ public class DefaultTable<T>
                     HBox hbox = new HBox();
 
                     String text = item.toString();
-                    
+
                     if (item instanceof Date)
                     {
                         text = df.format((Date) item);
                     }
-                    
+
                     Label label = new Label(text);
                     label.getStyleClass().add("table-label");
 
                     hbox.getChildren().add(label);
-                    
+
                     if (actions.length != 0)
                     {
                         ImageView image = new ImageView(new Image(ResourceLocator.getInstance().getImageResource("context.png")));
@@ -125,8 +127,8 @@ public class DefaultTable<T>
         list.setItems(FXCollections.observableArrayList(items));
         setSelectedItem(selected);
     }
-    
-     public List<T> getItems()
+
+    public List<T> getItems()
     {
         return list.getItems();
     }
@@ -150,7 +152,7 @@ public class DefaultTable<T>
     {
         list.getSelectionModel().select(index);
     }
-    
+
     public void clearSelection()
     {
         list.getSelectionModel().clearSelection();
@@ -160,10 +162,19 @@ public class DefaultTable<T>
     {
         this.actions = items;
     }
-    
+
     public void setShowAddPane(boolean show)
     {
         setTop(show ? pane : null);
+    }
+
+    public void setAddButtonDisabled(boolean disabled)
+    {
+        pane.setDisable(disabled);
+        if(disabled)
+        {
+            pane.setStyle("-fx-border-color: #CBC7C7");
+        }
     }
 
     private void initComponents()

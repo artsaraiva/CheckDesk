@@ -5,6 +5,8 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.PermissionController;
 import com.checkdesk.views.parts.MenuItem;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -24,6 +26,7 @@ import javafx.scene.paint.Paint;
 public class MenuPane
         extends VBox
 {
+
     public static class Events
     {
 
@@ -71,6 +74,13 @@ public class MenuPane
 
         for (MenuItem menuItem : menuItems)
         {
+            boolean p = false;
+            if (!menuItem.getRole().isEmpty())
+            {
+                p = !PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), menuItem.getRole());
+            }
+            menuItem.setDisable(p);
+
             menuItem.setOnMouseClicked(new EventHandler<MouseEvent>()
             {
                 @Override
@@ -86,9 +96,9 @@ public class MenuPane
 
     private MenuItem[] menuItems = new MenuItem[]
     {
-        new MenuItem(new HomePane(), "mp_home", "HOME"),
-        new MenuItem(null, "mp_survey", "PESQUISAS"),
-        new MenuItem(null, "mp_analysis", "ANÁLISES"),
-        new MenuItem(new RegisterPane(), "mp_config", "CONFIGURAÇÕES")
+        new MenuItem(new HomePane(), "mp_home", "HOME", ""),
+        new MenuItem(null, "mp_survey", "PESQUISAS", ""),
+        new MenuItem(null, "mp_analysis", "ANÁLISES", ""),
+        new MenuItem(new RegisterPane(), "mp_config", "CONFIGURAÇÕES", "view.configuration")
     };
 }

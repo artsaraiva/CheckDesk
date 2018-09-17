@@ -20,7 +20,7 @@ import javafx.scene.layout.Priority;
  */
 public class HomePane
         extends DefaultPane
-{
+{       
     public HomePane()
     {
         initComponents();

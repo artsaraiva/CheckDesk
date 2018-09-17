@@ -5,6 +5,8 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.details.DetailsPane;
@@ -82,6 +84,9 @@ public class UserPane
         {
             userDetails.setSource(userTable.getSelectedItem());
         });
+
+        userTable.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "add.user"));
     }
 
     private HBox hbox = new HBox();
@@ -93,6 +98,9 @@ public class UserPane
 
     
     {
+        delete.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "delete.user"));
+
         delete.setOnAction(new EventHandler<ActionEvent>()
         {
             @Override
@@ -101,6 +109,9 @@ public class UserPane
                 removeSelected();
             }
         });
+
+        edit.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "edit.user"));
 
         edit.setOnAction(new EventHandler<ActionEvent>()
         {
