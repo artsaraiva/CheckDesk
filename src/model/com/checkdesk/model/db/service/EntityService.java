@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javassist.Modifier;
 import org.hibernate.CacheMode;
 import org.hibernate.Query;
@@ -72,10 +73,7 @@ public class EntityService
 
         Session session = getSession();
 
-        Transaction t = session.beginTransaction();
-
         session.save(entity);
-        t.commit();
     }
 
     public void update(Serializable entity) throws Exception
@@ -84,10 +82,7 @@ public class EntityService
 
         Session session = getSession();
 
-        Transaction t = session.beginTransaction();
-
         session.update(entity);
-        t.commit();
     }
 
     public void delete(Serializable entity) throws Exception
@@ -96,10 +91,7 @@ public class EntityService
 
         Session session = getSession();
 
-        Transaction t = session.beginTransaction();
-
         session.delete(getValue(entity.getClass(), entity));
-        t.commit();
     }
 
     public Object getValue(Class type, int id) throws Exception
@@ -129,11 +121,34 @@ public class EntityService
         return getValue(type, (int) value);
     }
 
-    public Object getValue(String sql) throws Exception
+    public Object getViewValue(List<String> columns, String viewName, Map<String, Object> parameters) throws Exception
     {
         Session session = getSession();
 
-        return session.createSQLQuery(sql).uniqueResult();
+        String sql = "select ";
+        
+        for (String column : columns)
+        {
+            sql += column + ", ";
+        }
+        
+        sql = sql.substring(0, sql.lastIndexOf(", "));
+        
+        sql += " from " + viewName + " where ";
+        
+        for (String key : parameters.keySet())
+        {
+            sql += key + " = :" + key + " and ";
+        }
+        
+        Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
+        
+        for (Map.Entry entry : parameters.entrySet())
+        {
+            query.setParameter(entry.getKey().toString(), entry.getValue());
+        }
+        
+        return query.uniqueResult();
     }
 
     public Object loadValue(Class type, Serializable value) throws Exception

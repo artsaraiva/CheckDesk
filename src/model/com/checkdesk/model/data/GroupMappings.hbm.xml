@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.checkdesk.model.data.GroupMapping" optimistic-lock="version" schema="public" table="group_mappings">
+      <many-to-one class="com.checkdesk.model.data.Group" fetch="select" name="group">
+        <column name="ref_group"/>
+      </many-to-one>
+      <many-to-one class="com.checkdesk.model.data.User" fetch="select" name="user">
+        <column name="ref_user"/>
+      </many-to-one>
+  </class>
+</hibernate-mapping>

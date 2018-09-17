@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<permissions>
+    <item label="Visualizar">
+        <item name="view.surveys" label="Pesquisas"/>
+        <item name="view.analysis" label="Análises"/>
+        <item name="view.configuration" label="Configurações">
+            <item name="view.users" label="Usuários"/>
+            <item name="view.forms" label="Formulários"/>
+            <item name="view.permissions" label="Permissões"/>
+            <item name="view.logs" label="Auditorias"/>
+        </item>
+    </item>
+    <item label="Adicionar">
+        <item name="add.user" label="Adicionar Usuário"/>
+        <item name="add.survey" label="Adicionar Pesquisa"/>
+        <item name="add.form" label="Adicionar Formulário"/>
+    </item>
+    <item label="Editar">
+        <item name="edit.user" label="Editar Usuário"/>
+        <item name="edit.survey" label="Editar Pesquisa"/>
+        <item name="edit.form" label="Editar Formulário"/>
+        <item name="edit.permission" label="Modificar Permissões"/>
+    </item>
+    <item label="Excluir">
+        <item name="delete.user" label="Excluir Usuário"/>
+        <item name="delete.survey" label="Excluir Pesquisa"/>
+        <item name="delete.form" label="Excluir Formulário"/>
+    </item>
+    <item name="edit.log" label="Ativar/Desativar auditorias"/>
+</permissions>

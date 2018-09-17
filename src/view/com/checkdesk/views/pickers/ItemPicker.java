@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -123,25 +124,20 @@ public class ItemPicker<T>
         getDialogPane().getButtonTypes().addAll(btAccept, btCancel);
         getDialogPane().setContent(vbox);
 
-        setOnCloseRequest(new EventHandler()
+        setOnCloseRequest((DialogEvent t) ->
         {
-            @Override
-            public void handle(Event t)
+            if (selectedButton != btCancel)
             {
-                if (selectedButton != btCancel)
+                if (!validate())
                 {
-                    if (!validate())
-                    {
-                        t.consume();
-                    }
-                }
-
-                else
-                {
-                    list.clearSelection();
+                    t.consume();
                 }
             }
 
+            else
+            {
+                list.clearSelection();
+            }
         });
 
         setResultConverter(new Callback()

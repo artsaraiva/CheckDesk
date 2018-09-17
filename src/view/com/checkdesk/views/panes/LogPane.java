@@ -88,9 +88,7 @@ public class LogPane
             detailsPane.setSource(table.getSelectedItem());
         });
 
-        checkbox.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
-                .getActiveUser(), "edit.log"));
-
+        checkbox.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.log"));
         checkbox.setOnAction((ActionEvent t) ->
         {
             checkbox.setSelected(!checkbox.isSelected());

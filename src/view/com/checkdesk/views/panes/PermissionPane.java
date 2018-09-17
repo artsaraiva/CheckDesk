@@ -5,10 +5,9 @@
  */
 package com.checkdesk.views.panes;
 
-import com.checkdesk.model.data.Permission;
-import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.PermissionDescription;
-import java.util.Arrays;
+import com.checkdesk.views.parts.PermissionTree;
+import com.checkdesk.views.util.PermissionItem;
 import javafx.event.Event;
 import javafx.scene.layout.HBox;
 
@@ -27,46 +26,32 @@ public class PermissionPane
     @Override
     protected void resize()
     {
-        permissionList.setPrefWidth(getWidth()/2);
+        permissionTree.setPrefWidth(getWidth()/2);
         permissionDescription.setPrefWidth(getWidth()/2);
-        permissionList.setPrefHeight(getHeight());
+        permissionTree.setPrefHeight(getHeight());
         permissionDescription.setPrefHeight(getHeight());
     }
 
     @Override
     public void refreshContent()
     {
-        int selectedIndex = permissionList.getSelectedIndex();
-        
-        permissionList.setItems(Arrays.asList(
-                new Permission(1, "Cadastrar pesquisas"),
-                new Permission(1, "Responder pesquisas"),
-                new Permission(1, "Editar pesquisas"),
-                new Permission(1, "Inspecionar pesquisas"),
-                new Permission(1, "Excluir pesquisas"),
-                new Permission(1, "Cadastrar usuários"),
-                new Permission(1, "Excluir usuários")
-        ));
-        
-        permissionList.setSelectedIndex(selectedIndex < 0 ? 0 : selectedIndex);
+        permissionTree.refreshContent();
     }
 
     private void initComponents()
     {
-        permissionList.setShowAddPane(false);
-        
-        hbox.getChildren().addAll(permissionList, permissionDescription);
+        hbox.getChildren().addAll(permissionTree, permissionDescription);
         
         getChildren().add(hbox);
 
-        permissionList.addEventHandler(DefaultTable.Events.ON_SELECT, (Event event) ->
+        permissionTree.addEventHandler(PermissionTree.Events.ON_SELECT, (Event event) ->
         {
-            Permission selected = permissionList.getSelectedItem();
+            PermissionItem selected = permissionTree.getSelectedItem();
             permissionDescription.setSource(selected);
         });
     }
 
     private HBox hbox = new HBox();
-    private DefaultTable<Permission> permissionList = new DefaultTable<Permission>();
+    private PermissionTree permissionTree = new PermissionTree();
     private PermissionDescription permissionDescription = new PermissionDescription();
 }

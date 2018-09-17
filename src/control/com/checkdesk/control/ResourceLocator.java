@@ -26,6 +26,7 @@ public class ResourceLocator
 
     private String imagesPath;
     private String stylePath;
+    private String configPath;
 
     private ResourceLocator()
     {
@@ -36,6 +37,7 @@ public class ResourceLocator
     {
         imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + "/";
         stylePath = getClass().getClassLoader().getResource( "styles" ).toString() + "/";
+        configPath = getClass().getClassLoader().getResource( "config" ).toString() + "/";
     }
 
     public String getImageResource( String name )
@@ -58,4 +60,8 @@ public class ResourceLocator
         return stylePath + name;
     }
 
+    public String getConfigResource( String name )
+    {
+        return configPath + name;
+    }
 }

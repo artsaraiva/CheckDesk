@@ -10,9 +10,9 @@ import java.util.Set;
 public class User
         implements java.io.Serializable
 {
-    public static final int TYPE_SUPER     = 0;
-    public static final int TYPE_ADMIN     = 1;
-    public static final int TYPE_OPERATOR  = 2;
+    public static final int TYPE_SUPER    = 0;
+    public static final int TYPE_ADMIN    = 1;
+    public static final int TYPE_OPERATOR = 2;
     public static final int TYPE_EXPLORER = 3;
     
     private int id;

@@ -5,9 +5,11 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.views.pickers.ItemPicker;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,23 +26,46 @@ public class GroupTable
         extends DefaultTable<User>
 {
     private Group group;
+    private boolean saveOnChange = false;
     
     public GroupTable()
     {
         initComponents();
+    }
+
+    public void setSaveOnChange(boolean saveOnChange)
+    {
+        this.saveOnChange = saveOnChange;
     }
     
     private void removeSelected()
     {
         getItems().remove(getSelectedItem());
         setItems(getItems());
+        
+        if (saveOnChange)
+        {
+            createGroup();
+        }
     }
     
     private void addUser()
     {
-        getItems().remove(allUser);
-        getItems().add(new User(1, "Fulano", "teste", "teste", "teste", "teste", 0));
+        userPicker.setItems(UserUtilities.getUsers());
+        userPicker.open("Selecione um Usuário");
+        
+        if (userPicker.getSelected() != null)
+        {
+            getItems().remove(allUser);
+            getItems().add(userPicker.getSelected());
+        }
+        
         setItems(getItems());
+        
+        if (saveOnChange)
+        {
+            createGroup();
+        }
     }
 
     public void setGroup(Group group)
@@ -97,13 +122,13 @@ public class GroupTable
                 
                 else
                 {
-                    EntityService.getInstance().delete(group);
+                    EntityService.getInstance().update(group);
                 }
             }
             
             else if (group.getId() != 0)
             {
-                EntityService.getInstance().update(group);
+                EntityService.getInstance().delete(group);
             }
         }
         catch(Exception e)
@@ -113,30 +138,29 @@ public class GroupTable
         
         return group.getId() == 0 ? null : group;
     }
+
+    public void setTableDisable(boolean disable)
+    {
+        setAddButtonDisabled(disable);
+        remove.setDisable(disable);
+    }
     
     private void initComponents()
     {
         allUser.setName("TODOS");
         
-        remove.setOnAction(new EventHandler<ActionEvent>()
+        remove.setOnAction((ActionEvent event) ->
         {
-            @Override
-            public void handle(ActionEvent event)
-            {
-                removeSelected();
-            }
+            removeSelected();
         });
         
-        addEventHandler(Events.ON_ADD, new EventHandler()
+        addEventHandler(Events.ON_ADD, (Event event) ->
         {
-            @Override
-            public void handle(Event event)
-            {
-                addUser();
-            }
+            addUser();
         });
     }
     
+    private ItemPicker<User> userPicker = new ItemPicker<>();
     private User allUser = new User();
     private javafx.scene.control.MenuItem remove = new javafx.scene.control.MenuItem( "Remover" );
 }
