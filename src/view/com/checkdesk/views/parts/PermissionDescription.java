@@ -59,6 +59,7 @@ public class PermissionDescription
     {
         viewersTable.setTableDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.permission"));
         viewersTable.setSaveOnChange(true);
+        viewersTable.setShowAll(false);
         
         VBox.setVgrow(viewersTable, Priority.ALWAYS);
         vbox.getChildren().add(viewersTable);

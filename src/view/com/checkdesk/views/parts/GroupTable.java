@@ -5,10 +5,10 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.control.util.GroupUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.pickers.ItemPicker;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 
 /**
  *
@@ -27,6 +26,7 @@ public class GroupTable
 {
     private Group group;
     private boolean saveOnChange = false;
+    private boolean showAll = true;
     
     public GroupTable()
     {
@@ -36,6 +36,11 @@ public class GroupTable
     public void setSaveOnChange(boolean saveOnChange)
     {
         this.saveOnChange = saveOnChange;
+    }
+
+    public void setShowAll(boolean showAll)
+    {
+        this.showAll = showAll;
     }
     
     private void removeSelected()
@@ -56,7 +61,7 @@ public class GroupTable
         
         if (userPicker.getSelected() != null)
         {
-            getItems().remove(allUser);
+            getItems().remove(GroupUtilities.allUser);
             getItems().add(userPicker.getSelected());
         }
         
@@ -85,9 +90,9 @@ public class GroupTable
     @Override
     public void setItems(List<User> items)
     {
-        if (items.isEmpty())
+        if (items.isEmpty() && showAll)
         {
-            items.add(allUser);
+            items.add(GroupUtilities.allUser);
             setActions(new javafx.scene.control.MenuItem[0]);
         }
         
@@ -111,30 +116,7 @@ public class GroupTable
         
         group.setUsers(users);
         
-        try
-        {
-            if (!users.contains(allUser))
-            {
-                if (group.getId() == 0)
-                {
-                    EntityService.getInstance().save(group);
-                }
-                
-                else
-                {
-                    EntityService.getInstance().update(group);
-                }
-            }
-            
-            else if (group.getId() != 0)
-            {
-                EntityService.getInstance().delete(group);
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
+        GroupUtilities.saveGroup(group);
         
         return group.getId() == 0 ? null : group;
     }
@@ -147,8 +129,6 @@ public class GroupTable
     
     private void initComponents()
     {
-        allUser.setName("TODOS");
-        
         remove.setOnAction((ActionEvent event) ->
         {
             removeSelected();
@@ -161,6 +141,5 @@ public class GroupTable
     }
     
     private ItemPicker<User> userPicker = new ItemPicker<>();
-    private User allUser = new User();
     private javafx.scene.control.MenuItem remove = new javafx.scene.control.MenuItem( "Remover" );
 }

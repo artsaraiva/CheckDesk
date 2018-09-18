@@ -71,9 +71,9 @@ public class RegisterPane
     private BrowsePane browsePane = new BrowsePane();
     private BrowseButton[] buttons = new BrowseButton[]
     {
-        new BrowseButton(new UserPane(), "Usuários", "login1.png", "view.users"),
-        new BrowseButton(new FormPane(), "Formulários", "login1.png", "view.forms"),
-        new BrowseButton(new PermissionPane(), "Permissões", "login1.png", "view.permissions"),
-        new BrowseButton(new LogPane(), "Auditorias", "login1.png", "view.logs")
+        new BrowseButton(new UserPane(), "Usuários", "bi_users.png", "view.users"),
+        new BrowseButton(new FormPane(), "Formulários", "bi_forms.png", "view.forms"),
+        new BrowseButton(new PermissionPane(), "Permissões", "bi_permissions.png", "view.permissions"),
+        new BrowseButton(new LogPane(), "Auditorias", "bi_logs.png", "view.logs")
     };
 }

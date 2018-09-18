@@ -61,6 +61,7 @@ public class BrowsePane
         for (BrowseButton bt : buttons)
         {
             bt.setPrefSize(size, size);
+            bt.resize(size, size);
         }
     }
 

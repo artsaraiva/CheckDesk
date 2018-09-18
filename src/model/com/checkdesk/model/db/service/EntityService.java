@@ -73,7 +73,10 @@ public class EntityService
 
         Session session = getSession();
 
+        Transaction t = session.beginTransaction();
+
         session.save(entity);
+        t.commit();
     }
 
     public void update(Serializable entity) throws Exception
@@ -82,7 +85,10 @@ public class EntityService
 
         Session session = getSession();
 
+        Transaction t = session.beginTransaction();
+
         session.update(entity);
+        t.commit();
     }
 
     public void delete(Serializable entity) throws Exception
@@ -91,7 +97,10 @@ public class EntityService
 
         Session session = getSession();
 
+        Transaction t = session.beginTransaction();
+
         session.delete(getValue(entity.getClass(), entity));
+        t.commit();
     }
 
     public Object getValue(Class type, int id) throws Exception
@@ -163,10 +172,9 @@ public class EntityService
             }
 
             catch (Exception e)
-            {
-                /*NADA*/ }
+            { /*NADA*/ }
 
-            Object result = session.get(type, value);
+            Object result = session.load(type, value);
 
             for (Field field : result.getClass().getDeclaredFields())
             {
@@ -318,6 +326,7 @@ public class EntityService
 
         if (event == Log.EVENT_UPDATE)
         {
+            getSession().get(entity.getClass(), (Integer) new PropertyDescriptor("id", entity.getClass()).getReadMethod().invoke(entity));
             oldValue = (Serializable) loadValue(entity.getClass(), entity);
             builder.append("    <th> --> </th>")
                     .append("    <th>")
