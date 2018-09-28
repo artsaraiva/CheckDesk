@@ -118,9 +118,12 @@ public class ApplicationController
     }
 
     private User activeUser;
+    private final ServerConnection serverConnection;
 
     private ApplicationController()
     {
+        serverConnection = new ServerConnection(); 
+        
         activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor");
     }
 

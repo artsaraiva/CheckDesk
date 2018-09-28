@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.checkdesk.model.data.Answer" optimistic-lock="version" schema="public" table="answers">
+    <id name="id" type="int">
+      <column name="id"/>
+      <generator class="identity"/>
+    </id>
+    <many-to-one class="com.checkdesk.model.data.Survey" fetch="select" name="survey">
+      <column name="ref_survey" not-null="true"/>
+    </many-to-one>
+    <many-to-one class="com.checkdesk.model.data.User" fetch="select" name="owner">
+      <column name="ref_user" not-null="true"/>
+    </many-to-one>
+    <property name="feedback" type="string">
+      <column name="feedback" not-null="true"/>
+    </property>
+    <property name="occurredDate" type="timestamp">
+      <column length="29" name="dt_occurred" not-null="true"/>
+    </property>
+    <set fetch="select" inverse="true" lazy="true" name="questionAnswers" table="question_answers">
+      <key>
+        <column name="ref_answer" not-null="true"/>
+      </key>
+      <one-to-many class="com.checkdesk.model.data.QuestionAnswer"/>
+    </set>
+    <set fetch="select" inverse="true" lazy="true" name="rankStatements" table="rank_statements">
+      <key>
+        <column name="ref_answers" not-null="true"/>
+      </key>
+      <one-to-many class="com.checkdesk.model.data.RankStatement"/>
+    </set>
+  </class>
+</hibernate-mapping>
