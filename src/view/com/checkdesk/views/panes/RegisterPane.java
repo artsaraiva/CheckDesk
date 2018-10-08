@@ -7,9 +7,7 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
-import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.views.parts.BrowseButton;
-import com.checkdesk.views.parts.MenuItem;
 import com.checkdesk.views.parts.NavigationItem;
 import javafx.event.Event;
 

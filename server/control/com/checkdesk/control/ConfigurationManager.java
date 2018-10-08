@@ -10,12 +10,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Properties;
+import org.hibernate.cfg.Configuration;
 
 /**
  *
  * @author MNicaretta
  */
 public class ConfigurationManager
+        extends Configuration
 {
     private static ConfigurationManager instance;
 
@@ -59,6 +61,7 @@ public class ConfigurationManager
                 global.load(fileInputStream);
 
                 fileInputStream.close();
+                configure("hibernate.cfg.xml").addProperties(global);
             }
         }
 
@@ -68,7 +71,7 @@ public class ConfigurationManager
         }
     }
     
-    public void setProperty(String key, String value)
+    public void setString(String key, String value)
     {
         global.setProperty(key, value);
         store();
@@ -83,33 +86,52 @@ public class ConfigurationManager
             v = String.valueOf(value);
         }
         
-        setProperty(key, v);
+        setString(key, v);
     }
 
-    public String getProperty(String key)
+    public String getString(String key)
     {
-        return getProperty(key, null);
+        return getString(key, null);
     }
 
-    public String getProperty(String key, String defaultValue)
+    public String getString(String key, String defaultValue)
     {
         return global.getProperty(key, defaultValue);
     }
 
-    public boolean getFlag(String key)
+    public Boolean getFlag(String key)
     {
-        return getFlag(key, false);
+        return getFlag(key, null);
     }
 
-    public boolean getFlag(String key, boolean defaultValue)
+    public Boolean getFlag(String key, Boolean defaultValue)
     {
-        boolean result = defaultValue;
+        Boolean result = defaultValue;
         
         String value = global.getProperty(key);
         
         if (value != null && !value.isEmpty())
         {
             result = Boolean.valueOf(value);
+        }
+        
+        return result;
+    }
+
+    public Integer getInteger(String key)
+    {
+        return getInteger(key, null);
+    }
+
+    public Integer getInteger(String key, Integer defaultValue)
+    {
+        Integer result = defaultValue;
+        
+        String value = global.getProperty(key);
+        
+        if (value != null && !value.isEmpty())
+        {
+            result = Integer.valueOf(value);
         }
         
         return result;

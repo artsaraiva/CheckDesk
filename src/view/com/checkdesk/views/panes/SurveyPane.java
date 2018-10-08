@@ -7,9 +7,9 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
-import com.checkdesk.control.util.FormUtilities;
-import com.checkdesk.model.data.Form;
-import com.checkdesk.views.details.FormDetails;
+import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.model.data.Survey;
+import com.checkdesk.views.details.SurveyDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +30,16 @@ import javafx.scene.layout.VBox;
  *
  * @author MNicaretta
  */
-public class FormPane
+public class SurveyPane
         extends DefaultPane
 {
-    private List<Form> items = new ArrayList<>();
-
-    public FormPane()
+    private List<Survey> items = new ArrayList<>();
+    
+    public SurveyPane()
     {
         initComponents();
     }
-
+    
     @Override
     protected void resize()
     {
@@ -52,10 +52,10 @@ public class FormPane
     @Override
     public void refreshContent()
     {
-        table.setItems(items = FormUtilities.getValues());
+        surveyTable.setItems(items = SurveyUtilities.getValues());
         detailsPane.refreshContent();
     }
-
+    
     private void initComponents()
     {
         filterField.setPromptText("Digite para filtrar");
@@ -65,35 +65,35 @@ public class FormPane
         filterBox.getChildren().addAll(filterLabel, filterField);
 
         HBox.setHgrow(filterField, Priority.ALWAYS);
-        VBox.setVgrow(table, Priority.ALWAYS);
+        VBox.setVgrow(surveyTable, Priority.ALWAYS);
 
-        table.setActions(new MenuItem[]
+        surveyTable.setActions(new MenuItem[]
         {
             editItem, deleteItem
         });
-        selectionBox.getChildren().addAll(filterBox, table);
+        selectionBox.getChildren().addAll(filterBox, surveyTable);
 
         selectionBox.setMinWidth(450);
 
         hbox.getChildren().addAll(selectionBox, detailsPane);
         getChildren().add(hbox);
 
-        table.addEventHandler(DefaultTable.Events.ON_ADD, (Event t) ->
+        surveyTable.addEventHandler(DefaultTable.Events.ON_ADD, (Event t) ->
         {
-            FormUtilities.addForm();
+            SurveyUtilities.addSurvey();
             refreshContent();
         });
 
-        table.addEventHandler(DefaultTable.Events.ON_SELECT, (Event t) ->
+        surveyTable.addEventHandler(DefaultTable.Events.ON_SELECT, (Event t) ->
         {
-            detailsPane.setSource(table.getSelectedItem());
+            detailsPane.setSource(surveyTable.getSelectedItem());
         });
 
         filterField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) ->
         {
-            ObservableList<Form> filterList = FXCollections.observableArrayList();
+            ObservableList<Survey> filterList = FXCollections.observableArrayList();
 
-            for (Form item : items)
+            for (Survey item : items)
             {
                 String filter = filterField.getText().toLowerCase().trim();
 
@@ -103,40 +103,41 @@ public class FormPane
                 }
             }
 
-            table.setItems(filterList);
+            surveyTable.setItems(filterList);
         });
 
-        table.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
-                .getActiveUser(), "add.form"));
+        surveyTable.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "add.survey"));
     }
-
+    
     private HBox hbox = new HBox();
-
+    
     private VBox selectionBox = new VBox();
     private HBox filterBox = new HBox();
     private Label filterLabel = new Label("Filtro: ");
     private TextField filterField = new TextField();
-
-    private DefaultTable<Form> table = new DefaultTable<>();
-
-    private FormDetails detailsPane = new FormDetails();
-
+    
+    private DefaultTable<Survey> surveyTable = new DefaultTable<>();
+    private SurveyDetails detailsPane = new SurveyDetails();
+    
     private MenuItem editItem = new MenuItem("Editar");
     private MenuItem deleteItem = new MenuItem("Excluir");
     {
-        editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.form"));
+        editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "edit.survey"));
 
-        deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "delete.form"));
+        deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
+                .getActiveUser(), "delete.survey"));
 
         editItem.setOnAction((ActionEvent t) ->
         {
-            FormUtilities.editForm(table.getSelectedItem());
+            SurveyUtilities.editSurvey(surveyTable.getSelectedItem());
             refreshContent();
         });
 
         deleteItem.setOnAction((ActionEvent t) ->
         {
-            FormUtilities.deleteForm(table.getSelectedItem());
+            SurveyUtilities.deleteSurvey(surveyTable.getSelectedItem());
             refreshContent();
         });
     }

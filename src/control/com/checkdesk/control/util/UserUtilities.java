@@ -11,7 +11,7 @@ import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.views.editors.UserEditor;
 import com.checkdesk.views.util.EditorCallback;
-import com.checkdesk.views.util.Prompts;
+import com.checkdesk.views.parts.Prompts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

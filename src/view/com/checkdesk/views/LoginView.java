@@ -7,8 +7,9 @@ package com.checkdesk.views;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.ServerConnection;
 import com.checkdesk.model.db.service.EntityService;
-import com.checkdesk.views.util.Prompts;
+import com.checkdesk.views.parts.Prompts;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -74,6 +75,34 @@ public class LoginView
 
     private void validateLogin()
     {
+        boolean keepTrying = true;
+        
+        while (keepTrying)
+        {
+            keepTrying = ServerConnection.getInstance() == null;
+            
+            if (keepTrying)
+            {
+                String settings = ServerConnection.getConnectionSettings();
+                
+                String noConnection = "A conexão ao servidor não está configurada.";
+                String connectionRefused = "Não foi possível connectar ao servidor: " + settings;
+                
+                keepTrying = Prompts.confirm("Erro de conexão", (settings != null ? connectionRefused : noConnection) + "\n" +
+                                             "Deseja mudar as configurações de conexão?" );
+                
+                if (keepTrying)
+                {
+                    Prompts.editConnectionSettings();
+                }
+                
+                else
+                {
+                    keepTrying = Prompts.confirm("Erro de conexão", "Tentar novamente?");
+                }
+            }
+        }
+        
         if (login = ApplicationController.getInstance().login(loginField.getText(), passwordField.getText()) != null)
         {
             try

@@ -128,6 +128,23 @@ public class FormEditorPane
 
     @Override
     public void refreshContent(){}
+    
+    public void setEnable(boolean enable)
+    {
+        addPane.setDisable(!enable);
+        
+        if(!enable)
+        {
+            addPane.setStyle("-fx-border-color: #CBC7C7");
+        }
+        
+        removeItem.setDisable(!enable);
+        
+        for (QuestionCell cell : questionCells)
+        {
+            cell.setEnable(enable);
+        }
+    }
 
     private void initComponents()
     {
@@ -268,6 +285,14 @@ public class FormEditorPane
             nameField.setPrefWidth(width - 15);
             typeField.setPrefWidth(width - 15);
             optionSelector.setPrefWidth(width - 15);
+        }
+        
+        public void setEnable(boolean enable)
+        {
+            setDisable(!enable);
+            nameField.setDisable(!enable);
+            typeField.setDisable(!enable);
+            optionSelector.setDisable(!enable);
         }
 
         private void initDragEvent()

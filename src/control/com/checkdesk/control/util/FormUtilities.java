@@ -13,7 +13,7 @@ import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.views.editors.FormEditor;
 import com.checkdesk.views.util.EditorCallback;
-import com.checkdesk.views.util.Prompts;
+import com.checkdesk.views.parts.Prompts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,12 +45,7 @@ public class FormUtilities
             {
                 try
                 {
-                    EntityService.getInstance().save(getSource());
-                    
-                    for (Question question : (Set<Question>)getSource().getQuestions())
-                    {
-                        EntityService.getInstance().save(question);
-                    }
+                    saveForm(getSource());
                 }
 
                 catch (Exception e)
@@ -70,44 +65,7 @@ public class FormUtilities
             {
                 try
                 {
-                    EntityService.getInstance().update(getSource());
-                    
-                    List<Question> deleteQuestions = EntityService.getInstance().loadValues(Question.class,
-                                                                                            Arrays.asList(new Parameter("form",
-                                                                                                          Question.class.getDeclaredField("form"),
-                                                                                                          getSource(),
-                                                                                                          Parameter.COMPARATOR_EQUALS)));
-                    for (Question deletable : deleteQuestions)
-                    {
-                        boolean delete = true;
-                        
-                        for (Question question : (Set<Question>)getSource().getQuestions())
-                        {
-                            if (deletable.getId() == question.getId())
-                            {
-                                delete = false;
-                                break;
-                            }
-                        }
-                        
-                        if (delete)
-                        {
-                            EntityService.getInstance().delete(deletable);
-                        }
-                    }
-                    
-                    for (Question question : (Set<Question>)getSource().getQuestions())
-                    {
-                        if (question.getId() == 0)
-                        {
-                            EntityService.getInstance().save(question);
-                        }
-                        
-                        else
-                        {
-                            EntityService.getInstance().update(question);
-                        }
-                    }
+                    saveForm(getSource());
                 }
 
                 catch (Exception e)
@@ -171,6 +129,61 @@ public class FormUtilities
         }
 
         return result;
+    }
+    
+    public static void saveForm(Form form) throws Exception
+    {
+        if (form.getId() == 0)
+        {
+            EntityService.getInstance().save(form);
+
+            for (Question question : (Set<Question>)form.getQuestions())
+            {
+                EntityService.getInstance().save(question);
+            }
+        }
+        
+        else
+        {
+            EntityService.getInstance().update(form);
+
+            List<Question> deleteQuestions = EntityService.getInstance().loadValues(Question.class,
+                                                                                    Arrays.asList(new Parameter("form",
+                                                                                                  Question.class.getDeclaredField("form"),
+                                                                                                  form,
+                                                                                                  Parameter.COMPARATOR_EQUALS)));
+            for (Question deletable : deleteQuestions)
+            {
+                boolean delete = true;
+
+                for (Question question : (Set<Question>)form.getQuestions())
+                {
+                    if (deletable.getId() == question.getId())
+                    {
+                        delete = false;
+                        break;
+                    }
+                }
+
+                if (delete)
+                {
+                    EntityService.getInstance().delete(deletable);
+                }
+            }
+
+            for (Question question : (Set<Question>)form.getQuestions())
+            {
+                if (question.getId() == 0)
+                {
+                    EntityService.getInstance().save(question);
+                }
+
+                else
+                {
+                    EntityService.getInstance().update(question);
+                }
+            }
+        }
     }
     
     public static List<Item> getQuestionTypes()

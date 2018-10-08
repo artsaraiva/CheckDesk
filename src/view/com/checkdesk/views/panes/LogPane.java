@@ -13,7 +13,7 @@ import com.checkdesk.model.data.Log;
 import com.checkdesk.views.details.LogDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.ItemSelector;
-import com.checkdesk.views.util.Prompts;
+import com.checkdesk.views.parts.Prompts;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;

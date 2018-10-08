@@ -6,8 +6,8 @@
 package com.checkdesk.control;
 
 import com.checkdesk.control.util.LogUtilities;
-import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Log;
+import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +16,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javafx.scene.Node;
+import org.json.JSONObject;
 
 /**
  *
@@ -118,13 +120,11 @@ public class ApplicationController
     }
 
     private User activeUser;
-    private final ServerConnection serverConnection;
+    private Node rootNode;
 
     private ApplicationController()
     {
-        serverConnection = new ServerConnection(); 
-        
-        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor");
+        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor", false);
     }
 
     public User getActiveUser()
@@ -136,14 +136,42 @@ public class ApplicationController
     {
         try
         {
-            activeUser = UserUtilities.login(login, hash(password));
-        }
+            JSONObject json = new JSONObject();
+            json.put("user", login);
+            json.put("password", hash(password));
 
+            activeUser = (User) ServerConnection.getInstance().say(json.toString());
+        }
+        
         catch (Exception e)
         {
             logException(e);
         }
-
+        
         return activeUser;
+    }
+
+    public Node getRootNode()
+    {
+        return rootNode;
+    }
+
+    public void setRootNode(Node rootNode)
+    {
+        this.rootNode = rootNode;
+    }
+    
+    public void notify(Object object)
+    {
+        try
+        {
+            ServerConnection.getInstance().say(ServerConnection.NOTIFY, false);
+            ServerConnection.getInstance().say(object, false);
+        }
+        
+        catch (Exception e)
+        {
+            logException(e);
+        }
     }
 }

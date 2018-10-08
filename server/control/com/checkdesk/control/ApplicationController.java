@@ -9,6 +9,8 @@ import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
+import com.server.checkdesk.main.HandleClient;
+import com.server.checkdesk.main.Main;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -23,6 +25,7 @@ import java.util.Date;
  */
 public class ApplicationController
 {
+    public static final String NOTIFY = "notify";
     private static boolean activeLog;
 
     public static ApplicationController getInstance()
@@ -114,7 +117,7 @@ public class ApplicationController
 
     private ApplicationController()
     {
-        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor");
+        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor", false);
     }
 
     public User getActiveUser()
@@ -137,9 +140,19 @@ public class ApplicationController
         return activeUser;
     }
     
-    public Object handle(Object request)
+    public Object handle(Object request, HandleClient client) throws Exception
     {
         Object result = null;
+        
+        if (request != null)
+        {
+            switch (request.toString())
+            {
+                case NOTIFY:
+                    Main.notify(client.getObject());
+                    break;
+            }
+        }
         
         return result;
     }

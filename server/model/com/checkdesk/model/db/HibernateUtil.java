@@ -6,8 +6,10 @@
 package com.checkdesk.model.db;
 
 import com.checkdesk.control.ApplicationController;
-import org.hibernate.cfg.AnnotationConfiguration;
+import com.checkdesk.control.ConfigurationManager;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.service.ServiceRegistry;
 
 /**
  * Hibernate Utility class with a convenient method to get Session Factory object.
@@ -22,9 +24,9 @@ public class HibernateUtil
     {
         try
         {
-            // Create the SessionFactory from standard (hibernate.cfg.xml) 
-            // config file.
-            sessionFactory = new AnnotationConfiguration().configure().buildSessionFactory();
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(ConfigurationManager.getInstance().getProperties()).build();
+            
+            sessionFactory = ConfigurationManager.getInstance().buildSessionFactory(serviceRegistry);
         }
         catch (Throwable ex)
         {

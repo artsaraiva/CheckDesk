@@ -9,7 +9,7 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.util.EditorButton;
 import com.checkdesk.views.util.EditorCallback;
-import com.checkdesk.views.util.Prompts;
+import com.checkdesk.views.parts.Prompts;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;

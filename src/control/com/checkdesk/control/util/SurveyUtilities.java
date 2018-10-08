@@ -9,8 +9,11 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.editors.SurveyEditor;
+import com.checkdesk.views.parts.Prompts;
 import com.checkdesk.views.util.EditorCallback;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -39,6 +42,10 @@ public class SurveyUtilities
                 try
                 {
                     EntityService.getInstance().save(getSource());
+                    
+                    FormUtilities.saveForm(getSource().getForm());
+                    
+                    ApplicationController.getInstance().notify(getSource());
                 }
 
                 catch (Exception e)
@@ -49,7 +56,80 @@ public class SurveyUtilities
 
         }).show();
     }
+    
+    public static void editSurvey(Survey survey)
+    {
+        new SurveyEditor(new EditorCallback<Survey>(survey)
+        {
+            @Override
+            public void handle(Event t)
+            {
+                try
+                {
+                    EntityService.getInstance().update(getSource());
+                    
+                    FormUtilities.saveForm(getSource().getForm());
+                }
 
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
+            }
+        }).showAndWait();
+    }
+    
+    public static void deleteSurvey(Survey survey)
+    {
+        if (Prompts.confirm("Exlusão de Pesquisa", "Deseja realmente excluir a pesquisa?"))
+        {
+            try
+            {
+                EntityService.getInstance().delete(survey);
+                FormUtilities.deleteForm(survey.getForm());
+            }
+
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        }
+    }
+
+    public static Survey getValue(int surveyId)
+    {
+        Survey result = null;
+
+        try
+        {
+            result = (Survey) EntityService.getInstance().getValue(Survey.class, surveyId);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
+    public static List<Survey> getValues()
+    {
+        List<Survey> result = new ArrayList<>();
+
+        try
+        {
+            result = EntityService.getInstance().getValues(Survey.class);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
     public static ObservableList<Item> getItems()
     {
         return FXCollections.observableArrayList(TYPE_PUBLIC, TYPE_PRIVATE, TYPE_ANONYMOUS, TYPE_TOTEM);

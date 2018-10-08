@@ -49,6 +49,8 @@ public class MainView
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
+        
+        ApplicationController.getInstance().setRootNode(borderPane);
     }
     
     private void selectMenuItem(MenuItem selected)

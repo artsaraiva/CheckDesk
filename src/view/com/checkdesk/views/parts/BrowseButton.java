@@ -24,7 +24,6 @@ import javafx.scene.text.Font;
 public class BrowseButton
         extends VBox
 {
-
     private DefaultPane pane;
     private String title;
     private String icon;

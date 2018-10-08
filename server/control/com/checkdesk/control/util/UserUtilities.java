@@ -83,14 +83,13 @@ public class UserUtilities
     public static User login(String login, String password) throws Exception
     {
         List<Parameter> parameters = Arrays.asList(new Parameter("login",
-                User.class.getDeclaredField(login.contains("@")
-                        ? "email" : "login"),
-                login.toLowerCase(),
-                Parameter.COMPARATOR_LOWER_CASE),
-                new Parameter("password",
-                        User.class.getDeclaredField("password"),
-                        password,
-                        Parameter.COMPARATOR_EQUALS));
+                                                                 User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+                                                                 login.toLowerCase(),
+                                                                 Parameter.COMPARATOR_LOWER_CASE),
+                                                    new Parameter("password",
+                                                                  User.class.getDeclaredField("password"),
+                                                                  password,
+                                                                  Parameter.COMPARATOR_EQUALS));
 
         return (User) EntityService.getInstance().getValue(User.class, parameters);
     }
