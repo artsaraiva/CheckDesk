@@ -5,6 +5,9 @@
  */
 package com.checkdesk.control;
 
+import java.io.File;
+import java.io.InputStream;
+
 /**
  *
  * @author arthu
@@ -16,7 +19,7 @@ public class ResourceLocator
 
     public static ResourceLocator getInstance()
     {
-        if ( instance == null )
+        if (instance == null)
         {
             instance = new ResourceLocator();
         }
@@ -35,19 +38,19 @@ public class ResourceLocator
 
     private void load()
     {
-        imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + "/";
-        stylePath = getClass().getClassLoader().getResource( "styles" ).toString() + "/";
-        configPath = getClass().getClassLoader().getResource( "config" ).toString() + "/";
+        imagesPath = getClass().getClassLoader().getResource("images").toString() + "/";
+        stylePath = getClass().getClassLoader().getResource("styles").toString() + "/";
+        configPath = getClass().getClassLoader().getResource("config").toString() + "/";
     }
 
-    public String getImageResource( String name )
+    public String getImageResource(String name)
     {
         if (name == null)
         {
             name = "";
         }
-        
-        if(!name.endsWith(".png"))
+
+        if (!name.endsWith(".png"))
         {
             name += ".png";
         }
@@ -55,13 +58,18 @@ public class ResourceLocator
         return imagesPath + name;
     }
 
-    public String getStyleResource( String name )
+    public String getStyleResource(String name)
     {
         return stylePath + name;
     }
 
-    public String getConfigResource( String name )
+    public String getConfigResource(String name)
     {
         return configPath + name;
+    }
+
+    public InputStream getConfigStream(String name)
+    {
+        return getClass().getClassLoader().getResourceAsStream("config/" + name);
     }
 }

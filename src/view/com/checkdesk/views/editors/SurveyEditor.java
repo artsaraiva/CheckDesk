@@ -40,6 +40,7 @@ import javafx.scene.web.HTMLEditor;
 public class SurveyEditor
         extends DefaultEditor<Survey>
 {
+
     private int pageIndex = 0;
 
     public SurveyEditor(EditorCallback<Survey> callback)
@@ -100,7 +101,7 @@ public class SurveyEditor
     {
         getDialogPane().getButtonTypes().setAll(btCancel, btPrevious, btNext, btSave);
 
-        switch(pageIndex)
+        switch (pageIndex)
         {
             case 0:
                 getDialogPane().setContent(gridPane);
@@ -121,7 +122,16 @@ public class SurveyEditor
                 break;
 
             case 2:
-                getDialogPane().setContent(browsePane);
+                if (source.getForm() == null)
+                {
+                    getDialogPane().setContent(browsePane);
+                }
+                else
+                {
+                    FormEditorPane pane = new FormEditorPane();
+                    pane.setSource(source.getForm());
+                    getDialogPane().setContent(pane);
+                }
                 removeButton(btNext);
                 break;
         }
@@ -130,9 +140,9 @@ public class SurveyEditor
     private void showAddForm()
     {
         FormEditorPane pane = (FormEditorPane) editButton.getPane();
-        
+
         source.setForm(new Form());
-        
+
         pane.setSource(source.getForm());
         getDialogPane().setContent(pane);
     }
@@ -142,18 +152,18 @@ public class SurveyEditor
         FormEditorPane pane = (FormEditorPane) editButton.getPane();
         ItemPicker<Form> picker = new ItemPicker<>();
         picker.setItems(FormUtilities.getValues());
-        
+
         picker.open("Selecione um formulário");
-        
+
         if (picker.getSelected() != null)
         {
             source.setForm(picker.getSelected());
             pane.setSource(source.getForm());
             pane.setEnable(PermissionController.getInstance()
-                                               .hasPermission(ApplicationController.getInstance()
-                                                                                   .getActiveUser(),
-                                                              editButton.getRole()));
-            
+                    .hasPermission(ApplicationController.getInstance()
+                            .getActiveUser(),
+                            editButton.getRole()));
+
             getDialogPane().setContent(pane);
         }
     }
@@ -195,10 +205,10 @@ public class SurveyEditor
         getDialogPane().setContent(gridPane);
 
         //Terceira Página
-        addButton.setDisable(PermissionController.getInstance()
-                                                 .hasPermission(ApplicationController.getInstance()
-                                                                                     .getActiveUser(),
-                                                                addButton.getRole()));
+        addButton.setDisable(!PermissionController.getInstance()
+                .hasPermission(ApplicationController.getInstance()
+                        .getActiveUser(),
+                        addButton.getRole()));
 
         browsePane.setButtons(new BrowseButton[]
         {
@@ -213,9 +223,12 @@ public class SurveyEditor
                 showAddForm();
             }
 
-            else if (browsePane.getSelectedButton() == editButton)
+            else
             {
-                showEditForm();
+                if (browsePane.getSelectedButton() == editButton)
+                {
+                    showEditForm();
+                }
             }
         });
     }

@@ -51,11 +51,15 @@ public class DetailsTable
     
     public DetailsTable addItem(String label, Object value)
     {
-        String v = value.toString();
+        String v = "n/d";
         
         if (value instanceof Date)
         {
             v = df.format((Date) value);
+        }
+        else if(value != null)
+        {
+            v = value.toString();
         }
         
         return addItem(label, v);

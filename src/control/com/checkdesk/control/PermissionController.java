@@ -60,12 +60,12 @@ public class PermissionController
         {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-            Document document = builder.parse(new File(new URI(ResourceLocator.getInstance().getConfigResource("permissions.xml"))));
+            Document document = builder.parse(ResourceLocator.getInstance().getConfigStream("permissions.xml"));
             
             Node root = document.getDocumentElement();
             loadTreeChildren(root, rootItem);
             
-            document = builder.parse(new File(new URI(ResourceLocator.getInstance().getConfigResource("profiles.xml"))));
+            document = builder.parse(ResourceLocator.getInstance().getConfigStream("profiles.xml"));
             
             NodeList list = document.getElementsByTagName("type");
             

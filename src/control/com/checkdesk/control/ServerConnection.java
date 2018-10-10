@@ -175,6 +175,8 @@ class ConnectionListener extends Thread
     
     private void notify(Object object)
     {
+        System.out.println("Aviso de Pesquisa: " + String.valueOf(object));
+        
         if (object instanceof Survey)
         {
             Notifications.create()

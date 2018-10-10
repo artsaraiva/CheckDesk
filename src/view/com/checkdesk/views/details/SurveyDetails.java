@@ -17,7 +17,6 @@ import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-
 /**
  *
  * @author MNicaretta
@@ -25,11 +24,12 @@ import javafx.scene.layout.VBox;
 public class SurveyDetails
         extends DetailsPane<Survey>
 {
+
     public SurveyDetails()
     {
         initComponents();
     }
-    
+
     @Override
     public void setSource(int sourceId)
     {
@@ -60,26 +60,29 @@ public class SurveyDetails
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
                     new DetailsTable(75).addItem("Data de criação", source.getCreatedDate())
-                                        .addItem("Tipo", SurveyUtilities.getType(source.getType()))
-                                        .addItem("Autor", source.getOwner())
-                                        .addItem("Categoria", source.getCategory())
-                                        .addItem("Participantes", source.getParticipants())
-                                        .addItemHtml("Informações", source.getInfo())
-                                        .addItem("Formulário", source.getForm()));
+                            .addItem("Tipo", SurveyUtilities.getType(source.getType()))
+                            .addItem("Autor", source.getOwner())
+                            .addItem("Categoria", source.getCategory())
+                            .addItem("Participantes", source.getParticipants())
+                            .addItemHtml("Informações", source.getInfo())
+                            .addItem("Formulário", source.getForm()));
 
             Table table = new Table("Pergunta", "Tipo", "Opções");
 
-            for (Question question : (Set<Question>) source.getForm().getQuestions())
+            if (source.getForm() != null)
             {
-                table.addRow(question.getName(),
-                             FormUtilities.getQuestionType(question.getType()),
-                             question.getOption());
+                for (Question question : (Set<Question>) source.getForm().getQuestions())
+                {
+                    table.addRow(question.getName(),
+                            FormUtilities.getQuestionType(question.getType()),
+                            question.getOption());
+                }
             }
 
             vbox.getChildren().add(table);
         }
     }
-    
+
     private void initComponents()
     {
         getChildren().add(vbox);

@@ -1,10 +1,7 @@
 package com.checkdesk.model.data;
 // Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,8 +17,6 @@ public class Form
     private Set surveys = new HashSet(0);
     private Set questions = new HashSet(0);
     
-    private Map<Question, File> questionMap = new HashMap<Question, File>();
-
     public Form()
     {
     }
@@ -101,11 +96,6 @@ public class Form
     public void setQuestions(Set questions)
     {
         this.questions = questions;
-    }
-
-    public Map<Question, File> getQuestionMap()
-    {
-        return questionMap;
     }
 
     @Override

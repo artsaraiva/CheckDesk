@@ -24,10 +24,11 @@ import javafx.event.Event;
  */
 public class SurveyUtilities
 {
-    private static final Item TYPE_PUBLIC =    new Item("Pública", Survey.TYPE_PUBLIC);
-    private static final Item TYPE_PRIVATE =   new Item("Privada", Survey.TYPE_PRIVATE);
+
+    private static final Item TYPE_PUBLIC = new Item("Pública", Survey.TYPE_PUBLIC);
+    private static final Item TYPE_PRIVATE = new Item("Privada", Survey.TYPE_PRIVATE);
     private static final Item TYPE_ANONYMOUS = new Item("Anônima", Survey.TYPE_ANONYMOUS);
-    private static final Item TYPE_TOTEM =     new Item("Totem",   Survey.TYPE_TOTEM);
+    private static final Item TYPE_TOTEM = new Item("Totem", Survey.TYPE_TOTEM);
 
     public static void addSurvey()
     {
@@ -41,10 +42,10 @@ public class SurveyUtilities
             {
                 try
                 {
-                    EntityService.getInstance().save(getSource());
-                    
                     FormUtilities.saveForm(getSource().getForm());
-                    
+
+                    EntityService.getInstance().save(getSource());
+
                     ApplicationController.getInstance().notify(getSource());
                 }
 
@@ -56,7 +57,7 @@ public class SurveyUtilities
 
         }).show();
     }
-    
+
     public static void editSurvey(Survey survey)
     {
         new SurveyEditor(new EditorCallback<Survey>(survey)
@@ -67,7 +68,7 @@ public class SurveyUtilities
                 try
                 {
                     EntityService.getInstance().update(getSource());
-                    
+
                     FormUtilities.saveForm(getSource().getForm());
                 }
 
@@ -78,7 +79,7 @@ public class SurveyUtilities
             }
         }).showAndWait();
     }
-    
+
     public static void deleteSurvey(Survey survey)
     {
         if (Prompts.confirm("Exlusão de Pesquisa", "Deseja realmente excluir a pesquisa?"))
@@ -86,7 +87,11 @@ public class SurveyUtilities
             try
             {
                 EntityService.getInstance().delete(survey);
-                FormUtilities.deleteForm(survey.getForm());
+
+                if (survey.getForm() != null && survey.getForm().getSurveys().isEmpty())
+                {
+                    FormUtilities.deleteForm(survey.getForm());
+                }
             }
 
             catch (Exception e)
@@ -112,7 +117,7 @@ public class SurveyUtilities
 
         return result;
     }
-    
+
     public static List<Survey> getValues()
     {
         List<Survey> result = new ArrayList<>();
@@ -129,7 +134,7 @@ public class SurveyUtilities
 
         return result;
     }
-    
+
     public static ObservableList<Item> getItems()
     {
         return FXCollections.observableArrayList(TYPE_PUBLIC, TYPE_PRIVATE, TYPE_ANONYMOUS, TYPE_TOTEM);

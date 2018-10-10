@@ -81,15 +81,15 @@ create table options
     constraint fk_options_viewers foreign key (ref_viewers) references "groups"(id)
 );
 
--- groups_mappings
-create table groups_mappings
+-- group_mappings
+create table group_mappings
 (
     ref_user  int not null,
-    ref_groups int not null,
+    ref_group int not null,
 
-    constraint pk_groups_mappings       primary key (ref_user, ref_groups),
-    constraint fk_groups_mappings_user  foreign key (ref_user) references users(id),
-    constraint fk_groups_mappings_groups foreign key (ref_groups) references "groups"(id)
+    constraint pk_group_mappings       primary key (ref_user, ref_groups),
+    constraint fk_group_mappings_user  foreign key (ref_user) references users(id),
+    constraint fk_group_mappings_groups foreign key (ref_groups) references "groups"(id)
 );
 
 -- categories
