@@ -10,7 +10,6 @@ import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -18,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -25,13 +26,14 @@ import javafx.collections.ObservableList;
  */
 public class LogUtilities
 {
-    public static final Item EVENT_ADD         = new Item("Adicionar",                  Log.EVENT_ADD);
-    public static final Item EVENT_UPDATE      = new Item("Editar",                     Log.EVENT_UPDATE);
-    public static final Item EVENT_DELETE      = new Item("Excluir",                    Log.EVENT_DELETE);
+
+    public static final Item EVENT_ADD = new Item("Adicionar", Log.EVENT_ADD);
+    public static final Item EVENT_UPDATE = new Item("Editar", Log.EVENT_UPDATE);
+    public static final Item EVENT_DELETE = new Item("Excluir", Log.EVENT_DELETE);
     public static final Item EVENT_ACTIVE_LOGS = new Item("Ativar/Desativar auditoria", Log.EVENT_ACTIVE_LOGS);
-    
-    private static final int OPTION_USER   = 0;
-    private static final int OPTION_DATE   = 1;
+
+    private static final int OPTION_USER = 0;
+    private static final int OPTION_DATE = 1;
     private static final int OPTION_ACTION = 2;
 
     public static void addLog(Log log)
@@ -40,18 +42,18 @@ public class LogUtilities
         {
             EntityService.getInstance().save(log);
         }
-        
+
         catch (Exception e)
         {
             ApplicationController.logException(e);
         }
     }
-    
+
     public static ObservableList<Item> getFilterOptions()
     {
         return FXCollections.observableArrayList(new Item("Usuário", OPTION_USER),
-                                                 new Item("Data",    OPTION_DATE),
-                                                 new Item("Ação",    OPTION_ACTION));
+                new Item("Data", OPTION_DATE),
+                new Item("Ação", OPTION_ACTION));
     }
 
     public static List filtersFor(Item item)
@@ -91,7 +93,7 @@ public class LogUtilities
         try
         {
             List<Date> dates = EntityService.getInstance().getFieldValues(Log.class.getDeclaredField("timestamp"), Log.class);
-            
+
             for (Date d : dates)
             {
                 Calendar c = Calendar.getInstance();
@@ -100,7 +102,7 @@ public class LogUtilities
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.SECOND, 0);
                 c.set(Calendar.MILLISECOND, 0);
-                
+
                 if (!objects.contains(c.getTime()))
                 {
                     objects.add(c.getTime());
@@ -120,7 +122,7 @@ public class LogUtilities
     {
         return Arrays.asList(EVENT_ADD, EVENT_UPDATE, EVENT_DELETE, EVENT_ACTIVE_LOGS);
     }
-    
+
     public static Item getEvent(int type)
     {
         Item result = null;
@@ -137,7 +139,7 @@ public class LogUtilities
         return result;
     }
 
-    public static List<Log> getLogs(Item item, Object value)
+    public static List<Log> getLogs(Date value, Date value2)
     {
         List<Log> result = new ArrayList<>();
 
@@ -145,29 +147,14 @@ public class LogUtilities
 
         try
         {
-            if (item != null && value != null)
+            if (value != null)
             {
-                Field field = null;
-                int comparator = Parameter.COMPARATOR_EQUALS;
-                
-                switch (item.getValue())
-                {
-                    case OPTION_USER:
-                        field = Log.class.getDeclaredField("user");
-                        break;
+                parameters.add(new Parameter("from", Log.class.getDeclaredField("timestamp"), value, Parameter.COMPARATOR_DATE_FROM));
+            }
 
-                    case OPTION_DATE:
-                        field = Log.class.getDeclaredField("timestamp");
-                        comparator = Parameter.COMPARATOR_DATE;
-                        break;
-
-                    case OPTION_ACTION:
-                        field = Log.class.getDeclaredField("event");
-                        value = value instanceof Item ? ((Item) value).getValue() : value;
-                        break;
-                }
-
-                parameters = Arrays.asList(new Parameter(field.getName(), field, value, comparator));
+            if (value2 != null)
+            {
+                parameters.add(new Parameter("until", Log.class.getDeclaredField("timestamp"), value2, Parameter.COMPARATOR_DATE_UNTIL));
             }
             
             result = EntityService.getInstance().getValues(Log.class, parameters);
@@ -180,21 +167,39 @@ public class LogUtilities
 
         return result;
     }
-    
+
     public static Log getLog(int logId)
     {
         Log result = null;
-        
+
         try
         {
             result = (Log) EntityService.getInstance().getValue(Log.class, logId);
         }
-        
+
         catch (Exception e)
         {
             ApplicationController.logException(e);
         }
-        
+
         return result;
+    }
+    
+    public static void transferLogs(String table, Date from, Date until)
+    {
+        try
+        {
+            Map<String,Object> parameters = new LinkedHashMap<>();
+            
+            parameters.put("table", table); 
+            parameters.put("from", new java.sql.Timestamp(from.getTime()));
+            parameters.put("until",  new java.sql.Timestamp(until.getTime()));
+            
+            EntityService.getInstance().executeFunction("transfer_logs_to_aux_table", parameters);
+        }
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
     }
 }

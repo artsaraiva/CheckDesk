@@ -16,17 +16,20 @@ import java.util.Date;
  */
 public class Parameter
 {
+
     public static final int COMPARATOR_EQUALS = 0;
     public static final int COMPARATOR_LOWER_CASE = 1;
     public static final int COMPARATOR_DATE = 2;
+    public static final int COMPARATOR_DATE_FROM = 3;
+    public static final int COMPARATOR_DATE_UNTIL = 4;
 
-    private  DateFormat df = DateFormat.getDateInstance();
-    
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
     private String key;
     private Field field;
     private Object value;
     private int comparator;
-    
+
     public Parameter(String key, Field field, Object value, int comparator) throws Exception
     {
         this.key = key;
@@ -61,6 +64,20 @@ public class Parameter
                     result = df.format((Date) value);
                 }
                 break;
+
+            case COMPARATOR_DATE_FROM:
+                if (value instanceof Date)
+                {
+                    result = df.format((Date) value);
+                }
+                break;
+
+            case COMPARATOR_DATE_UNTIL:
+                if (value instanceof Date)
+                {
+                    result = df.format((Date) value);
+                }
+                break;
         }
 
         return result;
@@ -83,8 +100,15 @@ public class Parameter
             case COMPARATOR_DATE:
                 result = "to_char(" + field.getName() + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') = :" + key;
                 break;
-        }
 
+            case COMPARATOR_DATE_FROM:
+                result = "to_char(" + field.getName() + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') >= :" + key;
+                break;
+
+            case COMPARATOR_DATE_UNTIL:
+                result = "to_char(" + field.getName() + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') <= :" + key;
+                break;
+        }
         return result;
     }
 }
