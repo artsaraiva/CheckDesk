@@ -6,9 +6,16 @@
 package com.checkdesk.control;
 
 import com.checkdesk.model.data.Survey;
+import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.ServerRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,8 +28,6 @@ import org.controlsfx.control.Notifications;
  */
 public class ServerConnection
 {
-    public static final String NOTIFY = "notify";
-    
     private static ServerConnection serverConnection;
     
     public static ServerConnection getInstance()
@@ -83,6 +88,9 @@ public class ServerConnection
     
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
+    
+    private FileInputStream fis = null;
+    private FileOutputStream fos = null;
    
     private ServerConnection(Socket client)
     {
@@ -99,23 +107,63 @@ public class ServerConnection
         }
     }
     
-    public Object say(Object object) throws Exception
-    {
-        return say(object, true);
-    }
-    
-    public Object say(Object object, boolean waitResponse) throws Exception
+    public Object say(ServerRequest request) throws Exception
     {
         Object result = null;
         
-        out.writeObject(object);
+        out.writeObject(request);
         
-        if (waitResponse)
+        if (request.isWaitResponse())
         {
             result = in.readObject();
         }
         
         return result;
+    }
+    
+    public void sendFile(File file) throws Exception
+    {
+        byte[] bytes = new byte[16*1024];
+        InputStream in = new FileInputStream(file);
+        
+        int count = 0;
+        
+        while((count = in.read(bytes)) > 0)
+        {
+            out.write(bytes, 0, count);
+        }
+        
+        out.writeObject(new ServerRequest().setRequest(ServerRequest.FINISH_FILE));
+        in.close();
+    }
+    
+    public void receiveFile(File file) throws Exception
+    {
+        if (fos == null)
+        {
+            fos = new FileOutputStream(file);
+        }
+        
+        byte[] bytes = new byte[16 * 1024];
+
+        int contador;
+        
+        while ((contador = in.read(bytes)) > 0)
+        {
+            fos.write(bytes, 0, contador);
+        }
+        
+        Object result = in.readObject();
+        if (result instanceof ServerRequest && ((ServerRequest) result).getRequest() == ServerRequest.FINISH_FILE)
+        {
+            finishFile();
+        }
+    }
+    
+    private void finishFile() throws Exception
+    {
+        fos.close();
+        fos = null;
     }
 }
 
@@ -162,31 +210,39 @@ class ConnectionListener extends Thread
     
     private void handle(Object mens) throws Exception
     {
-        if (mens != null)
+        if ( mens instanceof ServerRequest )
         {
-            switch (mens.toString())
+            ServerRequest request = (ServerRequest) mens;
+            
+            switch (request.getRequest())
             {
-                case ServerConnection.NOTIFY:
-                    notify(in.readObject());
+                case ServerRequest.NOTIFY:
+                    notify(request.getParameter("object"));
                     break;
             }
         }
     }
     
-    private void notify(Object object)
+    private void notify(final Object object)
     {
-        System.out.println("Aviso de Pesquisa: " + String.valueOf(object));
-        
         if (object instanceof Survey)
         {
-            Notifications.create()
-                         .title("Nova pesquisa!")
-                         .text("Uma nova pesquisa foi criada: " + ((Survey) object).getTitle())
-                         .graphic(new ImageView(new Image(ResourceLocator.getInstance().getImageResource("mp_survey.png"))))
-                         .position(Pos.BOTTOM_RIGHT)
-                         .hideAfter(Duration.seconds(5))
-                         .owner(ApplicationController.getInstance().getRootNode())
-                         .show();
+            Platform.runLater( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Notifications.create()
+                                 .title("Nova pesquisa!")
+                                 .text("Uma nova pesquisa foi criada: " + ((Survey) object).getTitle())
+                                 .graphic(new ImageView(new Image(ResourceLocator.getInstance().getImageResource("mp_survey.png"))))
+                                 .position(Pos.BOTTOM_RIGHT)
+                                 .hideAfter(Duration.seconds(5))
+                                 .owner(ApplicationController.getInstance().getRootWindow())
+                                 .show();
+                }
+            } );
+            
         }
     }
 }

@@ -44,8 +44,6 @@ public class ItemPicker<T>
     protected ButtonType btCancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
     protected ButtonType selectedButton;
 
-    private boolean selectOnClick = true;
-
     public ItemPicker()
     {
         initComponents();
@@ -63,16 +61,6 @@ public class ItemPicker<T>
     public List<T> getItems()
     {
         return items;
-    }
-
-    public boolean isSelectOnClick()
-    {
-        return selectOnClick;
-    }
-
-    public void setSelectOnClick(boolean selectOnClick)
-    {
-        this.selectOnClick = selectOnClick;
     }
 
     public T getSelected()

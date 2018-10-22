@@ -5,15 +5,20 @@
  */
 package com.checkdesk.control;
 
+import com.checkdesk.control.util.AttachmentUtilities;
 import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
+import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.ServerRequest;
 import com.server.checkdesk.main.HandleClient;
 import com.server.checkdesk.main.Main;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
@@ -25,7 +30,6 @@ import java.util.Date;
  */
 public class ApplicationController
 {
-    public static final String NOTIFY = "notify";
     private static boolean activeLog;
 
     public static ApplicationController getInstance()
@@ -140,16 +144,49 @@ public class ApplicationController
         return activeUser;
     }
     
-    public Object handle(Object request, HandleClient client) throws Exception
+    public Object handle(ServerRequest request, HandleClient client) throws Exception
     {
         Object result = null;
         
         if (request != null)
         {
-            switch (request.toString())
+            switch (request.getRequest())
             {
-                case NOTIFY:
-                    Main.notify(client.getObject());
+                case ServerRequest.LOGIN:
+                    result = login((String) request.getParameter("user"), (String) request.getParameter("password"));
+                    break;
+                    
+                case ServerRequest.NOTIFY:
+                    Serializable object = request.getParameter("object");
+                    
+                    NotificationController.getInstance().sendNotification(object);
+                    Main.notify(object);
+                    break;
+                    
+                case ServerRequest.DOWNLOAD:
+                    Attachment attachment = (Attachment) request.getParameter("object");
+                    AttachmentUtilities.download(attachment, client);
+                    break;
+                    
+                case ServerRequest.UPLOAD:
+                    attachment = (Attachment) request.getParameter("object");
+                    AttachmentUtilities.upload(attachment, client);
+                    break;
+                    
+                case ServerRequest.FINISH_FILE:
+                    client.finishUpload();
+                    break;
+                    
+                case ServerRequest.INSERT:
+                    EntityService.getInstance().save(request.getParameter("object"));
+                    break;
+                    
+                case ServerRequest.UPDATE:
+                    EntityService.getInstance().update(request.getParameter("object"));
+                    break;
+                    
+                case ServerRequest.DELETE:
+                    EntityService.getInstance().delete(request.getParameter("object"));
                     break;
             }
         }

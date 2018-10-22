@@ -135,19 +135,17 @@ public class FormUtilities
     {
         if (form.getId() == 0)
         {
-            System.out.println("foifdfsdfsdfsdfsdfdfbvvvv");
             EntityService.getInstance().save(form);
 
-            for (Question question : (Set<Question>)form.getQuestions())
+            for (Question question : (Set<Question>) form.getQuestions())
             {
                 EntityService.getInstance().save(question);
+                AttachmentUtilities.saveAttachments(question);
             }
         }
         
         else
         {
-            EntityService.getInstance().update(form);
-
             List<Question> deleteQuestions = EntityService.getInstance().loadValues(Question.class,
                                                                                     Arrays.asList(new Parameter("form",
                                                                                                   Question.class.getDeclaredField("form"),
@@ -168,6 +166,7 @@ public class FormUtilities
 
                 if (delete)
                 {
+                    AttachmentUtilities.deleteAttachments(deletable);
                     EntityService.getInstance().delete(deletable);
                 }
             }
@@ -183,7 +182,11 @@ public class FormUtilities
                 {
                     EntityService.getInstance().update(question);
                 }
+                
+                AttachmentUtilities.saveAttachments(question);
             }
+
+            EntityService.getInstance().update(form);
         }
     }
     

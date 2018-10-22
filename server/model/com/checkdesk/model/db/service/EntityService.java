@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javassist.Modifier;
+import javax.persistence.StoredProcedureQuery;
 import org.hibernate.CacheMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -150,6 +151,8 @@ public class EntityService
             sql += key + " = :" + key + " and ";
         }
         
+        StoredProcedureQuery q;
+        
         Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
         
         for (Map.Entry entry : parameters.entrySet())
@@ -160,7 +163,7 @@ public class EntityService
         return query.uniqueResult();
     }
 
-    public Object loadValue(Class type, Serializable value) throws Exception
+    private Object loadValue(Class type, Serializable value) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -185,7 +188,8 @@ public class EntityService
 
                 catch (Exception e)
                 {
-                    /*NADA*/ }
+                    /*NADA*/
+                }
             }
 
             return result;

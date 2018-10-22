@@ -7,15 +7,17 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
+import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
+import com.checkdesk.views.pickers.AttachmentPicker;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -267,6 +269,8 @@ public class FormEditorPane
             nameField.setText(source.getName());
             typeField.setValue(FormUtilities.getQuestionType(source.getType()));
             optionSelector.setSelected(source.getOption());
+            
+            attachmentPicker.setQuestion(source);
         }
         
         public Question getSource()
@@ -274,6 +278,7 @@ public class FormEditorPane
             source.setName(nameField.getText());
             source.setType(typeField.getValue().getValue());
             source.setOption(optionSelector.getSelected());
+            source.setAttachments(new HashSet(attachmentSelector.getSelected()));
             source.setConstraints("");
 
             return source;
@@ -383,11 +388,12 @@ public class FormEditorPane
             
             typeField.setItems(FXCollections.observableArrayList(FormUtilities.getQuestionTypes()));
             optionSelector.setItems(FormUtilities.getQuestionOptions());
+            attachmentSelector.changePicker(attachmentPicker);
 
             typeField.valueProperty().addListener((ObservableValue<? extends Item> value, Item oldValue, Item newValue) ->
             {
                 optionSelector.setSelected(null);
-                getChildren().setAll(nameField, typeField, optionSelector);
+                getChildren().setAll(nameField, typeField, optionSelector, attachmentSelector);
 
                 if (typeField.getValue().getValue() != Question.TYPE_SINGLE_CHOICE &&
                     typeField.getValue().getValue() != Question.TYPE_MULTI_CHOICE)
@@ -412,6 +418,8 @@ public class FormEditorPane
         private TextField nameField = new TextField();
         private ComboBox<Item> typeField = new ComboBox<>();
         private ItemSelector<Option> optionSelector = new ItemSelector<>();
+        private ItemSelector<List<Attachment>> attachmentSelector = new ItemSelector();
+        private AttachmentPicker attachmentPicker = new AttachmentPicker();
         
         private Border dragBorder = new Border(new BorderStroke(Paint.valueOf("#0066CC"),
                                                                 BorderStrokeStyle.DASHED,

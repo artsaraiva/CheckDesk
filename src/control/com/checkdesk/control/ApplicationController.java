@@ -6,18 +6,22 @@
 package com.checkdesk.control;
 
 import com.checkdesk.control.util.LogUtilities;
+import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Log;
-import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
+import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.ServerRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javafx.scene.Node;
-import org.json.JSONObject;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 /**
  *
@@ -25,7 +29,6 @@ import org.json.JSONObject;
  */
 public class ApplicationController
 {
-
     private static ApplicationController defaultInstance;
     private static boolean activeLog;
 
@@ -120,11 +123,18 @@ public class ApplicationController
     }
 
     private User activeUser;
-    private Node rootNode;
+    private Window rootWindow;
 
     private ApplicationController()
     {
         activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor", false);
+    }
+    
+    public void close() throws Exception
+    {
+        defaultInstance = null;
+        EntityService.getInstance().close();
+        notify(null);
     }
 
     public User getActiveUser()
@@ -136,11 +146,10 @@ public class ApplicationController
     {
         try
         {
-            JSONObject json = new JSONObject();
-            json.put("user", login);
-            json.put("password", hash(password));
-
-            activeUser = (User) ServerConnection.getInstance().say(json.toString());
+            activeUser = (User) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.LOGIN)
+                                                                                      .addParameter("user", login)
+                                                                                      .addParameter("password", hash(password))
+                                                                                      .setWaitResponse(true));
         }
         
         catch (Exception e)
@@ -151,22 +160,64 @@ public class ApplicationController
         return activeUser;
     }
 
-    public Node getRootNode()
+    public Window getRootWindow()
     {
-        return rootNode;
+        return rootWindow;
     }
 
-    public void setRootNode(Node rootNode)
+    public void setRootWindow(Window rootWindow)
     {
-        this.rootNode = rootNode;
+        this.rootWindow = rootWindow;
     }
     
-    public void notify(Object object)
+    public void notify(Serializable object)
     {
         try
         {
-            ServerConnection.getInstance().say(ServerConnection.NOTIFY, false);
-            ServerConnection.getInstance().say(object, false);
+            ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.NOTIFY)
+                                                                  .addParameter("object", object)
+                                                                  .setWaitResponse(false));
+        }
+        
+        catch (Exception e)
+        {
+            logException(e);
+        }
+    }
+    
+    public void saveFile(Attachment attachment)
+    {
+        try
+        {
+            if (attachment.getAttachment() != null)
+            {
+                ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.UPLOAD)
+                                                                      .addParameter("object", attachment)
+                                                                      .setWaitResponse(false));
+                
+                ServerConnection.getInstance().sendFile(attachment.getAttachment());
+            }
+        }
+        
+        catch (Exception e)
+        {
+            logException(e);
+        }
+    }
+    
+    public void downloadFile(Attachment attachment)
+    {
+        try
+        {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialFileName( attachment.toString() );
+            File file = fileChooser.showSaveDialog(getRootWindow());
+            
+            ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DOWNLOAD)
+                                                                  .addParameter("object", attachment)
+                                                                  .setWaitResponse(false));
+            
+            ServerConnection.getInstance().receiveFile(file);
         }
         
         catch (Exception e)

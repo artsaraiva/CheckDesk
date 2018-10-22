@@ -28,5 +28,11 @@
       </key>
       <one-to-many class="com.checkdesk.model.data.QuestionAnswer"/>
     </set>
+    <set fetch="select" inverse="true" lazy="true" name="attachments" table="files">
+      <key>
+        <column name="ref_question" not-null="true"/>
+      </key>
+      <one-to-many class="com.checkdesk.model.data.Attachment"/>
+    </set>
   </class>
 </hibernate-mapping>

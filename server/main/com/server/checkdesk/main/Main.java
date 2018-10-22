@@ -7,8 +7,10 @@ package com.server.checkdesk.main;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ConfigurationManager;
+import com.checkdesk.control.NotificationController;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ public class Main extends Thread
         new Main().start();
     }
 
-    public static void notify(Object object) throws Exception
+    public static void notify(Serializable object) throws Exception
     {
         for (HandleClient client : listners)
         {

@@ -7,7 +7,6 @@ package com.checkdesk.views;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
-import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.panes.DefaultPane;
 import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.MenuPane;
@@ -50,7 +49,7 @@ public class MainView
         stage.setMaximized(true);
         stage.show();
         
-        ApplicationController.getInstance().setRootNode(borderPane);
+        ApplicationController.getInstance().setRootWindow(stage);
     }
     
     private void selectMenuItem(MenuItem selected)
@@ -104,7 +103,7 @@ public class MainView
         {
             try
             {
-                EntityService.getInstance().close();
+                ApplicationController.getInstance().close();
             }
             catch (Exception e)
             {

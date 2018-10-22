@@ -6,11 +6,14 @@
 package com.server.checkdesk.main;
 
 import com.checkdesk.control.ApplicationController;
-import com.checkdesk.model.data.User;
+import com.checkdesk.model.util.ServerRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
-import org.json.JSONObject;
 
 /**
  *
@@ -22,6 +25,9 @@ public class HandleClient extends Thread
 
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
+    
+    private FileInputStream fis = null;
+    private FileOutputStream fos = null;
 
     private final ApplicationController controller = ApplicationController.getInstance();
 
@@ -47,17 +53,26 @@ public class HandleClient extends Thread
             
             else
             {
-                JSONObject login = new JSONObject((String) first);
-                User user = controller.login(login.getString("user"), login.getString("password"));
-
-                out.flush();
-                out.writeObject(user);
-
-                Object request = in.readObject();
-
-                while (request != null)
+                ServerRequest request = (ServerRequest) first;
+                
+                out.writeObject(controller.handle(request, this));
+                
+                while ((request = (ServerRequest) in.readObject()) != null)
                 {
-                    out.writeObject(controller.handle(request, this));
+                    Object response = null;
+                    
+                    try
+                    {
+                        response = controller.handle(request, this);
+                    }
+                    
+                    finally
+                    {
+                        if (request.isWaitResponse())
+                        {
+                            out.writeObject(response);
+                        }
+                    }
                 }
             }
         }
@@ -72,12 +87,56 @@ public class HandleClient extends Thread
         return in.readObject();
     }
     
-    public void notify(Object object) throws Exception
+    public void notify(Serializable object) throws Exception
     {
-        out.flush();
-        out.writeObject(ApplicationController.NOTIFY);
+        ServerRequest request = new ServerRequest().setRequest(ServerRequest.NOTIFY)
+                                                   .addParameter("object", object)
+                                                   .setWaitResponse(false);
         
         out.flush();
-        out.writeObject(object);
+        out.writeObject(request);
+    }
+    
+    public void download(File file) throws Exception
+    {
+        if (fis == null)
+        {
+            fis = new FileInputStream(file);
+        }
+        
+        byte[] bytes = new byte[16*1024];
+        int count = 0;
+        
+        while((count = fis.read(bytes)) > 0)
+        {
+            out.write(bytes, 0, count);
+        }
+        
+        out.writeObject(new ServerRequest().setRequest(ServerRequest.FINISH_FILE));
+        fis.close();
+        fis = null;
+    }
+    
+    public void upload(File file) throws Exception
+    {
+        if (fos == null)
+        {
+            fos = new FileOutputStream(file);
+        }
+        
+        byte[] bytes = new byte[16 * 1024];
+
+        int count;
+        
+        while ((count = in.read(bytes)) > 0)
+        {
+            fos.write(bytes, 0, count);
+        }
+    }
+    
+    public void finishUpload() throws Exception
+    {
+        fos.close();
+        fos = null;
     }
 }

@@ -8,9 +8,12 @@ package com.checkdesk.views.panes;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.FormUtilities;
+import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
+import com.checkdesk.model.data.Question;
 import com.checkdesk.views.details.FormDetails;
 import com.checkdesk.views.parts.DefaultTable;
+import com.checkdesk.views.pickers.ItemPicker;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.value.ObservableValue;
@@ -69,7 +72,7 @@ public class FormPane
 
         table.setActions(new MenuItem[]
         {
-            editItem, deleteItem
+            editItem, deleteItem, attachmentItem
         });
         selectionBox.getChildren().addAll(filterBox, table);
 
@@ -123,6 +126,7 @@ public class FormPane
 
     private MenuItem editItem = new MenuItem("Editar");
     private MenuItem deleteItem = new MenuItem("Excluir");
+    private MenuItem attachmentItem = new MenuItem("Anexos");
     {
         editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.form"));
 
@@ -139,5 +143,37 @@ public class FormPane
             FormUtilities.deleteForm(table.getSelectedItem());
             refreshContent();
         });
+        
+        attachmentItem.setOnAction((ActionEvent t) ->
+        {
+            downloadAttachment();
+        });
+    }
+    
+    private void downloadAttachment()
+    {
+        try
+        {
+            ItemPicker<Question> questionPicker = new ItemPicker<>();
+            questionPicker.setItems(new ArrayList(table.getSelectedItem().getQuestions()));
+            questionPicker.open("Selecione um item");
+
+            if (questionPicker.getSelected() != null)
+            {
+                ItemPicker<Attachment> attachmentPicker = new ItemPicker<>();
+                attachmentPicker.setItems(new ArrayList(questionPicker.getSelected().getAttachments()));
+                attachmentPicker.open("Selecione um item");
+
+                if (attachmentPicker.getSelected() != null)
+                {
+                    ApplicationController.getInstance().downloadFile(attachmentPicker.getSelected());
+                }
+            }
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
     }
 }

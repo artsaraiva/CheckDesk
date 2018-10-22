@@ -54,5 +54,6 @@ Contributor(s):
     <mapping resource="com/checkdesk/model/data/Answers.hbm.xml"/>
     <mapping resource="com/checkdesk/model/data/Logs.hbm.xml"/>
     <mapping resource="com/checkdesk/model/data/Options.hbm.xml"/>
+    <mapping resource="com/checkdesk/model/data/Attachments.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

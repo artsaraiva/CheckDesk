@@ -17,7 +17,7 @@ public class Question
     public static final int TYPE_MULTI_CHOICE  = 4;
     public static final int TYPE_DATE          = 5;
     public static final int TYPE_NUMBER        = 6;
-    
+
     private int id;
     private Form form;
     private Option option;
@@ -25,6 +25,7 @@ public class Question
     private int type;
     private String constraints;
     private Set questionAnswers = new HashSet(0);
+    private Set attachments = new HashSet(0);
 
     public Question()
     {
@@ -44,7 +45,7 @@ public class Question
         this.constraints = constraints;
     }
 
-    public Question(int id, Form form, Option option, String name, int type, String constraints, Set questionAnswers)
+    public Question(int id, Form form, Option option, String name, int type, String constraints, Set questionAnswers, Set files)
     {
         this.id = id;
         this.form = form;
@@ -53,6 +54,7 @@ public class Question
         this.type = type;
         this.constraints = constraints;
         this.questionAnswers = questionAnswers;
+        this.attachments = files;
     }
 
     public int getId()
@@ -123,6 +125,16 @@ public class Question
     public void setQuestionAnswers(Set questionAnswers)
     {
         this.questionAnswers = questionAnswers;
+    }
+
+    public Set getAttachments()
+    {
+        return attachments;
+    }
+
+    public void setAttachments(Set attachments)
+    {
+        this.attachments = attachments;
     }
 
     @Override

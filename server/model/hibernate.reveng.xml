@@ -55,4 +55,5 @@ Contributor(s):
   <table-filter match-name="group_mappings"/>
   <table-filter match-name="permissions"/>
   <table-filter match-name="options"/>
+  <table-filter match-name="attachments"/>
 </hibernate-reverse-engineering>

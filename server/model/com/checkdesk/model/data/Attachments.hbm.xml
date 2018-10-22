@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 11, 2018 4:12:55 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.checkdesk.model.data.Attachment" optimistic-lock="version" schema="public" table="attachments">
+    <id name="id" type="int">
+      <column name="id"/>
+      <generator class="identity"/>
+    </id>
+    <many-to-one class="com.checkdesk.model.data.Question" fetch="select" name="question">
+      <column name="ref_question" not-null="true"/>
+    </many-to-one>
+    <property name="name" type="string">
+      <column name="name" not-null="true"/>
+    </property>
+    <property name="type" type="string">
+      <column name="type" not-null="true"/>
+    </property>
+  </class>
+</hibernate-mapping>

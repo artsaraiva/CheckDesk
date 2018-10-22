@@ -6,9 +6,11 @@
 package com.checkdesk.model.db.service;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.ServerConnection;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.model.db.HibernateUtil;
 import com.checkdesk.model.util.Parameter;
+import com.checkdesk.model.util.ServerRequest;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javassist.Modifier;
+import javax.persistence.StoredProcedureQuery;
 import org.hibernate.CacheMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -69,38 +72,50 @@ public class EntityService
 
     public void save(Serializable entity) throws Exception
     {
-        logEvent(Log.EVENT_ADD, entity);
-
-        Session session = getSession();
-
-        Transaction t = session.beginTransaction();
-
-        session.save(entity);
-        t.commit();
+//        logEvent(Log.EVENT_ADD, entity);
+//
+//        Session session = getSession();
+//
+//        Transaction t = session.beginTransaction();
+//
+//        session.save(entity);
+//        t.commit();
+        
+        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.INSERT)
+                                                              .addParameter("object", entity)
+                                                              .setWaitResponse(true));
     }
 
     public void update(Serializable entity) throws Exception
     {
-        logEvent(Log.EVENT_UPDATE, entity);
-
-        Session session = getSession();
-
-        Transaction t = session.beginTransaction();
-
-        session.update(entity);
-        t.commit();
+//        logEvent(Log.EVENT_UPDATE, entity);
+//
+//        Session session = getSession();
+//
+//        Transaction t = session.beginTransaction();
+//
+//        session.update(entity);
+//        t.commit();
+        
+        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.UPDATE)
+                                                              .addParameter("object", entity)
+                                                              .setWaitResponse(true));
     }
 
     public void delete(Serializable entity) throws Exception
     {
-        logEvent(Log.EVENT_DELETE, entity);
-
-        Session session = getSession();
-
-        Transaction t = session.beginTransaction();
-
-        session.delete(getValue(entity.getClass(), entity));
-        t.commit();
+//        logEvent(Log.EVENT_DELETE, entity);
+//
+//        Session session = getSession();
+//
+//        Transaction t = session.beginTransaction();
+//
+//        session.delete(getValue(entity.getClass(), entity));
+//        t.commit();
+        
+        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DELETE)
+                                                              .addParameter("object", entity)
+                                                              .setWaitResponse(true));
     }
 
     public Object getValue(Class type, int id) throws Exception
@@ -150,6 +165,8 @@ public class EntityService
             sql += key + " = :" + key + " and ";
         }
         
+        StoredProcedureQuery q;
+        
         Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
         
         for (Map.Entry entry : parameters.entrySet())
@@ -160,7 +177,7 @@ public class EntityService
         return query.uniqueResult();
     }
 
-    public Object loadValue(Class type, Serializable value) throws Exception
+    private Object loadValue(Class type, Serializable value) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -185,7 +202,8 @@ public class EntityService
 
                 catch (Exception e)
                 {
-                    /*NADA*/ }
+                    /*NADA*/
+                }
             }
 
             return result;

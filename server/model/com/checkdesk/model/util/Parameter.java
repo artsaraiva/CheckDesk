@@ -5,6 +5,7 @@
  */
 package com.checkdesk.model.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,10 +16,12 @@ import java.util.Date;
  * @author MNicaretta
  */
 public class Parameter
+        implements Serializable
 {
-    public static final int COMPARATOR_EQUALS = 0;
+    public static final int COMPARATOR_EQUALS     = 0;
     public static final int COMPARATOR_LOWER_CASE = 1;
-    public static final int COMPARATOR_DATE = 2;
+    public static final int COMPARATOR_DATE       = 2;
+    public static final int COMPARATOR_UNLIKE     = 3;
 
     private  DateFormat df = DateFormat.getDateInstance();
     
@@ -82,6 +85,10 @@ public class Parameter
 
             case COMPARATOR_DATE:
                 result = "to_char(" + field.getName() + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') = :" + key;
+                break;
+                
+            case COMPARATOR_UNLIKE:
+                result = field.getName() + " <> :" + key;
                 break;
         }
 

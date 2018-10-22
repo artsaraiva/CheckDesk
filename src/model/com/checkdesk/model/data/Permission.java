@@ -57,7 +57,7 @@ public class Permission
     {
         this.name = name;
     }
-    
+
     @Override
     public String toString()
     {
