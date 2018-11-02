@@ -215,4 +215,5 @@ public class DefaultTable<T>
     private HBox pane = new HBox();
     private Label addItem = new Label("Adicionar");
     private ListView<T> list = new ListView<>();
+    
 }

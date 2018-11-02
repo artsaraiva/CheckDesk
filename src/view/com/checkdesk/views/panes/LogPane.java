@@ -11,14 +11,18 @@ import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.views.details.LogDetails;
+import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.parts.DefaultTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.parts.Prompts;
-import javafx.beans.value.ObservableValue;
+import java.util.List;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -48,39 +52,37 @@ public class LogPane
     @Override
     public void refreshContent()
     {
-        table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
+        table.setItems(LogUtilities.getLogs(fromDate.getDate(), untilDate.getDate()));
+        transferLogsButton.setDisable(fromDate.getDate() == null || untilDate.getDate() == null);
         detailsPane.refreshContent();
     }
 
     private void initComponents()
     {
+        transferLogsButton.setText("Transferir registros");
         table.setShowAddPane(false);
         checkbox.setSelected(ApplicationController.isActiveLog());
 
-        filterOption.setMinWidth(100);
-        HBox.setHgrow(filterSelector, Priority.ALWAYS);
-
         VBox.setVgrow(table, Priority.ALWAYS);
 
-        filterBox.getChildren().addAll(filterOption, filterSelector);
+        filterBox.getChildren().addAll(fromDate, untilDate);
         selectionBox.getChildren().addAll(filterBox, table);
 
-        detailsBox.getChildren().addAll(checkbox, detailsPane);
+        detailsBox.getChildren().addAll(checkbox, transferLogsButton, detailsPane);
 
         VBox.setVgrow(detailsPane, Priority.ALWAYS);
 
         hbox.getChildren().addAll(selectionBox, detailsBox);
         getChildren().add(hbox);
 
-        filterOption.valueProperty().addListener((ObservableValue<? extends Item> ov, Item t, Item t1) ->
+        fromDate.valueProperty().addListener((observable, oldValue, newValue) ->
         {
-            filterSelector.setItems(LogUtilities.filtersFor(t1));
-            table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
+            refreshContent();
         });
 
-        filterSelector.addEventHandler(ItemSelector.Events.ON_SELECT, (Event t) ->
+        untilDate.valueProperty().addListener((observable, oldValue, newValue) ->
         {
-            table.setItems(LogUtilities.getLogs(filterOption.getValue(), filterSelector.getSelected()));
+            refreshContent();
         });
 
         table.addEventHandler(DefaultTable.Events.ON_SELECT, (Event t) ->
@@ -104,6 +106,24 @@ public class LogPane
                 refreshContent();
             }
         });
+
+        transferLogsButton.setOnAction((ActionEvent t) ->
+        {
+            TextInputDialog dialog = new TextInputDialog("logs2");
+
+            dialog.setTitle("Transferência de registros de auditoria");
+            dialog.setHeaderText("Informe o nome da tabela destino:");
+            dialog.setContentText("Tabela:");
+
+            Optional<String> result = dialog.showAndWait();
+
+            result.ifPresent(name ->
+            {
+               LogUtilities.transferLogs(name, fromDate.getDate(), untilDate.getDate());
+               refreshContent();
+            });
+        });
+
     }
 
     private HBox hbox = new HBox();
@@ -111,11 +131,13 @@ public class LogPane
     private VBox selectionBox = new VBox();
     private HBox filterBox = new HBox();
     private ComboBox<Item> filterOption = new ComboBox<>(LogUtilities.getFilterOptions());
-    private ItemSelector filterSelector = new ItemSelector();
+    private DatePicker fromDate = new DatePicker();
+    private DatePicker untilDate = new DatePicker();
 
     private DefaultTable<Log> table = new DefaultTable<>();
 
     private VBox detailsBox = new VBox();
     private CheckBox checkbox = new CheckBox("Ativar/Desativar auditoria");
+    private Button transferLogsButton = new Button();
     private LogDetails detailsPane = new LogDetails();
 }

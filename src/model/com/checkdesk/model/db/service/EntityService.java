@@ -17,8 +17,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import javassist.Modifier;
 import javax.persistence.StoredProcedureQuery;
 import org.hibernate.CacheMode;
@@ -150,34 +152,59 @@ public class EntityService
         Session session = getSession();
 
         String sql = "select ";
-        
+
         for (String column : columns)
         {
             sql += column + ", ";
         }
-        
+
         sql = sql.substring(0, sql.lastIndexOf(", "));
-        
+
         sql += " from " + viewName + " where ";
-        
+
         for (String key : parameters.keySet())
         {
             sql += key + " = :" + key + " and ";
         }
-        
-        StoredProcedureQuery q;
-        
+
         Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
-        
+
+        for (Map.Entry entry : parameters.entrySet())
+        {
+            query.setParameter(entry.getKey().toString(), entry.getValue());
+        }
+
+        return query.uniqueResult();
+    }
+
+    public void executeFunction(String function, Map<String, Object> parameters) throws Exception
+    {
+        Session session = getSession();
+
+        String sql = "select " + function;
+
+        StringJoiner joiner = new StringJoiner(", ");
+
+        for (String key : parameters.keySet())
+        {
+            joiner.add(":" + key);
+        }
+
+        Query query = session.createSQLQuery(sql + "(" + joiner.toString() + ")");
+
         for (Map.Entry entry : parameters.entrySet())
         {
             query.setParameter(entry.getKey().toString(), entry.getValue());
         }
         
-        return query.uniqueResult();
+        Transaction t = session.beginTransaction();
+        
+        query.uniqueResult();
+        
+        t.commit();
     }
 
-    private Object loadValue(Class type, Serializable value) throws Exception
+    public Object loadValue(Class type, Serializable value) throws Exception
     {
         Session session = HibernateUtil.getSessionFactory().openSession();
 
