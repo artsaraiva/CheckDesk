@@ -7,6 +7,7 @@ package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
+import com.checkdesk.control.util.AttachmentUtilities;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
@@ -55,7 +56,7 @@ public class FormPane
     @Override
     public void refreshContent()
     {
-        table.setItems(items = FormUtilities.getValues());
+        table.setItems(items = FormUtilities.getForms());
         detailsPane.refreshContent();
     }
 
@@ -155,13 +156,13 @@ public class FormPane
         try
         {
             ItemPicker<Question> questionPicker = new ItemPicker<>();
-            questionPicker.setItems(new ArrayList(table.getSelectedItem().getQuestions()));
+            questionPicker.setItems(FormUtilities.getQuestions(table.getSelectedItem()));
             questionPicker.open("Selecione um item");
 
             if (questionPicker.getSelected() != null)
             {
                 ItemPicker<Attachment> attachmentPicker = new ItemPicker<>();
-                attachmentPicker.setItems(new ArrayList(questionPicker.getSelected().getAttachments()));
+                attachmentPicker.setItems(AttachmentUtilities.getAttachments(questionPicker.getSelected()));
                 attachmentPicker.open("Selecione um item");
 
                 if (attachmentPicker.getSelected() != null)

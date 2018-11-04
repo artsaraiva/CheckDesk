@@ -7,11 +7,11 @@ package com.server.checkdesk.main;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ConfigurationManager;
-import com.checkdesk.control.NotificationController;
-import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
 import java.io.Serializable;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +45,10 @@ public class Main extends Thread
             EntityService.getInstance();
             ServerSocket serverSocket = new ServerSocket(PORT);
 
+            System.out.println("Server started: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                               "IP Address: " + Inet4Address.getLocalHost().getHostAddress() + ":" + PORT + "\n" +
+                               "--------------------------------\n" );
+            
             while (true)
             {
                 new HandleClient(serverSocket.accept()).start();

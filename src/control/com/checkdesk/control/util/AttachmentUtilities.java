@@ -10,13 +10,13 @@ import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
+import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.AttachmentEditor;
 import com.checkdesk.views.parts.Prompts;
 import com.checkdesk.views.util.EditorCallback;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import javafx.event.Event;
 
 /**
@@ -34,10 +34,9 @@ public class AttachmentUtilities
             try
             {
                 result = EntityService.getInstance().getValues(Attachment.class,
-                                                               Arrays.asList(new Parameter("question",
-                                                                             Attachment.class.getDeclaredField("question"),
-                                                                             question,
-                                                                             Parameter.COMPARATOR_EQUALS)));
+                                                               Arrays.asList(new Parameter(Attachment.class.getDeclaredField("questionId"),
+                                                                                           question.getId(),
+                                                                                           Parameter.COMPARATOR_EQUALS)));
             }
 
             catch (Exception e)
@@ -70,19 +69,18 @@ public class AttachmentUtilities
         return Prompts.confirm("Exclusão de Anexo", "Deseja realmente excluir o anexo selecionado?");
     }
     
-    public static void saveAttachments(Question question) throws Exception
+    public static void saveAttachments(QuestionWrapper wrapper) throws Exception
     {
-        List<Attachment> deleteAttachements = EntityService.getInstance().loadValues(Attachment.class,
-                                                                                     Arrays.asList(new Parameter("question",
-                                                                                                   Attachment.class.getDeclaredField("question"),
-                                                                                                   question,
-                                                                                                   Parameter.COMPARATOR_EQUALS)));
+        List<Attachment> deleteAttachements = EntityService.getInstance().getValues(Attachment.class,
+                                                                                    Arrays.asList(new Parameter(Attachment.class.getDeclaredField("question"),
+                                                                                                                wrapper.getQuestion().getId(),
+                                                                                                                Parameter.COMPARATOR_EQUALS)));
         
         for (Attachment deletable : deleteAttachements)
         {
             boolean delete = true;
 
-            for (Attachment attachment : (Set<Attachment>) question.getAttachments())
+            for (Attachment attachment : wrapper.getAttachments())
             {
                 if (deletable.getId() == attachment.getId())
                 {
@@ -98,7 +96,7 @@ public class AttachmentUtilities
             }
         }
 
-        for (Attachment attachment : (Set<Attachment>) question.getAttachments())
+        for (Attachment attachment : wrapper.getAttachments())
         {
             if (attachment.getId() == 0)
             {
@@ -116,7 +114,7 @@ public class AttachmentUtilities
     
     public static void deleteAttachments(Question question) throws Exception
     {
-        for (Attachment attachment : (Set<Attachment>) question.getAttachments())
+        for (Attachment attachment : getAttachments(question))
         {
             EntityService.getInstance().delete(attachment);
 //            ApplicationController.getInstance().deleteFile(attachment);

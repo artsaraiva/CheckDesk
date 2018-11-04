@@ -11,12 +11,13 @@ import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
+import com.checkdesk.model.util.FormWrapper;
+import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.AttachmentPicker;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -63,7 +64,7 @@ import javafx.scene.web.HTMLEditor;
 public class FormEditorPane
         extends DefaultPane
 {
-    private Form source;
+    private FormWrapper source;
     private ObservableList<QuestionCell> questionCells = FXCollections.observableArrayList();
     private QuestionCell selectedCell = null;
 
@@ -72,27 +73,31 @@ public class FormEditorPane
         initComponents();
     }
 
-    public void setSource(Form value)
+    public void setSource(FormWrapper value)
     {
         this.source = value;
         
-        nameField.setText(source.getName());
-        viewersTable.setGroup(source.getViewers());
-        infoField.setHtmlText(source.getInfo());
+        Form form = source.getForm();
         
-        for (Question question : (Set<Question>)source.getQuestions())
+        nameField.setText(form.getName());
+        viewersTable.setGroup(form.getViewersId());
+        infoField.setHtmlText(form.getInfo());
+        
+        for (QuestionWrapper questionWrapper : source.getQuestions())
         {
-            addItem(question);
+            addItem(questionWrapper);
         }
     }
 
     public void obtainInput()
     {
-        source.setName(nameField.getText());
-        source.setViewers(viewersTable.createGroup());
-        source.setInfo(infoField.getHtmlText());
+        Form form = source.getForm();
         
-        Set<Question> questions = new HashSet<>();
+        form.setName(nameField.getText());
+        form.setViewersId(viewersTable.createGroup().getGroupId());
+        form.setInfo(infoField.getHtmlText());
+        
+        List<QuestionWrapper> questions = new ArrayList<>();
         
         for (QuestionCell cell : questionCells)
         {
@@ -112,9 +117,9 @@ public class FormEditorPane
         }
     }
 
-    private void addItem(Question question)
+    private void addItem(QuestionWrapper questionWrapper)
     {
-        QuestionCell questionCell = new QuestionCell(question);
+        QuestionCell questionCell = new QuestionCell(questionWrapper);
         HBox.setHgrow(questionCell, Priority.ALWAYS);
 
         listbox.getChildren().add(questionCells.size(), questionCell);
@@ -202,7 +207,10 @@ public class FormEditorPane
         {
             if (event.getButton() == MouseButton.PRIMARY)
             {
-                addItem(new Question(source));
+                Question question = new Question();
+                question.setFormId(source.getForm().getId());
+                
+                addItem(new QuestionWrapper(question));
             }
         });
     }
@@ -250,9 +258,9 @@ public class FormEditorPane
     private class QuestionCell
             extends HBox
     {
-        private Question source;
+        private QuestionWrapper source;
 
-        public QuestionCell(Question question)
+        public QuestionCell(QuestionWrapper question)
         {
             setId(UUID.randomUUID().toString());
 
@@ -262,24 +270,29 @@ public class FormEditorPane
             setSource(question);
         }
 
-        private void setSource(Question question)
+        private void setSource(QuestionWrapper source)
         {
-            this.source = question;
+            this.source = source;
             
-            nameField.setText(source.getName());
-            typeField.setValue(FormUtilities.getQuestionType(source.getType()));
-            optionSelector.setSelected(source.getOption());
+            Question question = source.getQuestion();
             
-            attachmentPicker.setQuestion(source);
+            nameField.setText(question.getName());
+            typeField.setValue(FormUtilities.getQuestionType(question.getType()));
+            optionSelector.setSelected(FormUtilities.getQuestionOption(question.getOptionId()));
+            
+            attachmentPicker.setQuestion(question);
         }
         
-        public Question getSource()
+        public QuestionWrapper getSource()
         {
-            source.setName(nameField.getText());
-            source.setType(typeField.getValue().getValue());
-            source.setOption(optionSelector.getSelected());
-            source.setAttachments(new HashSet(attachmentSelector.getSelected()));
-            source.setConstraints("");
+            Question question = source.getQuestion();
+            
+            question.setName(nameField.getText());
+            question.setType(typeField.getValue().getValue());
+            question.setOptionId(optionSelector.getSelected().getId());
+            question.setConstraints("");
+            
+            source.setAttachments(new ArrayList(attachmentSelector.getSelected()));
 
             return source;
         }

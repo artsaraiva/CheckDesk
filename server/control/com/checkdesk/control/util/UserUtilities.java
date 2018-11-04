@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 
 /**
  *
@@ -30,7 +29,7 @@ public class UserUtilities
 
     public static void addUser(User user) throws Exception
     {
-        EntityService.getInstance().save(user);
+        EntityService.getInstance().insert(user);
     }
 
     public static void editUser(User user) throws Exception
@@ -82,12 +81,10 @@ public class UserUtilities
 
     public static User login(String login, String password) throws Exception
     {
-        List<Parameter> parameters = Arrays.asList(new Parameter("login",
-                                                                 User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+        List<Parameter> parameters = Arrays.asList(new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
                                                                  login.toLowerCase(),
                                                                  Parameter.COMPARATOR_LOWER_CASE),
-                                                    new Parameter("password",
-                                                                  User.class.getDeclaredField("password"),
+                                                    new Parameter(User.class.getDeclaredField("password"),
                                                                   password,
                                                                   Parameter.COMPARATOR_EQUALS));
 
@@ -101,6 +98,27 @@ public class UserUtilities
         try
         {
             result = EntityService.getInstance().getValues(User.class);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
+    public static List<String> getUserEmails()
+    {
+        List<String> result = new ArrayList<>();
+
+        try
+        {
+            result = EntityService.getInstance().getFieldValues(User.class.getDeclaredField("email"),
+                                                                User.class,
+                                                                Arrays.asList(new Parameter(User.class.getDeclaredField("email"),
+                                                                                            "",
+                                                                                            Parameter.COMPARATOR_UNLIKE)));
         }
 
         catch (Exception e)

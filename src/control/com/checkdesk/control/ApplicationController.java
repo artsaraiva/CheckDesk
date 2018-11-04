@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -30,7 +29,6 @@ import javafx.stage.Window;
 public class ApplicationController
 {
     private static ApplicationController defaultInstance;
-    private static boolean activeLog;
 
     public static ApplicationController getInstance()
     {
@@ -104,22 +102,32 @@ public class ApplicationController
 
     public static boolean isActiveLog()
     {
-        return activeLog;
+        try
+        {
+            return (boolean) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.ACTIVE_LOG).setWaitResponse(true));
+        }
+        
+        catch (Exception e)
+        {
+            logException(e);
+        }
+        
+        return false;
     }
 
     public static void setActiveLog(boolean activeLog)
     {
-        ApplicationController.activeLog = activeLog;
-        ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
+        try
+        {
+            ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.ACTIVE_LOG)
+                                                                  .addParameter("newValue", activeLog)
+                                                                  .setWaitResponse(false));
+        }
         
-        Log log = new Log(0,
-                          getInstance().activeUser,
-                          Log.EVENT_ACTIVE_LOGS,
-                          activeLog ? "Ativar" : "Desativar",
-                          "Auditoria",
-                          "A auditoria foi " + (activeLog ? "ativada" : "desativada"));
-        
-        LogUtilities.addLog(log);
+        catch (Exception e)
+        {
+            logException(e);
+        }
     }
 
     private User activeUser;
@@ -127,13 +135,11 @@ public class ApplicationController
 
     private ApplicationController()
     {
-        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor", false);
     }
     
     public void close() throws Exception
     {
         defaultInstance = null;
-        EntityService.getInstance().close();
         notify(null);
     }
 
@@ -146,7 +152,7 @@ public class ApplicationController
     {
         try
         {
-            activeUser = (User) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.LOGIN)
+            activeUser = (User) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DATABASE)
                                                                                       .addParameter("user", login)
                                                                                       .addParameter("password", hash(password))
                                                                                       .setWaitResponse(true));

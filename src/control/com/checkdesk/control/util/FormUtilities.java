@@ -10,14 +10,15 @@ import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.model.util.Parameter;
+import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.FormEditor;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.parts.Prompts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import javafx.event.Event;
 
 /**
@@ -38,7 +39,7 @@ public class FormUtilities
     {
         Form form = new Form();
 
-        new FormEditor(new EditorCallback<Form>(form)
+        new FormEditor(new EditorCallback<FormWrapper>(new FormWrapper(form))
         {
             @Override
             public void handle(Event t)
@@ -58,7 +59,7 @@ public class FormUtilities
     
     public static void editForm(Form form)
     {
-        new FormEditor(new EditorCallback<Form>(form)
+        new FormEditor(new EditorCallback<FormWrapper>(new FormWrapper(form))
         {
             @Override
             public void handle(Event t)
@@ -76,13 +77,18 @@ public class FormUtilities
         }).showAndWait();
     }
     
+    public static void deleteForm(int formId)
+    {
+        deleteForm(getForm(formId));
+    }
+    
     public static void deleteForm(Form form)
     {
         if (Prompts.confirm("Exlusão de Formulário", "Deseja realmente excluir o formulário?"))
         {
             try
             {
-                for (Question question : (Set<Question>)form.getQuestions())
+                for (Question question : getQuestions(form))
                 {
                     EntityService.getInstance().delete(question);
                 }
@@ -96,8 +102,66 @@ public class FormUtilities
             }
         }
     }
+    
+    public static void saveForm(FormWrapper formWrapper) throws Exception
+    {
+        if (formWrapper.getForm().getId() == 0)
+        {
+            EntityService.getInstance().save(formWrapper.getForm());
 
-    public static Form getValue(int formId)
+            for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
+            {
+                EntityService.getInstance().save(questionWrapper.getQuestion());
+                AttachmentUtilities.saveAttachments(questionWrapper);
+            }
+        }
+        
+        else
+        {
+            List<Question> deleteQuestions = EntityService.getInstance().getValues(Question.class,
+                                                                                   Arrays.asList(new Parameter(Question.class.getDeclaredField("form"),
+                                                                                                 formWrapper.getForm().getId(),
+                                                                                                 Parameter.COMPARATOR_EQUALS)));
+            for (Question deletable : deleteQuestions)
+            {
+                boolean delete = true;
+
+                for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
+                {
+                    if (deletable.equals(questionWrapper.getQuestion()))
+                    {
+                        delete = false;
+                        break;
+                    }
+                }
+
+                if (delete)
+                {
+                    AttachmentUtilities.deleteAttachments(deletable);
+                    EntityService.getInstance().delete(deletable);
+                }
+            }
+
+            for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
+            {
+                if (questionWrapper.getQuestion().getId() == 0)
+                {
+                    EntityService.getInstance().save(questionWrapper.getQuestion());
+                }
+
+                else
+                {
+                    EntityService.getInstance().update(questionWrapper.getQuestion());
+                }
+                
+                AttachmentUtilities.saveAttachments(questionWrapper);
+            }
+
+            EntityService.getInstance().update(formWrapper.getForm());
+        }
+    }
+
+    public static Form getForm(int formId)
     {
         Form result = null;
 
@@ -114,7 +178,7 @@ public class FormUtilities
         return result;
     }
 
-    public static List<Form> getValues()
+    public static List<Form> getForms()
     {
         List<Form> result = new ArrayList<>();
 
@@ -129,76 +193,6 @@ public class FormUtilities
         }
 
         return result;
-    }
-    
-    public static void saveForm(Form form) throws Exception
-    {
-        if (form.getId() == 0)
-        {
-            EntityService.getInstance().save(form);
-
-            for (Question question : (Set<Question>) form.getQuestions())
-            {
-                EntityService.getInstance().save(question);
-                AttachmentUtilities.saveAttachments(question);
-            }
-        }
-        
-        else
-        {
-            List<Question> deleteQuestions = EntityService.getInstance().loadValues(Question.class,
-                                                                                    Arrays.asList(new Parameter("form",
-                                                                                                  Question.class.getDeclaredField("form"),
-                                                                                                  form,
-                                                                                                  Parameter.COMPARATOR_EQUALS)));
-            for (Question deletable : deleteQuestions)
-            {
-                boolean delete = true;
-
-                for (Question question : (Set<Question>)form.getQuestions())
-                {
-                    if (deletable.getId() == question.getId())
-                    {
-                        delete = false;
-                        break;
-                    }
-                }
-
-                if (delete)
-                {
-                    AttachmentUtilities.deleteAttachments(deletable);
-                    EntityService.getInstance().delete(deletable);
-                }
-            }
-
-            for (Question question : (Set<Question>)form.getQuestions())
-            {
-                if (question.getId() == 0)
-                {
-                    EntityService.getInstance().save(question);
-                }
-
-                else
-                {
-                    EntityService.getInstance().update(question);
-                }
-                
-                AttachmentUtilities.saveAttachments(question);
-            }
-
-            EntityService.getInstance().update(form);
-        }
-    }
-    
-    public static List<Item> getQuestionTypes()
-    {
-        return Arrays.asList(TYPE_CATEGORY,
-                             TYPE_SMALL_TEXT,
-                             TYPE_LARGE_TEXT,
-                             TYPE_SINGLE_CHOICE,
-                             TYPE_MULTI_CHOICE,
-                             TYPE_DATE,
-                             TYPE_NUMBER);
     }
     
     public static Item getQuestionType(int questionType)
@@ -217,6 +211,34 @@ public class FormUtilities
         return result;
     }
     
+    public static List<Item> getQuestionTypes()
+    {
+        return Arrays.asList(TYPE_CATEGORY,
+                             TYPE_SMALL_TEXT,
+                             TYPE_LARGE_TEXT,
+                             TYPE_SINGLE_CHOICE,
+                             TYPE_MULTI_CHOICE,
+                             TYPE_DATE,
+                             TYPE_NUMBER);
+    }
+    
+    public static Option getQuestionOption(int optionId)
+    {
+        Option result = null;
+
+        try
+        {
+            result = (Option) EntityService.getInstance().getValue(Option.class, optionId);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
     public static List<Option> getQuestionOptions()
     {
         List<Option> result = new ArrayList<>();
@@ -229,6 +251,34 @@ public class FormUtilities
         catch (Exception e)
         {
             ApplicationController.logException(e);
+        }
+        
+        return result;
+    }
+    
+    public static List<Question> getQuestions(Form form)
+    {
+        return getQuestions(form.getId());
+    }
+    
+    public static List<Question> getQuestions(int formId)
+    {
+        List<Question> result = new ArrayList();
+        
+        if (formId != 0)
+        {
+            try
+            {
+                result = EntityService.getInstance().getValues(Question.class,
+                                                               Arrays.asList(new Parameter(Question.class.getDeclaredField("formId"),
+                                                                                           formId,
+                                                                                           Parameter.COMPARATOR_EQUALS)));
+            }
+
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
         }
         
         return result;

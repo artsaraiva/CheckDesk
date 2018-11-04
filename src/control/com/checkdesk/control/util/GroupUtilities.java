@@ -9,6 +9,8 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,6 +18,8 @@ import com.checkdesk.model.db.service.EntityService;
  */
 public class GroupUtilities
 {
+    public static List<Group> cacheGroup = new ArrayList<>();
+    
     public static final User allUser = new User();
     static
     {
@@ -50,5 +54,20 @@ public class GroupUtilities
         {
             ApplicationController.logException(e);
         }
+    }
+    
+    public static Group getGroup(int groupId)
+    {
+        Group result = null;
+        
+        for (Group group : cacheGroup)
+        {
+            if (group.getId() == groupId)
+            {
+                result = group;
+            }
+        }
+        
+        return result;
     }
 }

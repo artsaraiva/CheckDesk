@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,11 +31,16 @@ import java.util.Date;
  */
 public class ApplicationController
 {
-    private static boolean activeLog;
-
+    private static ThreadLocal<ApplicationController> localController = new ThreadLocal<>();
+    
     public static ApplicationController getInstance()
     {
-        return new ApplicationController();
+        if (localController.get() == null)
+        {
+            localController.set(new ApplicationController());
+        }
+        
+        return localController.get();
     }
 
     public static void logException(Throwable e)
@@ -99,20 +105,20 @@ public class ApplicationController
 
     public static boolean isActiveLog()
     {
-        return activeLog;
+        return ConfigurationManager.getInstance().getFlag("logs.monitor");
     }
 
     public static void setActiveLog(boolean activeLog)
     {
-        ApplicationController.activeLog = activeLog;
         ConfigurationManager.getInstance().setFlag("logs.monitor", activeLog);
         
-        Log log = new Log(0,
-                          getInstance().activeUser,
-                          Log.EVENT_ACTIVE_LOGS,
-                          activeLog ? "Ativar" : "Desativar",
-                          "Auditoria",
-                          "A auditoria foi " + (activeLog ? "ativada" : "desativada"));
+        Log log = new Log();
+        log.setUserId(getInstance().activeUser.getId());
+        log.setEvent(Log.EVENT_ACTIVE_LOGS);
+        log.setObjectName(activeLog ? "Ativar" : "Desativar");
+        log.setObjectClass("Auditoria");
+        log.setCommand("A auditoria foi " + (activeLog ? "ativada" : "desativada"));
+        log.setTimestamp(new Timestamp(System.currentTimeMillis()));
         
         LogUtilities.addLog(log);
     }
@@ -121,7 +127,6 @@ public class ApplicationController
 
     private ApplicationController()
     {
-        activeLog = ConfigurationManager.getInstance().getFlag("logs.monitor", false);
     }
 
     public User getActiveUser()
@@ -152,10 +157,18 @@ public class ApplicationController
         {
             switch (request.getRequest())
             {
-                case ServerRequest.LOGIN:
-                    result = login((String) request.getParameter("user"), (String) request.getParameter("password"));
-                    break;
+                case ServerRequest.DATABASE:
+                    if (request.getParameter("request") == null)
+                    {
+                        result = login((String) request.getParameter("user"), (String) request.getParameter("password"));
+                    }
                     
+                    else
+                    {
+                        result = EntityService.getInstance().handleRequest(this, request);
+                    }
+                    break;
+                
                 case ServerRequest.NOTIFY:
                     Serializable object = request.getParameter("object");
                     
@@ -177,17 +190,16 @@ public class ApplicationController
                     client.finishUpload();
                     break;
                     
-                case ServerRequest.INSERT:
-                    EntityService.getInstance().save(request.getParameter("object"));
-                    break;
+                case ServerRequest.ACTIVE_LOG:
+                    if (request.getParameter("newValue") != null)
+                    {
+                        setActiveLog((boolean) request.getParameter("newValue"));
+                    }
                     
-                case ServerRequest.UPDATE:
-                    EntityService.getInstance().update(request.getParameter("object"));
-                    break;
-                    
-                case ServerRequest.DELETE:
-                    EntityService.getInstance().delete(request.getParameter("object"));
-                    break;
+                    else
+                    {
+                        result = isActiveLog();
+                    }
             }
         }
         

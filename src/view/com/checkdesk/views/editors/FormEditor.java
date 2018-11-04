@@ -6,6 +6,7 @@
 package com.checkdesk.views.editors;
 
 import com.checkdesk.model.data.Form;
+import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.views.panes.FormEditorPane;
 import com.checkdesk.views.util.EditorCallback;
 
@@ -14,9 +15,9 @@ import com.checkdesk.views.util.EditorCallback;
  * @author MNicaretta
  */
 public class FormEditor
-        extends DefaultEditor<Form>
+        extends DefaultEditor<FormWrapper>
 {
-    public FormEditor(EditorCallback<Form> callback)
+    public FormEditor(EditorCallback<FormWrapper> callback)
     {
         super(callback);
         
@@ -28,7 +29,7 @@ public class FormEditor
         setSource(callback.getSource());
     }
     
-    private void setSource(Form value)
+    private void setSource(FormWrapper value)
     {
         formPane.setSource(value);
     }

@@ -7,18 +7,23 @@ package com.checkdesk.views.editors;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
+import com.checkdesk.control.util.CategoryUtilities;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Category;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
+import com.checkdesk.model.util.FormWrapper;
+import com.checkdesk.model.util.SurveyWrapper;
 import com.checkdesk.views.panes.BrowsePane;
 import com.checkdesk.views.panes.FormEditorPane;
 import com.checkdesk.views.parts.BrowseButton;
 import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.parts.GroupTable;
+import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.ItemPicker;
 import com.checkdesk.views.util.EditorCallback;
 import javafx.collections.FXCollections;
@@ -38,12 +43,15 @@ import javafx.scene.web.HTMLEditor;
  * @author MNicaretta
  */
 public class SurveyEditor
-        extends DefaultEditor<Survey>
+        extends DefaultEditor<SurveyWrapper>
 {
-
+    private static final int PAGE_INFO         = 0;
+    private static final int PAGE_PARTICIPANTS = 1;
+    private static final int PAGE_FORM         = 2;
+    
     private int pageIndex = 0;
 
-    public SurveyEditor(EditorCallback<Survey> callback)
+    public SurveyEditor(EditorCallback<SurveyWrapper> callback)
     {
         super(callback);
 
@@ -55,32 +63,34 @@ public class SurveyEditor
         setSource(callback.getSource());
     }
 
-    private void setSource(Survey value)
+    private void setSource(SurveyWrapper value)
     {
         this.source = value;
 
-        titleField.setText(value.getTitle());
-        createdField.setDate(value.getCreatedDate());
-        typeField.setValue(SurveyUtilities.getType(value.getType()));
-        infoField.setHtmlText(value.getInfo() != null ? value.getInfo() : "");
-
-        participantsTable.setGroup(value.getParticipants());
-        viewersTable.setGroup(value.getViewers());
+        Survey survey = source.getSurvey();
+        
+        titleField.setText(survey.getTitle());
+        createdField.setDate(survey.getCreatedDate());
+        typeField.setValue(SurveyUtilities.getType(survey.getType()));
+        infoField.setHtmlText(survey.getInfo() != null ? survey.getInfo() : "");
+        participantsTable.setGroup(survey.getParticipantsId());
+        viewersTable.setGroup(survey.getViewersId());
+        ownerSelector.setSelected(UserUtilities.getUser(survey.getOwnerId()));
+        categorySelector.setSelected(CategoryUtilities.getCategory(survey.getOwnerId()));
     }
 
     @Override
     protected void obtainInput()
     {
-        source.setTitle(titleField.getText());
-        source.setType(typeField.getValue().getValue());
-        source.setInfo(infoField.getHtmlText());
-        source.setParticipants(participantsTable.createGroup());
-        source.setViewers(viewersTable.createGroup());
-
-        //TEMPORARIO
-        source.setOwner(new User(1, "", "", "", "", "", 0));
-        source.setCategory(new Category(1, null, "", ""));
-        source.setForm(new Form(1, "", ""));
+        Survey survey = source.getSurvey();
+        
+        survey.setTitle(titleField.getText());
+        survey.setType(typeField.getValue().getValue());
+        survey.setInfo(infoField.getHtmlText());
+        survey.setParticipantsId(participantsTable.createGroup().getGroupId());
+        survey.setViewersId(viewersTable.createGroup().getGroupId());
+        survey.setOwnerId(ownerSelector.getSelected().getId());
+        survey.setCategoryId(categorySelector.getSelected().getId());
     }
 
     @Override
@@ -99,17 +109,17 @@ public class SurveyEditor
 
     private void updatePage()
     {
-        getDialogPane().getButtonTypes().setAll(btCancel, btPrevious, btNext, btSave);
+        getDialogPane().getButtonTypes().setAll(btPrevious, btNext, btSave, btCancel);
 
         switch (pageIndex)
         {
-            case 0:
+            case PAGE_INFO:
                 getDialogPane().setContent(gridPane);
                 getButton(btPrevious).setDisable(true);
                 removeButton(btSave);
                 break;
 
-            case 1:
+            case PAGE_PARTICIPANTS:
                 vbox.getChildren().setAll(viewersLabel, viewersTable);
 
                 if (typeField.getValue().getValue() == Survey.TYPE_PRIVATE)
@@ -121,11 +131,12 @@ public class SurveyEditor
                 removeButton(btSave);
                 break;
 
-            case 2:
+            case PAGE_FORM:
                 if (source.getForm() == null)
                 {
                     getDialogPane().setContent(browsePane);
                 }
+                
                 else
                 {
                     FormEditorPane pane = new FormEditorPane();
@@ -141,7 +152,7 @@ public class SurveyEditor
     {
         FormEditorPane pane = (FormEditorPane) editButton.getPane();
 
-        source.setForm(new Form());
+        source.setForm(new FormWrapper(new Form()));
 
         pane.setSource(source.getForm());
         getDialogPane().setContent(pane);
@@ -151,18 +162,15 @@ public class SurveyEditor
     {
         FormEditorPane pane = (FormEditorPane) editButton.getPane();
         ItemPicker<Form> picker = new ItemPicker<>();
-        picker.setItems(FormUtilities.getValues());
+        picker.setItems(FormUtilities.getForms());
 
         picker.open("Selecione um formulário");
 
         if (picker.getSelected() != null)
         {
-            source.setForm(picker.getSelected());
+            source.setForm(new FormWrapper(picker.getSelected().clone()));
             pane.setSource(source.getForm());
-            pane.setEnable(PermissionController.getInstance()
-                    .hasPermission(ApplicationController.getInstance()
-                            .getActiveUser(),
-                            editButton.getRole()));
+            pane.setEnable(PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), editButton.getRole()));
 
             getDialogPane().setContent(pane);
         }
@@ -171,7 +179,7 @@ public class SurveyEditor
     private void initComponents()
     {
         setWidth(500);
-        setHeight(400);
+        setHeight(450);
 
         updatePage();
 
@@ -182,13 +190,15 @@ public class SurveyEditor
         int count = 0;
 
         HBox.setHgrow(typeField, Priority.ALWAYS);
-        infoField.setPrefHeight(300);
+        infoField.setPrefHeight(250);
 
         createdField.setDisable(true);
         typeField.setItems(SurveyUtilities.getItems());
 
         gridPane.addRow(count++, titleLabel, titleField);
+        gridPane.addRow(count++, ownerLabel, ownerSelector);
         gridPane.addRow(count++, createdLabel, createdField);
+        gridPane.addRow(count++, categoryLabel, categorySelector);
         gridPane.addRow(count++, typeLabel, typeField);
         gridPane.add(infoLabel, 0, count++, 2, 1);
         gridPane.add(infoField, 0, count++, 2, 1);
@@ -238,9 +248,15 @@ public class SurveyEditor
 
     private Label titleLabel = new Label("Título");
     private TextField titleField = new TextField();
+    
+    private Label ownerLabel = new Label("Autor:");
+    private ItemSelector<User> ownerSelector = new ItemSelector();
 
     private Label createdLabel = new Label("Criado em:");
     private DatePicker createdField = new DatePicker();
+    
+    private Label categoryLabel = new Label("Categoria:");
+    private ItemSelector<Category> categorySelector = new ItemSelector();
 
     private Label typeLabel = new Label("Tipo:");
     private ComboBox<Item> typeField = new ComboBox();

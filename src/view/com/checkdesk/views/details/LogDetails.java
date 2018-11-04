@@ -56,7 +56,7 @@ public class LogDetails
                 new DetailsCaption(source.toString()),
                 new DetailsTable(75).addItem("Ação", LogUtilities.getEvent(source.getEvent()))
                                     .addItem("Data", source.getTimestamp())
-                                    .addItem("Usuário", source.getUser())
+                                    .addItem("Usuário", source.getUserId())
                                     .addItem("Objeto", source.getObjectClass() + " - " + source.getObjectName())
                                     .addItemHtml("Mudanças", source.getCommand()));
         }

@@ -8,11 +8,14 @@ package com.checkdesk.control.util;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.Parameter;
+import com.checkdesk.model.util.SurveyWrapper;
 import com.checkdesk.views.editors.SurveyEditor;
 import com.checkdesk.views.parts.Prompts;
 import com.checkdesk.views.util.EditorCallback;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,9 +36,9 @@ public class SurveyUtilities
     public static void addSurvey()
     {
         Survey survey = new Survey();
-        survey.setCreatedDate(new Date(System.currentTimeMillis()));
+        survey.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 
-        new SurveyEditor(new EditorCallback<Survey>(survey)
+        new SurveyEditor(new EditorCallback<SurveyWrapper>(new SurveyWrapper(survey))
         {
             @Override
             public void handle(Event t)
@@ -44,9 +47,9 @@ public class SurveyUtilities
                 {
                     FormUtilities.saveForm(getSource().getForm());
 
-                    EntityService.getInstance().save(getSource());
+                    EntityService.getInstance().save(getSource().getSurvey());
 
-                    ApplicationController.getInstance().notify(getSource());
+                    ApplicationController.getInstance().notify(getSource().getSurvey());
                 }
 
                 catch (Exception e)
@@ -60,16 +63,16 @@ public class SurveyUtilities
 
     public static void editSurvey(Survey survey)
     {
-        new SurveyEditor(new EditorCallback<Survey>(survey)
+        new SurveyEditor(new EditorCallback<SurveyWrapper>(new SurveyWrapper(survey))
         {
             @Override
             public void handle(Event t)
             {
                 try
                 {
-                    EntityService.getInstance().update(getSource());
-
                     FormUtilities.saveForm(getSource().getForm());
+                    
+                    EntityService.getInstance().update(getSource().getSurvey());
                 }
 
                 catch (Exception e)
@@ -88,10 +91,7 @@ public class SurveyUtilities
             {
                 EntityService.getInstance().delete(survey);
 
-                if (survey.getForm() != null && survey.getForm().getSurveys().isEmpty())
-                {
-                    FormUtilities.deleteForm(survey.getForm());
-                }
+                FormUtilities.deleteForm(survey.getFormId());
             }
 
             catch (Exception e)
@@ -125,6 +125,42 @@ public class SurveyUtilities
         try
         {
             result = EntityService.getInstance().getValues(Survey.class);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
+    public static List<Survey> getPendingSurvey()
+    {
+        List<Survey> result = new ArrayList<>();
+
+        try
+        {
+            result = EntityService.getInstance().getValues(Survey.class);
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
+    
+    public static List<Survey> getOwnedSurvey()
+    {
+        List<Survey> result = new ArrayList<>();
+
+        try
+        {
+            result = EntityService.getInstance().getValues(Survey.class, Arrays.asList(new Parameter(Survey.class.getDeclaredField("ownerId"),
+                                                                                                     ApplicationController.getInstance().getActiveUser().getId(),
+                                                                                                     Parameter.COMPARATOR_EQUALS)));
         }
 
         catch (Exception e)

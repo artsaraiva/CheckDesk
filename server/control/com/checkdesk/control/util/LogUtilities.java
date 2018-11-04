@@ -38,7 +38,7 @@ public class LogUtilities
     {
         try
         {
-            EntityService.getInstance().save(log);
+            EntityService.getInstance().insert(log);
         }
         
         catch (Exception e)
@@ -167,7 +167,7 @@ public class LogUtilities
                         break;
                 }
 
-                parameters = Arrays.asList(new Parameter(field.getName(), field, value, comparator));
+                parameters = Arrays.asList(new Parameter(field, value, comparator));
             }
             
             result = EntityService.getInstance().getValues(Log.class, parameters);

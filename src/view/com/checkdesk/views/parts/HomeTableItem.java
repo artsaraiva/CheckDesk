@@ -6,6 +6,7 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
 import javafx.geometry.HPos;
@@ -40,7 +41,7 @@ public class HomeTableItem
     {
         this.survey = survey;
 
-        iconUser.setImage(new Image(ResourceLocator.getInstance().getImageResource(survey.getOwner().getLogin())));
+        iconUser.setImage(new Image(UserUtilities.getUserIcon(survey.getOwnerId())));
         iconUser.setFitHeight(70);
         iconUser.setFitWidth(70);
         

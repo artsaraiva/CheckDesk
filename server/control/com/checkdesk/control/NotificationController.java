@@ -5,7 +5,11 @@
  */
 package com.checkdesk.control;
 
+import com.checkdesk.control.util.CategoryUtilities;
+import com.checkdesk.control.util.FormUtilities;
+import com.checkdesk.control.util.GroupUtilities;
 import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
@@ -13,7 +17,6 @@ import com.checkdesk.model.util.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringJoiner;
 import javax.mail.Address;
 import javax.mail.Message;
@@ -59,9 +62,9 @@ public class NotificationController
         
         StringJoiner joiner = new StringJoiner("\n");
         
-        if (survey.getParticipants() != null)
+        if (GroupUtilities.getGroup(survey.getParticipantsId()) != null )
         {
-            for (User user : (Set<User>)survey.getParticipants().getUsers())
+            for (User user : GroupUtilities.getGroup(survey.getParticipantsId()).getUsers())
             {
                 joiner.add(user.toString());
             }
@@ -85,11 +88,11 @@ public class NotificationController
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Autor:</td>")
-               .append("            <td>").append(survey.getOwner()).append("</td>")
+               .append("            <td>").append(UserUtilities.getUser(survey.getOwnerId())).append("</td>")
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Categoria:</td>")
-               .append("            <td>").append(survey.getCategory()).append("</td>")
+               .append("            <td>").append(CategoryUtilities.getCategory(survey.getCategoryId())).append("</td>")
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Participantes:</td>")
@@ -101,7 +104,7 @@ public class NotificationController
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Formulário:</td>")
-               .append("            <td>").append(survey.getForm()).append("</td>")
+               .append("            <td>").append(FormUtilities.getForm(survey.getFormId())).append("</td>")
                .append("        </tr>")
                .append("    </table>")
                .append("</body>");
@@ -111,20 +114,15 @@ public class NotificationController
     
     private void notifyAll(String subject, String content) throws Exception
     {
-        List<String> emails = EntityService.getInstance().getFieldValues(User.class.getDeclaredField("email"),
-                                                                         User.class,
-                                                                         Arrays.asList(new Parameter("empty",
-                                                                                                     User.class.getDeclaredField("email"),
-                                                                                                     "",
-                                                                                                     Parameter.COMPARATOR_UNLIKE)));
+        List<String> emails = UserUtilities.getUserEmails();
         
         send(emails, subject, content);
     }
     
     private void send(List<String> emails, String subject, String content) throws Exception
     {
+        // Parâmetros de conexão com servidor Gmail
         Properties props = new Properties();
-        /** Parâmetros de conexão com servidor Gmail */
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.socketFactory.port", "465");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -145,7 +143,6 @@ public class NotificationController
         message.setFrom(new InternetAddress("info.checkdesk@gmail.com")); //Remetente
 
         //Destinatário(s)
-        
         StringJoiner joiner = new StringJoiner(", ");
         
         for ( String email : emails)
@@ -156,13 +153,13 @@ public class NotificationController
             }
         }
         
-//        Address[] toUser = InternetAddress.parse(joiner.toString());  
-        Address[] toUser = InternetAddress.parse("marcelo.nicaretta@universo.univates.br, arthur.saraiva@universo.univates.br");  
+        Address[] toUser = InternetAddress.parse(joiner.toString());
 
         message.setRecipients(Message.RecipientType.TO, toUser);
         message.setSubject("CheckDesk - " + subject);//Assunto
         message.setContent(content, "text/html; charset=utf-8");
-        /**Método para enviar a mensagem criada*/
+        
+        //Método para enviar a mensagem criada
         Transport.send(message);
     }
 }

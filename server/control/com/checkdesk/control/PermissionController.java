@@ -174,32 +174,4 @@ public class PermissionController
 
         return hasPermission;
     }
-    
-//    public Permission getPermission(PermissionItem item)
-//    {
-//        Permission result = null;
-//        
-//        try
-//        {
-//            Parameter parameter = new Parameter("name", Permission.class.getDeclaredField("name"), item.getName(), Parameter.COMPARATOR_EQUALS);
-//            
-//            result = (Permission) EntityService.getInstance().getValue(Permission.class, Arrays.asList(parameter));
-//            
-//            if (result == null)
-//            {
-//                Group group = new Group(0, "");
-//                EntityService.getInstance().save(group);
-//                
-//                result = new Permission(0, group, item.getName());
-//                EntityService.getInstance().save(result);
-//            }
-//        }
-//        
-//        catch (Exception e)
-//        {
-//            ApplicationController.logException(e);
-//        }
-//        
-//        return result;
-//    }
 }

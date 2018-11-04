@@ -5,28 +5,15 @@
  */
 package com.checkdesk.model.db.service;
 
-import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ServerConnection;
-import com.checkdesk.model.data.Log;
-import com.checkdesk.model.db.HibernateUtil;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.model.util.ServerRequest;
-import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
-import javassist.Modifier;
-import javax.persistence.StoredProcedureQuery;
-import org.hibernate.CacheMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  *
@@ -34,7 +21,12 @@ import org.hibernate.Transaction;
  */
 public class EntityService
 {
-
+    private static final int REQUEST_INSERT        = 0;
+    private static final int REQUEST_UPDATE        = 1;
+    private static final int REQUEST_DELETE        = 2;
+    private static final int REQUEST_SELECT_UNIQUE = 3;
+    private static final int REQUEST_SELECT_LIST   = 4;
+    
     public static EntityService getInstance() throws Exception
     {
         if (defaultInstance == null)
@@ -45,208 +37,56 @@ public class EntityService
         return defaultInstance;
     }
 
-    private static Session getSession() throws Exception
-    {
-        if (defaultSession == null)
-        {
-            defaultSession = HibernateUtil.getSessionFactory().openSession();
-            defaultSession.setCacheMode(CacheMode.IGNORE);
-        }
-
-        return defaultSession;
-    }
-
     private static EntityService defaultInstance = null;
-    private static Session defaultSession = null;
 
     private EntityService() throws Exception
     {
-        initialTransaction();
     }
 
-    private void initialTransaction() throws Exception
+    public Serializable save(Serializable entity) throws Exception
     {
-        Session session = getSession();
-
-        Query q = session.createSQLQuery("select current_date");
-        q.uniqueResult();
+        return (Serializable) ServerConnection.getInstance().say(newRequest(REQUEST_INSERT).addParameter("object", entity));
     }
 
-    public void save(Serializable entity) throws Exception
+    public Serializable update(Serializable entity) throws Exception
     {
-//        logEvent(Log.EVENT_ADD, entity);
-//
-//        Session session = getSession();
-//
-//        Transaction t = session.beginTransaction();
-//
-//        session.save(entity);
-//        t.commit();
-        
-        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.INSERT)
-                                                              .addParameter("object", entity)
-                                                              .setWaitResponse(true));
-    }
-
-    public void update(Serializable entity) throws Exception
-    {
-//        logEvent(Log.EVENT_UPDATE, entity);
-//
-//        Session session = getSession();
-//
-//        Transaction t = session.beginTransaction();
-//
-//        session.update(entity);
-//        t.commit();
-        
-        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.UPDATE)
-                                                              .addParameter("object", entity)
-                                                              .setWaitResponse(true));
+        return (Serializable) ServerConnection.getInstance().say(newRequest(REQUEST_UPDATE).addParameter("object", entity));
     }
 
     public void delete(Serializable entity) throws Exception
     {
-//        logEvent(Log.EVENT_DELETE, entity);
-//
-//        Session session = getSession();
-//
-//        Transaction t = session.beginTransaction();
-//
-//        session.delete(getValue(entity.getClass(), entity));
-//        t.commit();
-        
-        ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DELETE)
-                                                              .addParameter("object", entity)
-                                                              .setWaitResponse(true));
+        ServerConnection.getInstance().say(newRequest(REQUEST_DELETE).addParameter("object", entity));
     }
 
     public Object getValue(Class type, int id) throws Exception
     {
-        Session session = getSession();
-
-        return session.get(type, id);
+        return ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("type", type)
+                                                                                   .addParameter("id", id));
     }
 
     public Object getValue(Class type, Serializable value) throws Exception
     {
-        try
-        {
-            Method getter = new PropertyDescriptor("id", value.getClass()).getReadMethod();
-
-            if (getter != null)
-            {
-                value = (Integer) getter.invoke(value);
-            }
-        }
-
-        catch (Exception e)
-        {
-            //NADA
-        }
-
-        return getValue(type, (int) value);
+        return ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("type", type)
+                                                                                   .addParameter("object", value));
     }
 
     public Object getViewValue(List<String> columns, String viewName, Map<String, Object> parameters) throws Exception
     {
-        Session session = getSession();
-
-        String sql = "select ";
-
-        for (String column : columns)
-        {
-            sql += column + ", ";
-        }
-
-        sql = sql.substring(0, sql.lastIndexOf(", "));
-
-        sql += " from " + viewName + " where ";
-
-        for (String key : parameters.keySet())
-        {
-            sql += key + " = :" + key + " and ";
-        }
-
-        Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
-
-        for (Map.Entry entry : parameters.entrySet())
-        {
-            query.setParameter(entry.getKey().toString(), entry.getValue());
-        }
-
-        return query.uniqueResult();
+        return ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("viewName", viewName)
+                                                                                   .addParameter("columns", new ArrayList(columns))
+                                                                                   .addParameter("parameters", new HashMap(parameters)));
     }
 
     public void executeFunction(String function, Map<String, Object> parameters) throws Exception
     {
-        Session session = getSession();
-
-        String sql = "select " + function;
-
-        StringJoiner joiner = new StringJoiner(", ");
-
-        for (String key : parameters.keySet())
-        {
-            joiner.add(":" + key);
-        }
-
-        Query query = session.createSQLQuery(sql + "(" + joiner.toString() + ")");
-
-        for (Map.Entry entry : parameters.entrySet())
-        {
-            query.setParameter(entry.getKey().toString(), entry.getValue());
-        }
-        
-        Transaction t = session.beginTransaction();
-        
-        query.uniqueResult();
-        
-        t.commit();
-    }
-
-    public Object loadValue(Class type, Serializable value) throws Exception
-    {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        try
-        {
-            try
-            {
-                value = (Integer) new PropertyDescriptor("id", value.getClass()).getReadMethod().invoke(value);
-            }
-
-            catch (Exception e)
-            { /*NADA*/ }
-
-            Object result = session.load(type, value);
-
-            for (Field field : result.getClass().getDeclaredFields())
-            {
-                try
-                {
-                    new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result).toString();
-                }
-
-                catch (Exception e)
-                {
-                    /*NADA*/
-                }
-            }
-
-            return result;
-        }
-
-        finally
-        {
-            session.close();
-        }
+        ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("function", function)
+                                                                            .addParameter("parameters", new HashMap(parameters)));
     }
 
     public Object getValue(Class type, List<Parameter> parameters) throws Exception
     {
-        Session session = getSession();
-
-        return composeQuery(session, type, parameters).uniqueResult();
+        return ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("type", type)
+                                                                                   .addParameter("parameters", new ArrayList(parameters)));
     }
 
     public List getValues(Class type) throws Exception
@@ -256,9 +96,8 @@ public class EntityService
 
     public List getValues(Class type, List<Parameter> parameters) throws Exception
     {
-        Session session = getSession();
-
-        return (List) composeQuery(session, type, parameters).list();
+        return (List) ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_LIST).addParameter("type", type)
+                                                                                        .addParameter("parameters", new ArrayList(parameters)));
     }
 
     public List getFieldValues(Field field, Class type) throws Exception
@@ -268,145 +107,15 @@ public class EntityService
 
     public List getFieldValues(Field field, Class type, List<Parameter> parameters) throws Exception
     {
-        Session session = getSession();
-
-        return (List) composeQuery(field, session, type, parameters).list();
+        return (List) ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_LIST).addParameter("field", field.getName())
+                                                                                        .addParameter("type", type)
+                                                                                        .addParameter("parameters", new ArrayList(parameters)));
     }
 
-    public List loadValues(Class type, List<Parameter> parameters) throws Exception
+    private ServerRequest newRequest(int request)
     {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        try
-        {
-            List result = (List) composeQuery(session, type, parameters).list();
-
-            for (Object o : result)
-            {
-                for (Field field : o.getClass().getDeclaredFields())
-                {
-                    try
-                    {
-                        new PropertyDescriptor(field.getName(), o.getClass()).getReadMethod().invoke(o).toString();
-                    }
-
-                    catch (Exception e)
-                    {
-                        /*NADA*/ }
-                }
-            }
-
-            return result;
-        }
-
-        finally
-        {
-            session.close();
-        }
-    }
-
-    private Query composeQuery(Session session, Class type, List<Parameter> parameters) throws Exception
-    {
-        return composeQuery(null, session, type, parameters);
-    }
-
-    private Query composeQuery(Field field, Session session, Class type, List<Parameter> parameters) throws Exception
-    {
-        String conditions = "";
-
-        for (Parameter parameter : parameters)
-        {
-            if (parameter.getCondition() != null)
-            {
-                conditions += (conditions.isEmpty() ? " where " : " and ") + parameter.getCondition();
-            }
-        }
-
-        Query query = session.createQuery((field != null ? "select " + field.getName() + " " : "") + "from " + type.getName()
-                + conditions);
-
-        for (Parameter parameter : parameters)
-        {
-            query.setParameter(parameter.getKey(), parameter.getValue());
-        }
-
-        return query;
-    }
-
-    public void close() throws Exception
-    {
-        getSession().close();
-        HibernateUtil.getSessionFactory().close();
-    }
-
-    private void logEvent(int event, Serializable entity) throws Exception
-    {
-        if (ApplicationController.isActiveLog() && !(entity instanceof Log))
-        {
-            Log log = new Log();
-            log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            log.setUser(ApplicationController.getInstance().getActiveUser());
-            log.setEvent(event);
-            log.setObjectName(entity.toString());
-            log.setObjectClass(entity.getClass().toString());
-            log.setCommand(getCommand(event, entity));
-
-            save(log);
-        }
-    }
-
-    private String getCommand(int event, Serializable entity) throws Exception
-    {
-        StringBuilder builder = new StringBuilder();
-        Serializable oldValue = null;
-
-        builder.append("<table class=\"log-command\">")
-                .append("    <tr>")
-                .append("        <th>")
-                .append("            Campo:")
-                .append("        </th>")
-                .append("        <th>")
-                .append(event == Log.EVENT_UPDATE ? "Valores Anteriores:" : "Valores:")
-                .append("        </th>");
-
-        if (event == Log.EVENT_UPDATE)
-        {
-            getSession().get(entity.getClass(), (Integer) new PropertyDescriptor("id", entity.getClass()).getReadMethod().invoke(entity));
-            oldValue = (Serializable) loadValue(entity.getClass(), entity);
-            builder.append("    <th> --> </th>")
-                    .append("    <th>")
-                    .append("        Novos Valores:")
-                    .append("    </th>");
-        }
-
-        builder.append("    </tr>");
-
-        for (Field field : entity.getClass().getDeclaredFields())
-        {
-            if (!Modifier.isStatic(field.getModifiers()))
-            {
-                Method getter = new PropertyDescriptor(field.getName(), entity.getClass()).getReadMethod();
-
-                builder.append("<tr>")
-                        .append("    <td>")
-                        .append(field.getName()).append(": ")
-                        .append("    </td>");
-
-                if (event == Log.EVENT_UPDATE)
-                {
-                    builder.append("<td>")
-                            .append(getter.invoke(oldValue))
-                            .append("</td>")
-                            .append("<td> --> </td>");
-                }
-
-                builder.append("    <td>")
-                        .append(getter.invoke(entity))
-                        .append("    </td>")
-                        .append("</tr>");
-            }
-        }
-
-        return builder.toString();
+        return new ServerRequest().setRequest(ServerRequest.DATABASE)
+                                  .addParameter("request", request)
+                                  .setWaitResponse(true);
     }
 }

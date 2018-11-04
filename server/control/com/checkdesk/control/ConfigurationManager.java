@@ -10,14 +10,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Properties;
-import org.hibernate.cfg.Configuration;
 
 /**
  *
  * @author MNicaretta
  */
 public class ConfigurationManager
-        extends Configuration
 {
     private static ConfigurationManager instance;
 
@@ -61,7 +59,6 @@ public class ConfigurationManager
                 global.load(fileInputStream);
 
                 fileInputStream.close();
-                configure("hibernate.cfg.xml").addProperties(global);
             }
         }
 

@@ -139,7 +139,7 @@ public class LogUtilities
         return result;
     }
 
-    public static List<Log> getLogs(Date value, Date value2)
+    public static List<Log> getLogs(Date from, Date until)
     {
         List<Log> result = new ArrayList<>();
 
@@ -147,14 +147,14 @@ public class LogUtilities
 
         try
         {
-            if (value != null)
+            if (from != null)
             {
-                parameters.add(new Parameter("from", Log.class.getDeclaredField("timestamp"), value, Parameter.COMPARATOR_DATE_FROM));
+                parameters.add(new Parameter(Log.class.getDeclaredField("timestamp"), from, Parameter.COMPARATOR_DATE_FROM));
             }
 
-            if (value2 != null)
+            if (until != null)
             {
-                parameters.add(new Parameter("until", Log.class.getDeclaredField("timestamp"), value2, Parameter.COMPARATOR_DATE_UNTIL));
+                parameters.add(new Parameter(Log.class.getDeclaredField("timestamp"), until, Parameter.COMPARATOR_DATE_UNTIL));
             }
             
             result = EntityService.getInstance().getValues(Log.class, parameters);

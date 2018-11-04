@@ -6,23 +6,24 @@
 package com.checkdesk.model.db.service;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.model.data.Entity;
 import com.checkdesk.model.data.Log;
-import com.checkdesk.model.db.HibernateUtil;
+import com.checkdesk.model.db.Database;
+import com.checkdesk.model.db.Schemas;
+import com.checkdesk.model.db.Schemas.Schema;
 import com.checkdesk.model.util.Parameter;
+import com.checkdesk.model.util.ServerRequest;
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javassist.Modifier;
-import javax.persistence.StoredProcedureQuery;
-import org.hibernate.CacheMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import java.util.StringJoiner;
 
 /**
  *
@@ -30,6 +31,13 @@ import org.hibernate.Transaction;
  */
 public class EntityService
 {
+    private static final int REQUEST_INSERT        = 0;
+    private static final int REQUEST_UPDATE        = 1;
+    private static final int REQUEST_DELETE        = 2;
+    private static final int REQUEST_SELECT_UNIQUE = 3;
+    private static final int REQUEST_SELECT_LIST   = 4;
+    
+    private static EntityService defaultInstance = null;
 
     public static EntityService getInstance() throws Exception
     {
@@ -41,171 +49,261 @@ public class EntityService
         return defaultInstance;
     }
 
-    private static Session getSession() throws Exception
-    {
-        if (defaultSession == null)
-        {
-            defaultSession = HibernateUtil.getSessionFactory().openSession();
-            defaultSession.setCacheMode(CacheMode.IGNORE);
-        }
-
-        return defaultSession;
-    }
-
-    private static EntityService defaultInstance = null;
-    private static Session defaultSession = null;
-
     private EntityService() throws Exception
     {
-        initialTransaction();
     }
 
-    private void initialTransaction() throws Exception
+    public Object handleRequest(ApplicationController controller, ServerRequest request) throws Exception
     {
-        Session session = getSession();
+        Object result = null;
+        
+        switch ((int) request.getParameter("request"))
+        {
+            case REQUEST_INSERT:
+            {
+                result = insert((Entity) request.getParameter("object"));
+            }
+            break;
+                
+            case REQUEST_UPDATE:
+            {
+                result = update((Entity) request.getParameter("object"));
+            }
+            break;
+                
+            case REQUEST_DELETE:
+            {
+                delete((Entity) request.getParameter("object"));
+            }
+            break;
+                
+            case REQUEST_SELECT_UNIQUE:
+            {
+                List<String> parameters = request.getParameters();
+                
+                if (parameters.contains("viewName"))
+                {
+                    result = getViewValue((ArrayList) request.getParameter("columns"),
+                                          (String) request.getParameter("viewName"),
+                                          (HashMap) request.getParameter("parameters"));
+                }
+                
+                else if (parameters.contains("function"))
+                {
+                    result = executeFunction((String) request.getParameter("function"),
+                                             (HashMap) request.getParameter("parameters"));
+                }
+                
+                else 
+                {
+                    Class clazz = (Class) request.getParameter("type");
+                    
+                    if (parameters.contains("id"))
+                    {
+                        result = getValue(clazz, (int) request.getParameter("id"));
+                    }
 
-        Query q = session.createSQLQuery("select current_date");
-        q.uniqueResult();
+                    else if (parameters.contains("value"))
+                    {
+                        result = getValue(clazz, (Entity) request.getParameter("value"));
+                    }
+
+                    else if (parameters.contains("parameters"))
+                    {
+                        result = getValue(clazz, (List) request.getParameter("parameters"));
+                    }
+                }
+            }
+            break;
+                
+            case REQUEST_SELECT_LIST:
+            {
+                List<String> parameters = request.getParameters();
+                
+                Class clazz = (Class) request.getParameter("type");
+
+                if (parameters.contains("field"))
+                {
+                    result = getFieldValues(clazz.getDeclaredField((String) request.getParameter("field")),
+                                            clazz,
+                                            (ArrayList) request.getParameter("parameters"));
+                }
+                
+                else
+                {
+                    result = getValues(clazz, (ArrayList) request.getParameter("parameters"));
+                }
+            }
+            break;
+        }
+        
+        return result;
     }
 
-    public void save(Serializable entity) throws Exception
+    public Entity insert(Entity entity) throws Exception
     {
         logEvent(Log.EVENT_ADD, entity);
+        
+        Database db = getDatabase();
 
-        Session session = getSession();
+        try
+        {
+            Schema schema = Schemas.getSchema(entity.getClass());
+            
+            if (schema != null)
+            {
+                entity.setId(db.queryInt(schema.fetcher.insert(db, schema, entity)));
 
-        Transaction t = session.beginTransaction();
+                return entity;
+            }
 
-        session.save(entity);
-        t.commit();
+            return null;
+        }
+        
+        finally
+        {
+            db.release();
+        }
     }
 
-    public void update(Serializable entity) throws Exception
+    public Entity update(Entity entity) throws Exception
     {
         logEvent(Log.EVENT_UPDATE, entity);
 
-        Session session = getSession();
+        Database db = getDatabase();
 
-        Transaction t = session.beginTransaction();
+        try
+        {
+            Schema schema = Schemas.getSchema(entity.getClass());
+            
+            if (schema != null)
+            {
+                db.executeCommand(schema.fetcher.update(db, schema, entity));
 
-        session.update(entity);
-        t.commit();
+                return entity;
+            }
+
+            return null;
+        }
+        
+        finally
+        {
+            db.release();
+        }
     }
 
-    public void delete(Serializable entity) throws Exception
+    public void delete(Entity entity) throws Exception
     {
         logEvent(Log.EVENT_DELETE, entity);
 
-        Session session = getSession();
-
-        Transaction t = session.beginTransaction();
-
-        session.delete(getValue(entity.getClass(), entity));
-        t.commit();
-    }
-
-    public Object getValue(Class type, int id) throws Exception
-    {
-        Session session = getSession();
-
-        return session.get(type, id);
-    }
-
-    public Object getValue(Class type, Serializable value) throws Exception
-    {
-        try
-        {
-            Method getter = new PropertyDescriptor("id", value.getClass()).getReadMethod();
-
-            if (getter != null)
-            {
-                value = (Integer) getter.invoke(value);
-            }
-        }
-
-        catch (Exception e)
-        {
-            //NADA
-        }
-
-        return getValue(type, (int) value);
-    }
-
-    public Object getViewValue(List<String> columns, String viewName, Map<String, Object> parameters) throws Exception
-    {
-        Session session = getSession();
-
-        String sql = "select ";
-        
-        for (String column : columns)
-        {
-            sql += column + ", ";
-        }
-        
-        sql = sql.substring(0, sql.lastIndexOf(", "));
-        
-        sql += " from " + viewName + " where ";
-        
-        for (String key : parameters.keySet())
-        {
-            sql += key + " = :" + key + " and ";
-        }
-        
-        StoredProcedureQuery q;
-        
-        Query query = session.createSQLQuery(sql.substring(0, sql.lastIndexOf(" and ")));
-        
-        for (Map.Entry entry : parameters.entrySet())
-        {
-            query.setParameter(entry.getKey().toString(), entry.getValue());
-        }
-        
-        return query.uniqueResult();
-    }
-
-    private Object loadValue(Class type, Serializable value) throws Exception
-    {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Database db = getDatabase();
 
         try
         {
-            try
+            Schema schema = Schemas.getSchema(entity.getClass());
+            
+            if (schema != null)
             {
-                value = (Integer) new PropertyDescriptor("id", value.getClass()).getReadMethod().invoke(value);
+                db.executeCommand(schema.fetcher.delete(db, schema, entity));
             }
-
-            catch (Exception e)
-            { /*NADA*/ }
-
-            Object result = session.load(type, value);
-
-            for (Field field : result.getClass().getDeclaredFields())
-            {
-                try
-                {
-                    new PropertyDescriptor(field.getName(), result.getClass()).getReadMethod().invoke(result).toString();
-                }
-
-                catch (Exception e)
-                {
-                    /*NADA*/
-                }
-            }
-
-            return result;
         }
-
+        
         finally
         {
-            session.close();
+            db.release();
         }
     }
 
-    public Object getValue(Class type, List<Parameter> parameters) throws Exception
+    public Entity getValue(Class type, int id) throws Exception
     {
-        Session session = getSession();
+        return getValue(type, Arrays.asList(new Parameter(Entity.class.getDeclaredField("id"),
+                                            id,
+                                            Parameter.COMPARATOR_EQUALS)));
+    }
 
-        return composeQuery(session, type, parameters).uniqueResult();
+    public Entity getValue(Class type, Entity value) throws Exception
+    {
+        return getValue(type, value.getId());
+    }
+    
+    public Entity getValue(Class type, List<Parameter> parameters) throws Exception
+    {
+        Database db = getDatabase();
+
+        try
+        {
+            Schema schema = Schemas.getSchema(type);
+            
+            if (schema != null)
+            {
+                return db.fetchOne(composeQuery(db, schema, parameters), schema.fetcher);
+            }
+            
+            return null;
+        }
+        
+        finally
+        {
+            db.release();
+        }
+    }
+
+    public List<Object[]> getViewValue(List<String> columns, String viewName, Map<String, Object> parameters) throws Exception
+    {
+        Database db = getDatabase();
+        
+        try
+        {
+            StringJoiner columnJoin = new StringJoiner(", ");
+            StringJoiner paramJoin = new StringJoiner(" and ");
+
+            for (String column : columns)
+            {
+                columnJoin.add(column);
+            }
+
+            for (Map.Entry<String, Object> entry : parameters.entrySet())
+            {
+                paramJoin.add(entry.getKey() + " = " + db.quote(entry.getValue()));
+            }
+
+            String sql = "select " + columnJoin.toString() +
+                         " from " + viewName +
+                         " where " + paramJoin.toString();
+
+            return db.queryMatrix(sql, columns.size());
+        }
+        
+        finally
+        {
+            db.release();
+        }
+    }
+
+    public Object executeFunction(String function, Map<String, Object> parameters) throws Exception
+    {
+        Database db = getDatabase();
+
+        try
+        {
+
+            StringJoiner paramJoin = new StringJoiner(" and ");
+
+            for (Map.Entry<String, Object> entry : parameters.entrySet())
+            {
+                paramJoin.add(entry.getKey() + " = " + db.quote(entry.getValue()));
+            }
+
+            String sql = "select " + function +
+                         " where " + paramJoin.toString();
+            
+            return db.query(sql);
+        }
+        
+        finally
+        {
+            db.release();
+        }
     }
 
     public List getValues(Class type) throws Exception
@@ -215,9 +313,24 @@ public class EntityService
 
     public List getValues(Class type, List<Parameter> parameters) throws Exception
     {
-        Session session = getSession();
+        Database db = getDatabase();
 
-        return (List) composeQuery(session, type, parameters).list();
+        try
+        {
+            Schema schema = Schemas.getSchema(type);
+            
+            if (schema != null)
+            {
+                return db.fetchAll(composeQuery(db, schema, parameters), schema.fetcher);
+            }
+            
+            return null;
+        }
+        
+        finally
+        {
+            db.release();
+        }
     }
 
     public List getFieldValues(Field field, Class type) throws Exception
@@ -227,97 +340,74 @@ public class EntityService
 
     public List getFieldValues(Field field, Class type, List<Parameter> parameters) throws Exception
     {
-        Session session = getSession();
-
-        return (List) composeQuery(field, session, type, parameters).list();
-    }
-
-    public List loadValues(Class type, List<Parameter> parameters) throws Exception
-    {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Database db = getDatabase();
 
         try
         {
-            List result = (List) composeQuery(session, type, parameters).list();
-
-            for (Object o : result)
+            Schema schema = Schemas.getSchema(type);
+            
+            if (schema != null)
             {
-                for (Field field : o.getClass().getDeclaredFields())
-                {
-                    try
-                    {
-                        new PropertyDescriptor(field.getName(), o.getClass()).getReadMethod().invoke(o).toString();
-                    }
-
-                    catch (Exception e)
-                    {
-                        /*NADA*/ }
-                }
+                return db.fetchAll(composeQuery(db, schema, field, parameters), schema.fetcher);
             }
-
-            return result;
+            
+            return null;
         }
-
+        
         finally
         {
-            session.close();
+            db.release();
         }
     }
 
-    private Query composeQuery(Session session, Class type, List<Parameter> parameters) throws Exception
+    private String composeQuery(Database db, Schema schema, List<Parameter> parameters) throws Exception
     {
-        return composeQuery(null, session, type, parameters);
+        return composeQuery(db, schema, null, parameters);
     }
 
-    private Query composeQuery(Field field, Session session, Class type, List<Parameter> parameters) throws Exception
+    private String composeQuery(Database db, Schema schema, Field field, List<Parameter> parameters) throws Exception
     {
-        String conditions = "";
+        StringJoiner paramJoiner = new StringJoiner(" and ");
 
         for (Parameter parameter : parameters)
         {
-            if (parameter.getCondition() != null)
-            {
-                conditions += (conditions.isEmpty() ? " where " : " and ") + parameter.getCondition();
-            }
+            paramJoiner.add(getCondition(db, schema, parameter));
         }
-
-        Query query = session.createQuery((field != null ? "select " + field.getName() + " " : "") + "from " + type.getName()
-                + conditions);
-
-        for (Parameter parameter : parameters)
+        
+        if (field == null)
         {
-            query.setParameter(parameter.getKey(), parameter.getValue());
+            return schema.select +
+                   (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner;
         }
-
-        return query;
+        
+        else
+        {
+            return "select " + schema.getField(field.getName()) +
+                   " from " + schema.name +
+                   " where " + paramJoiner;
+        }
     }
 
-    public void close() throws Exception
-    {
-        getSession().close();
-        HibernateUtil.getSessionFactory().close();
-    }
-
-    private void logEvent(int event, Serializable entity) throws Exception
+    private void logEvent(int event, Entity entity) throws Exception
     {
         if (ApplicationController.isActiveLog() && !(entity instanceof Log))
         {
             Log log = new Log();
             log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            log.setUser(ApplicationController.getInstance().getActiveUser());
+            log.setUserId(ApplicationController.getInstance().getActiveUser().getId());
             log.setEvent(event);
             log.setObjectName(entity.toString());
             log.setObjectClass(entity.getClass().toString());
             log.setCommand(getCommand(event, entity));
 
-            save(log);
+            insert(log);
         }
     }
 
-    private String getCommand(int event, Serializable entity) throws Exception
+    private String getCommand(int event, Entity entity) throws Exception
     {
         StringBuilder builder = new StringBuilder();
-        Serializable oldValue = null;
+        Entity oldValue = null;
 
         builder.append("<table class=\"log-command\">")
                 .append("    <tr>")
@@ -330,8 +420,7 @@ public class EntityService
 
         if (event == Log.EVENT_UPDATE)
         {
-            getSession().get(entity.getClass(), (Integer) new PropertyDescriptor("id", entity.getClass()).getReadMethod().invoke(entity));
-            oldValue = (Serializable) loadValue(entity.getClass(), entity);
+            oldValue = getValue(entity.getClass(), entity);
             builder.append("    <th> --> </th>")
                     .append("    <th>")
                     .append("        Novos Valores:")
@@ -367,5 +456,67 @@ public class EntityService
         }
 
         return builder.toString();
+    }
+    
+    private String getValue(Database db, Parameter parameter)
+    {
+        Object result = parameter.getValue();
+
+        switch (parameter.getComparator())
+        {
+            case Parameter.COMPARATOR_LOWER_CASE:
+                result = parameter.getValue().toString().toLowerCase();
+                break;
+        }
+
+        return db.quote(result);
+    }
+
+    private String getCondition(Database db, Schema schema, Parameter parameter)
+    {
+        String result = null;
+        String fieldName = schema.getField(parameter.getField());
+        
+        switch (parameter.getComparator())
+        {
+            case Parameter.COMPARATOR_EQUALS:
+                result = fieldName + " = " + getValue(db, parameter);
+                break;
+
+            case Parameter.COMPARATOR_LOWER_CASE:
+                result = "lower(" + fieldName + ") like " + getValue(db, parameter);
+                break;
+
+            case Parameter.COMPARATOR_DATE:
+                result = fieldName + " = " + getValue(db, parameter);
+                break;
+
+            case Parameter.COMPARATOR_DATE_FROM:
+                result = fieldName + " >= " + getValue(db, parameter);
+                break;
+
+            case Parameter.COMPARATOR_DATE_UNTIL:
+                result = fieldName + " <= " + getValue(db, parameter);
+                break;
+                
+            case Parameter.COMPARATOR_UNLIKE:
+                result = fieldName + " <> " + getValue(db, parameter);
+                break;
+                
+            case Parameter.COMPARATOR_MAX_VALUE:
+                result = fieldName + " = max(" + fieldName + ")";
+                break;
+                
+            case Parameter.COMPARATOR_MIN_VALUE:
+                result = fieldName + " = min(" + fieldName + ")";
+                break;
+        }
+        
+        return result;
+    }
+    
+    private Database getDatabase() throws Exception
+    {
+        return Database.getInstance();
     }
 }

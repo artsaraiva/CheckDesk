@@ -61,21 +61,21 @@ public class SurveyDetails
                     new DetailsCaption(source.toString()),
                     new DetailsTable(75).addItem("Data de criação", source.getCreatedDate())
                             .addItem("Tipo", SurveyUtilities.getType(source.getType()))
-                            .addItem("Autor", source.getOwner())
-                            .addItem("Categoria", source.getCategory())
-                            .addItem("Participantes", source.getParticipants())
+                            .addItem("Autor", source.getOwnerId())
+                            .addItem("Categoria", source.getCategoryId())
+                            .addItem("Participantes", source.getParticipantsId())
                             .addItemHtml("Informações", source.getInfo())
-                            .addItem("Formulário", source.getForm()));
+                            .addItem("Formulário", source.getFormId()));
 
             Table table = new Table("Pergunta", "Tipo", "Opções");
 
-            if (source.getForm() != null)
+            if (source.getFormId() != 0)
             {
-                for (Question question : (Set<Question>) source.getForm().getQuestions())
+                for (Question question : FormUtilities.getQuestions(source.getFormId()))
                 {
                     table.addRow(question.getName(),
                             FormUtilities.getQuestionType(question.getType()),
-                            question.getOption());
+                            question.getOptionId());
                 }
             }
 

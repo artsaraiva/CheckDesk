@@ -35,14 +35,12 @@ public class LoginView
         extends Application
 {
     private Stage stage;
-    private boolean login = false;
 
     public static void main(String[] args)
     {
         try
         {
             //Inicialization
-            EntityService.getInstance();
             ApplicationController.getInstance();
             launch(args);
         }
@@ -103,7 +101,7 @@ public class LoginView
             }
         }
         
-        if (login = ApplicationController.getInstance().login(loginField.getText(), passwordField.getText()) != null)
+        if (ApplicationController.getInstance().login(loginField.getText(), passwordField.getText()) != null)
         {
             try
             {
@@ -163,21 +161,6 @@ public class LoginView
             else if (event.getCode().equals(KeyCode.ESCAPE))
             {
                 System.exit(0);
-            }
-        });
-
-        stage.setOnCloseRequest((WindowEvent t) ->
-        {
-            if (!login)
-            {
-                try
-                {
-                    EntityService.getInstance().close();
-                }
-                catch (Exception e)
-                {
-                    ApplicationController.logException(e);
-                }
             }
         });
     }

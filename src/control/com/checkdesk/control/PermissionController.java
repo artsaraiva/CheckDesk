@@ -183,16 +183,19 @@ public class PermissionController
         
         try
         {
-            Parameter parameter = new Parameter("name", Permission.class.getDeclaredField("name"), item.getName(), Parameter.COMPARATOR_EQUALS);
+            Parameter parameter = new Parameter(Permission.class.getDeclaredField("name"), item.getName(), Parameter.COMPARATOR_EQUALS);
             
             result = (Permission) EntityService.getInstance().getValue(Permission.class, Arrays.asList(parameter));
             
             if (result == null)
             {
-                Group group = new Group(0, "");
+                Group group = new Group();
                 EntityService.getInstance().save(group);
                 
-                result = new Permission(0, group, item.getName());
+                result = new Permission();
+                result.setViewersId(group.getGroupId());
+                result.setName(item.getName());
+                
                 EntityService.getInstance().save(result);
             }
         }

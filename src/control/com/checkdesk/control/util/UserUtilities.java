@@ -6,6 +6,7 @@
 package com.checkdesk.control.util;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
@@ -25,7 +26,6 @@ import javafx.event.Event;
  */
 public class UserUtilities
 {
-
     private static final Item TYPE_SUPER = new Item("Super", User.TYPE_SUPER);
     private static final Item TYPE_ADMIN = new Item("Admin", User.TYPE_ADMIN);
     private static final Item TYPE_OPERATOR = new Item("Operator", User.TYPE_OPERATOR);
@@ -128,15 +128,13 @@ public class UserUtilities
 
     public static User login(String login, String password) throws Exception
     {
-        List<Parameter> parameters = Arrays.asList(new Parameter("login",
-                User.class.getDeclaredField(login.contains("@")
-                        ? "email" : "login"),
-                login.toLowerCase(),
-                Parameter.COMPARATOR_LOWER_CASE),
-                new Parameter("password",
-                        User.class.getDeclaredField("password"),
-                        password,
-                        Parameter.COMPARATOR_EQUALS));
+        List<Parameter> parameters = Arrays.asList(new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+                                                                 login.toLowerCase(),
+                                                                 Parameter.COMPARATOR_LOWER_CASE),
+
+                                                   new Parameter(User.class.getDeclaredField("password"),
+                                                                 password,
+                                                                 Parameter.COMPARATOR_EQUALS));
 
         return (User) EntityService.getInstance().getValue(User.class, parameters);
     }
@@ -156,5 +154,10 @@ public class UserUtilities
         }
 
         return result;
+    }
+    
+    public static String getUserIcon(int userId)
+    {
+        return ResourceLocator.getInstance().getImageResource(getUser(userId).getLogin());
     }
 }

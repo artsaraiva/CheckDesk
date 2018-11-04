@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.sql.Timestamp;
 
 /**
  *
@@ -29,7 +30,7 @@ public class HandleClient extends Thread
     private FileInputStream fis = null;
     private FileOutputStream fos = null;
 
-    private final ApplicationController controller = ApplicationController.getInstance();
+    private ApplicationController controller;
 
     public HandleClient(Socket socket)
     {
@@ -41,6 +42,7 @@ public class HandleClient extends Thread
     {
         try
         {
+            
             out = new ObjectOutputStream(client.getOutputStream());
             in = new ObjectInputStream(client.getInputStream());
 
@@ -53,6 +55,11 @@ public class HandleClient extends Thread
             
             else
             {
+                controller = ApplicationController.getInstance();
+                System.out.println("Client connected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                                   "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
+                                   "--------------------------------\n" );
+                
                 ServerRequest request = (ServerRequest) first;
                 
                 out.writeObject(controller.handle(request, this));

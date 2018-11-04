@@ -51,7 +51,7 @@ public class PermissionDescription
         
         permission = PermissionController.getInstance().getPermission(item);
         
-        viewersTable.setGroup(permission.getViewers());
+        viewersTable.setGroup(permission.getViewersId());
         vbox.getChildren().add(viewersTable);
     }
     

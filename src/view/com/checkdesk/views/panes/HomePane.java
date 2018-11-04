@@ -6,11 +6,9 @@
 package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ResourceLocator;
-import com.checkdesk.model.data.Survey;
+import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.HomeTable;
-import java.util.Arrays;
-import java.util.Date;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -47,45 +45,8 @@ public class HomePane
         User user4 = new User();
         user4.setLogin("test_user");
 
-        pendingList.setSurveys(Arrays.asList(
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0),
-                new Survey(1, null, null, user1, "Pesquisa de Satisfação", "", new Date(), 0),
-                new Survey(2, null, null, user2, "Pesquisa Corporativa", "", new Date(), 0),
-                new Survey(3, null, null, user3, "Pesquisa de TCC", "", new Date(), 0)
-        ));
-
-        createdList.setSurveys(Arrays.asList(
-                new Survey(4, null, null, user4, "Pesquisa de IBGE", "", new Date(), 0)
-        ));
+        pendingList.setSurveys(SurveyUtilities.getPendingSurvey());
+        createdList.setSurveys(SurveyUtilities.getOwnedSurvey());
     }
 
     private void initComponents()

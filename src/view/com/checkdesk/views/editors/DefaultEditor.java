@@ -109,7 +109,7 @@ public class DefaultEditor<T>
         getDialogPane().getStylesheets().add(ResourceLocator.getInstance().getStyleResource("default.css"));
         setResizable(false);
 
-        getDialogPane().getButtonTypes().addAll(btCancel, btSave);
+        getDialogPane().getButtonTypes().addAll(btSave, btCancel);
 
         setOnCloseRequest(new EventHandler()
         {

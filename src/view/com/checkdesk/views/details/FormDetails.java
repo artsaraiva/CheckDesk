@@ -11,7 +11,6 @@ import com.checkdesk.model.data.Question;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
 import com.checkdesk.views.details.util.Table;
-import java.util.Set;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -32,7 +31,7 @@ public class FormDetails
     @Override
     public void setSource(int sourceId)
     {
-        setSource(FormUtilities.getValue(sourceId));
+        setSource(FormUtilities.getForm(sourceId));
     }
 
     @Override
@@ -62,11 +61,11 @@ public class FormDetails
 
             Table table = new Table("Pergunta", "Tipo", "Opções");
 
-            for (Question question : (Set<Question>) source.getQuestions())
+            for (Question question : FormUtilities.getQuestions(source))
             {
                 table.addRow(question.getName(),
                         FormUtilities.getQuestionType(question.getType()),
-                        question.getOption());
+                        question.getOptionId());
             }
 
             vbox.getChildren().add(table);

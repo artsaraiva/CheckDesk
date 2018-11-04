@@ -51,7 +51,7 @@ public class AttachmentPicker
     private void addAttachment()
     {
         Attachment attachment = new Attachment();
-        attachment.setQuestion(question);
+        attachment.setQuestionId(question.getId());
         
         if (AttachmentUtilities.editAttachment(attachment))
         {

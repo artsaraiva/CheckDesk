@@ -72,9 +72,12 @@ public class HomeTable
     {
         getVBoxChildren().clear();
 
-        for (Survey s : surveys)
+        if (surveys != null)
         {
-            getVBoxChildren().add(createItem(s));
+            for (Survey s : surveys)
+            {
+                getVBoxChildren().add(createItem(s));
+            }
         }
 
         updateTitle();
