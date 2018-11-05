@@ -37,6 +37,7 @@ public class SurveyUtilities
     {
         Survey survey = new Survey();
         survey.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+        survey.setOwnerId(ApplicationController.getInstance().getActiveUser().getId());
 
         new SurveyEditor(new EditorCallback<SurveyWrapper>(new SurveyWrapper(survey))
         {
@@ -45,11 +46,12 @@ public class SurveyUtilities
             {
                 try
                 {
-                    FormUtilities.saveForm(getSource().getForm());
+                    FormUtilities.saveForm(getSource().getFormWrapper());
 
-                    EntityService.getInstance().save(getSource().getSurvey());
+                    getSource().getSurvey().setFormId(getSource().getFormWrapper().getForm().getId());
+                    Survey survey = (Survey) EntityService.getInstance().save(getSource().getSurvey());
 
-                    ApplicationController.getInstance().notify(getSource().getSurvey());
+                    ApplicationController.getInstance().notify(survey);
                 }
 
                 catch (Exception e)
@@ -70,7 +72,7 @@ public class SurveyUtilities
             {
                 try
                 {
-                    FormUtilities.saveForm(getSource().getForm());
+                    FormUtilities.saveForm(getSource().getFormWrapper());
                     
                     EntityService.getInstance().update(getSource().getSurvey());
                 }
@@ -158,9 +160,9 @@ public class SurveyUtilities
 
         try
         {
-            result = EntityService.getInstance().getValues(Survey.class, Arrays.asList(new Parameter(Survey.class.getDeclaredField("ownerId"),
-                                                                                                     ApplicationController.getInstance().getActiveUser().getId(),
-                                                                                                     Parameter.COMPARATOR_EQUALS)));
+            result = EntityService.getInstance().getValues(Survey.class, new Parameter(Survey.class.getDeclaredField("ownerId"),
+                                                                                       ApplicationController.getInstance().getActiveUser().getId(),
+                                                                                       Parameter.COMPARATOR_EQUALS));
         }
 
         catch (Exception e)

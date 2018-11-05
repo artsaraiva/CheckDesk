@@ -14,6 +14,7 @@ import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Category;
 import com.checkdesk.model.data.Form;
+import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.util.FormWrapper;
@@ -26,6 +27,7 @@ import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.ItemPicker;
 import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Validation;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.scene.control.ComboBox;
@@ -65,6 +67,10 @@ public class SurveyEditor
 
     private void setSource(SurveyWrapper value)
     {
+        typeField.setItems(SurveyUtilities.getItems());
+        ownerSelector.setItems(UserUtilities.getUsers());
+        categorySelector.setItems(CategoryUtilities.getCategories());
+        
         this.source = value;
 
         Survey survey = source.getSurvey();
@@ -74,9 +80,11 @@ public class SurveyEditor
         typeField.setValue(SurveyUtilities.getType(survey.getType()));
         infoField.setHtmlText(survey.getInfo() != null ? survey.getInfo() : "");
         participantsTable.setGroup(survey.getParticipantsId());
-        viewersTable.setGroup(survey.getViewersId());
+        viewersTable.setGroup(survey.getParticipantsId());
         ownerSelector.setSelected(UserUtilities.getUser(survey.getOwnerId()));
         categorySelector.setSelected(CategoryUtilities.getCategory(survey.getOwnerId()));
+        
+        setValidations();
     }
 
     @Override
@@ -91,6 +99,14 @@ public class SurveyEditor
         survey.setViewersId(viewersTable.createGroup().getGroupId());
         survey.setOwnerId(ownerSelector.getSelected().getId());
         survey.setCategoryId(categorySelector.getSelected().getId());
+        
+        formPane.obtainInput();
+    }
+
+    @Override
+    protected boolean validateInput()
+    {
+        return super.validateInput() && formPane.validateInput();
     }
 
     @Override
@@ -132,16 +148,16 @@ public class SurveyEditor
                 break;
 
             case PAGE_FORM:
-                if (source.getForm() == null)
+                if (source.getFormWrapper().getForm() == null)
                 {
                     getDialogPane().setContent(browsePane);
                 }
                 
                 else
                 {
-                    FormEditorPane pane = new FormEditorPane();
-                    pane.setSource(source.getForm());
-                    getDialogPane().setContent(pane);
+                    formPane = new FormEditorPane();
+                    formPane.setSource(source.getFormWrapper());
+                    getDialogPane().setContent(formPane);
                 }
                 removeButton(btNext);
                 break;
@@ -152,10 +168,10 @@ public class SurveyEditor
     {
         FormEditorPane pane = (FormEditorPane) editButton.getPane();
 
-        source.setForm(new FormWrapper(new Form()));
+        source.setFormWrapper(new FormWrapper(new Form()));
 
-        pane.setSource(source.getForm());
-        getDialogPane().setContent(pane);
+        pane.setSource(source.getFormWrapper());
+        getDialogPane().setContent(formPane = pane);
     }
 
     private void showEditForm()
@@ -168,12 +184,47 @@ public class SurveyEditor
 
         if (picker.getSelected() != null)
         {
-            source.setForm(new FormWrapper(picker.getSelected().clone()));
-            pane.setSource(source.getForm());
+            source.setFormWrapper(new FormWrapper(picker.getSelected().clone()));
+            pane.setSource(source.getFormWrapper());
             pane.setEnable(PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), editButton.getRole()));
 
-            getDialogPane().setContent(pane);
+            getDialogPane().setContent(formPane = pane);
         }
+    }
+    
+    private void setValidations()
+    {
+        addValidation(titleField);
+        addValidation(ownerSelector);
+        addValidation(createdField, new Validation()
+        {
+            private String error = "";
+            
+            @Override
+            public boolean validate()
+            {
+                boolean result = false;
+                
+                if ( createdField.getDate() == null )
+                {
+                    error  = "Esse campo deve ser preenchido";
+                }
+                
+                else
+                {
+                    result = true;
+                }
+                
+                return result;
+            }
+
+            @Override
+            public String getError()
+            {
+                return error;
+            }
+        } );
+        addValidation(categorySelector);
     }
 
     private void initComponents()
@@ -193,7 +244,7 @@ public class SurveyEditor
         infoField.setPrefHeight(250);
 
         createdField.setDisable(true);
-        typeField.setItems(SurveyUtilities.getItems());
+        ownerSelector.setDisable(true);
 
         gridPane.addRow(count++, titleLabel, titleField);
         gridPane.addRow(count++, ownerLabel, ownerSelector);
@@ -274,4 +325,5 @@ public class SurveyEditor
     private BrowsePane browsePane = new BrowsePane();
     private BrowseButton addButton = new BrowseButton(new FormEditorPane(), "Nova", "bi_users.png", "add.form");
     private BrowseButton editButton = new BrowseButton(new FormEditorPane(), "Editar", "bi_forms.png", "edit.form");
+    private FormEditorPane formPane;
 }

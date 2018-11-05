@@ -9,7 +9,6 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
-import com.checkdesk.views.details.DetailsPane;
 import com.checkdesk.views.details.UserDetails;
 import com.checkdesk.views.parts.DefaultTable;
 import javafx.event.ActionEvent;

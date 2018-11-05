@@ -6,9 +6,11 @@
 package com.checkdesk.views.details.util;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.model.data.Group;
 import java.text.DateFormat;
 import java.util.Date;
-import javafx.beans.value.ChangeListener;
+import java.util.List;
+import java.util.StringJoiner;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -57,6 +59,17 @@ public class DetailsTable
         {
             v = df.format((Date) value);
         }
+        
+        else if (value instanceof Group)
+        {
+            listToString(((Group) value).getUsers());
+        }
+        
+        else if (value instanceof List)
+        {
+            listToString(((Group) value).getUsers());
+        }
+        
         else if(value != null)
         {
             v = value.toString();
@@ -114,6 +127,18 @@ public class DetailsTable
         });
         
         return result;
+    }
+    
+    private String listToString(List list)
+    {
+        StringJoiner joiner = new StringJoiner(", ");
+        
+        for (Object item : list)
+        {
+            joiner.add(item.toString());
+        }
+        
+        return joiner.toString();
     }
 
     private void initComponents()

@@ -5,14 +5,16 @@
  */
 package com.checkdesk.views.details;
 
+import com.checkdesk.control.util.CategoryUtilities;
 import com.checkdesk.control.util.FormUtilities;
+import com.checkdesk.control.util.GroupUtilities;
 import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
 import com.checkdesk.views.details.util.Table;
-import java.util.Set;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -60,12 +62,12 @@ public class SurveyDetails
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
                     new DetailsTable(75).addItem("Data de criação", source.getCreatedDate())
-                            .addItem("Tipo", SurveyUtilities.getType(source.getType()))
-                            .addItem("Autor", source.getOwnerId())
-                            .addItem("Categoria", source.getCategoryId())
-                            .addItem("Participantes", source.getParticipantsId())
-                            .addItemHtml("Informações", source.getInfo())
-                            .addItem("Formulário", source.getFormId()));
+                                        .addItem("Tipo", SurveyUtilities.getType(source.getType()))
+                                        .addItem("Autor", UserUtilities.getUser(source.getOwnerId()))
+                                        .addItem("Categoria", CategoryUtilities.getCategory(source.getCategoryId()))
+                                        .addItem("Participantes", GroupUtilities.getGroup(source.getParticipantsId(), true))
+                                        .addItemHtml("Informações", source.getInfo())
+                                        .addItem("Formulário", FormUtilities.getForm(source.getFormId())));
 
             Table table = new Table("Pergunta", "Tipo", "Opções");
 
@@ -74,8 +76,8 @@ public class SurveyDetails
                 for (Question question : FormUtilities.getQuestions(source.getFormId()))
                 {
                     table.addRow(question.getName(),
-                            FormUtilities.getQuestionType(question.getType()),
-                            question.getOptionId());
+                                 FormUtilities.getQuestionType(question.getType()),
+                                 FormUtilities.getOption(question.getOptionId()));
                 }
             }
 

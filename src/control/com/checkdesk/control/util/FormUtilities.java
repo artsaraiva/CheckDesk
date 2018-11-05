@@ -107,22 +107,24 @@ public class FormUtilities
     {
         if (formWrapper.getForm().getId() == 0)
         {
-            EntityService.getInstance().save(formWrapper.getForm());
-
+            formWrapper.setForm((Form) EntityService.getInstance().save(formWrapper.getForm()));
+            
             for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
             {
-                EntityService.getInstance().save(questionWrapper.getQuestion());
+                questionWrapper.getQuestion().setFormId(formWrapper.getForm().getId());
+                
+                questionWrapper.setQuestion((Question) EntityService.getInstance().save(questionWrapper.getQuestion()));
                 AttachmentUtilities.saveAttachments(questionWrapper);
             }
         }
         
         else
         {
-            List<Question> deleteQuestions = EntityService.getInstance().getValues(Question.class,
-                                                                                   Arrays.asList(new Parameter(Question.class.getDeclaredField("form"),
-                                                                                                 formWrapper.getForm().getId(),
-                                                                                                 Parameter.COMPARATOR_EQUALS)));
-            for (Question deletable : deleteQuestions)
+            List<Question> oldQuestions = EntityService.getInstance().getValues(Question.class,
+                                                                                new Parameter(Question.class.getDeclaredField("formId"),
+                                                                                              formWrapper.getForm().getId(),
+                                                                                              Parameter.COMPARATOR_EQUALS));
+            for (Question deletable : oldQuestions)
             {
                 boolean delete = true;
 
@@ -146,18 +148,18 @@ public class FormUtilities
             {
                 if (questionWrapper.getQuestion().getId() == 0)
                 {
-                    EntityService.getInstance().save(questionWrapper.getQuestion());
+                    questionWrapper.setQuestion((Question) EntityService.getInstance().save(questionWrapper.getQuestion()));
                 }
 
                 else
                 {
-                    EntityService.getInstance().update(questionWrapper.getQuestion());
+                    questionWrapper.setQuestion((Question) EntityService.getInstance().update(questionWrapper.getQuestion()));
                 }
                 
                 AttachmentUtilities.saveAttachments(questionWrapper);
             }
 
-            EntityService.getInstance().update(formWrapper.getForm());
+            formWrapper.setForm((Form) EntityService.getInstance().update(formWrapper.getForm()));
         }
     }
 
@@ -222,24 +224,27 @@ public class FormUtilities
                              TYPE_NUMBER);
     }
     
-    public static Option getQuestionOption(int optionId)
+    public static Option getOption(Integer optionId)
     {
         Option result = null;
 
-        try
+        if (optionId != null)
         {
-            result = (Option) EntityService.getInstance().getValue(Option.class, optionId);
-        }
+            try
+            {
+                result = (Option) EntityService.getInstance().getValue(Option.class, optionId);
+            }
 
-        catch (Exception e)
-        {
-            ApplicationController.logException(e);
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
         }
 
         return result;
     }
     
-    public static List<Option> getQuestionOptions()
+    public static List<Option> getOptions()
     {
         List<Option> result = new ArrayList<>();
         
@@ -258,7 +263,7 @@ public class FormUtilities
     
     public static List<Question> getQuestions(Form form)
     {
-        return getQuestions(form.getId());
+        return getQuestions(form != null ? form.getId() : 0);
     }
     
     public static List<Question> getQuestions(int formId)
@@ -270,9 +275,9 @@ public class FormUtilities
             try
             {
                 result = EntityService.getInstance().getValues(Question.class,
-                                                               Arrays.asList(new Parameter(Question.class.getDeclaredField("formId"),
-                                                                                           formId,
-                                                                                           Parameter.COMPARATOR_EQUALS)));
+                                                               new Parameter(Question.class.getDeclaredField("formId"),
+                                                                             formId,
+                                                                             Parameter.COMPARATOR_EQUALS));
             }
 
             catch (Exception e)

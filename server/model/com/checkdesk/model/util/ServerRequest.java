@@ -17,12 +17,14 @@ import java.util.List;
 public class ServerRequest
         implements Serializable
 {
-    public static final int DATABASE    = 0;
-    public static final int NOTIFY      = 1;
-    public static final int DOWNLOAD    = 2;
-    public static final int UPLOAD      = 3;
-    public static final int FINISH_FILE = 4;
-    public static final int ACTIVE_LOG  = 5;
+    public static final int DATABASE      = 0;
+    public static final int NOTIFY        = 1;
+    public static final int DOWNLOAD      = 2;
+    public static final int UPLOAD        = 3;
+    public static final int FINISH_FILE   = 4;
+    public static final int ACTIVE_LOG    = 5;
+    public static final int CONFIGURATION = 6;
+    public static final int PERMISSION    = 7;
     
     private int request;
     private HashMap<String, Serializable> parameters = new HashMap<>();

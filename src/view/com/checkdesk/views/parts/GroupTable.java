@@ -71,7 +71,7 @@ public class GroupTable
         }
     }
 
-    public void setGroup(int groupId)
+    public void setGroup(Integer groupId)
     {
         setGroup(GroupUtilities.getGroup(groupId));
     }
@@ -123,7 +123,7 @@ public class GroupTable
 
         GroupUtilities.saveGroup(group);
 
-        return group.getId() == 0 ? null : group;
+        return group;
     }
 
     public void setTableDisable(boolean disable)

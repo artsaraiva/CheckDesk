@@ -39,12 +39,12 @@ public class SurveyWrapper
         this.survey = survey;
     }
 
-    public FormWrapper getForm()
+    public FormWrapper getFormWrapper()
     {
         return formWrapper;
     }
 
-    public void setForm(FormWrapper form)
+    public void setFormWrapper(FormWrapper form)
     {
         this.formWrapper = form;
     }

@@ -6,6 +6,7 @@
 package com.checkdesk.views.details;
 
 import com.checkdesk.control.util.LogUtilities;
+import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Log;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
@@ -56,7 +57,7 @@ public class LogDetails
                 new DetailsCaption(source.toString()),
                 new DetailsTable(75).addItem("Ação", LogUtilities.getEvent(source.getEvent()))
                                     .addItem("Data", source.getTimestamp())
-                                    .addItem("Usuário", source.getUserId())
+                                    .addItem("Usuário", UserUtilities.getUser(source.getUserId()))
                                     .addItem("Objeto", source.getObjectClass() + " - " + source.getObjectName())
                                     .addItemHtml("Mudanças", source.getCommand()));
         }

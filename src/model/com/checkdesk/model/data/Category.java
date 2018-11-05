@@ -6,8 +6,8 @@ package com.checkdesk.model.data;
 public class Category
         extends Entity
 {
-    private int parentId;
-    private int viewersId;
+    private Integer parentId;
+    private Integer viewersId;
     private int ownerId;
     private String name;
     private String info;
@@ -16,24 +16,24 @@ public class Category
     {
     }
 
-    public int getParentId()
+    public Integer getParentId()
     {
         return this.parentId;
     }
 
-    public void setParentId(int parentId)
+    public void setParentId(Integer parentId)
     {
-        this.parentId = parentId;
+        this.parentId = parentId == null || parentId == 0 ? null : parentId;
     }
 
-    public int getViewersId()
+    public Integer getViewersId()
     {
         return this.viewersId;
     }
 
-    public void setViewersId(int viewersId)
+    public void setViewersId(Integer viewersId)
     {
-        this.viewersId = viewersId;
+        this.viewersId = viewersId == null || viewersId == 0 ? null : viewersId;
     }
 
     public int getOwnerId()

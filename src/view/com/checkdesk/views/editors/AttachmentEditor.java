@@ -48,6 +48,8 @@ public class AttachmentEditor
         {
             chooseFile();
         }
+        
+        setValidations();
     }
 
     @Override
@@ -76,6 +78,11 @@ public class AttachmentEditor
             file = choosed;
             filePath.setText(file.getAbsolutePath());
         }
+    }
+    
+    private void setValidations()
+    {
+        addValidation(nameField);
     }
     
     private void initComponents()

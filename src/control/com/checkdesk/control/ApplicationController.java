@@ -5,11 +5,8 @@
  */
 package com.checkdesk.control;
 
-import com.checkdesk.control.util.LogUtilities;
 import com.checkdesk.model.data.Attachment;
-import com.checkdesk.model.data.Log;
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.ServerRequest;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -141,6 +138,7 @@ public class ApplicationController
     {
         defaultInstance = null;
         notify(null);
+        ServerConnection.getInstance().close();
     }
 
     public User getActiveUser()

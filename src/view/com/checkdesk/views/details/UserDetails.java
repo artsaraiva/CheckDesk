@@ -56,9 +56,9 @@ public class UserDetails
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
                     new DetailsTable(75).addItem("Login", source.getLogin())
-                            .addItem("E-mail", source.getEmail())
-                            .addItem("Telefone", source.getPhone())
-                            .addItem("Tipo", UserUtilities.getType(source.getType())));
+                                        .addItem("E-mail", source.getEmail())
+                                        .addItem("Telefone", UserUtilities.maskPhone(source.getPhone()))
+                                        .addItem("Tipo", UserUtilities.getType(source.getType())));
         }
     }
 

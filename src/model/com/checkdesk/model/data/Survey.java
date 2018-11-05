@@ -13,11 +13,10 @@ public class Survey
     public static final int TYPE_ANONYMOUS = 2;
     public static final int TYPE_TOTEM     = 3;
     
-    private int id;
     private int categoryId;
     private int formId;
-    private int viewersId;
-    private int participantsId;
+    private Integer viewersId;
+    private Integer participantsId;
     private int ownerId;
     private String title;
     private String info;
@@ -48,24 +47,24 @@ public class Survey
         this.formId = formId;
     }
 
-    public int getViewersId()
+    public Integer getViewersId()
     {
         return this.viewersId;
     }
 
-    public void setViewersId(int viewersId)
+    public void setViewersId(Integer viewersId)
     {
-        this.viewersId = viewersId;
+        this.viewersId = viewersId == null || viewersId == 0 ? null : viewersId;
     }
 
-    public int getParticipantsId()
+    public Integer getParticipantsId()
     {
         return this.participantsId;
     }
 
-    public void setParticipantsId(int participantsId)
+    public void setParticipantsId(Integer participantsId)
     {
-        this.participantsId = participantsId;
+        this.participantsId = participantsId == null || participantsId == 0 ? null : participantsId;
     }
 
     public int getOwnerId()

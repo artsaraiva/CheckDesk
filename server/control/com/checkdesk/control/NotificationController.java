@@ -12,9 +12,7 @@ import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
-import com.checkdesk.model.db.service.EntityService;
-import com.checkdesk.model.util.Parameter;
-import java.util.Arrays;
+import java.text.DateFormat;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringJoiner;
@@ -80,7 +78,7 @@ public class NotificationController
                .append("    <table>")
                .append("        <tr>")
                .append("            <td>Data de criação:</td>")
-               .append("            <td>").append(survey.getCreatedDate()).append("</td>")
+               .append("            <td>").append(DateFormat.getInstance().format(survey.getCreatedDate())).append("</td>")
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Tipo:</td>")

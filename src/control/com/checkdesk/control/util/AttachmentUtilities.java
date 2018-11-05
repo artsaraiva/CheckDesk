@@ -15,7 +15,6 @@ import com.checkdesk.views.editors.AttachmentEditor;
 import com.checkdesk.views.parts.Prompts;
 import com.checkdesk.views.util.EditorCallback;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javafx.event.Event;
 
@@ -34,9 +33,9 @@ public class AttachmentUtilities
             try
             {
                 result = EntityService.getInstance().getValues(Attachment.class,
-                                                               Arrays.asList(new Parameter(Attachment.class.getDeclaredField("questionId"),
-                                                                                           question.getId(),
-                                                                                           Parameter.COMPARATOR_EQUALS)));
+                                                               new Parameter(Attachment.class.getDeclaredField("questionId"),
+                                                                             question.getId(),
+                                                                             Parameter.COMPARATOR_EQUALS));
             }
 
             catch (Exception e)
@@ -71,12 +70,12 @@ public class AttachmentUtilities
     
     public static void saveAttachments(QuestionWrapper wrapper) throws Exception
     {
-        List<Attachment> deleteAttachements = EntityService.getInstance().getValues(Attachment.class,
-                                                                                    Arrays.asList(new Parameter(Attachment.class.getDeclaredField("question"),
-                                                                                                                wrapper.getQuestion().getId(),
-                                                                                                                Parameter.COMPARATOR_EQUALS)));
+        List<Attachment> oldAttachements = EntityService.getInstance().getValues(Attachment.class,
+                                                                                 new Parameter(Attachment.class.getDeclaredField("questionId"),
+                                                                                               wrapper.getQuestion().getId(),
+                                                                                               Parameter.COMPARATOR_EQUALS));
         
-        for (Attachment deletable : deleteAttachements)
+        for (Attachment deletable : oldAttachements)
         {
             boolean delete = true;
 
@@ -100,12 +99,12 @@ public class AttachmentUtilities
         {
             if (attachment.getId() == 0)
             {
-                EntityService.getInstance().save(attachment);
+                attachment = (Attachment) EntityService.getInstance().save(attachment);
             }
 
             else
             {
-                EntityService.getInstance().update(attachment);
+                attachment = (Attachment) EntityService.getInstance().update(attachment);
             }
 
             ApplicationController.getInstance().saveFile(attachment);

@@ -5,26 +5,20 @@
  */
 package com.checkdesk.control;
 
-import com.checkdesk.control.util.UserUtilities;
-import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.Permission;
 import com.checkdesk.model.data.User;
+import com.checkdesk.model.util.ServerRequest;
+import com.checkdesk.views.util.PermissionItem;
+import com.checkdesk.model.data.Group;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
-import com.checkdesk.views.util.PermissionItem;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javafx.scene.control.TreeItem;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -45,7 +39,6 @@ public class PermissionController
     }
     
     private TreeItem rootItem = new TreeItem(new PermissionItem("", "Permissões"));
-    private Map<String, List<Integer>> defaultPermissions = new HashMap<>();
 
     private PermissionController()
     {
@@ -62,18 +55,6 @@ public class PermissionController
             
             Node root = document.getDocumentElement();
             loadTreeChildren(root, rootItem);
-            
-            document = builder.parse(ResourceLocator.getInstance().getConfigStream("profiles.xml"));
-            
-            NodeList list = document.getElementsByTagName("type");
-            
-            for (int i = 0; i < list.getLength(); i++)
-            {
-                if (list.item(i).getNodeType() == Node.ELEMENT_NODE)
-                {
-                    loadDefaultPermission((Element) list.item(i));
-                }
-            }
         }
         
         catch (Exception e)
@@ -103,30 +84,6 @@ public class PermissionController
         }
     }
     
-    private void loadDefaultPermission(Element element)
-    {
-        Integer type = Integer.parseInt(element.getAttribute("value"));
-        
-        for (int i = 0; i < element.getChildNodes().getLength(); i++)
-        {
-            if (element.getChildNodes().item(i).getNodeType() == Node.ELEMENT_NODE)
-            {
-                Element child = (Element) element.getChildNodes().item(i);
-                
-                String name = child.getAttribute("name");
-                
-                List<Integer> types = defaultPermissions.get(name);
-                
-                if (types == null)
-                {
-                    defaultPermissions.put(name, types = new ArrayList<>());
-                }
-                
-                types.add(type);
-            }
-        }
-    }
-    
     public TreeItem getRootItem()
     {
         return rootItem;
@@ -136,17 +93,16 @@ public class PermissionController
     {
         String result = "";
         
-        if (defaultPermissions.get(permissionName) != null)
+        try
         {
-            for (Integer i : defaultPermissions.get(permissionName))
-            {
-                result += UserUtilities.getType(i) + ", ";
-            }
+            result = (String) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.PERMISSION)
+                                                                                    .addParameter("permissionName", permissionName)
+                                                                                    .setWaitResponse(true));
         }
         
-        if (!result.isEmpty())
+        catch (Exception e)
         {
-            result = result.substring(0, result.lastIndexOf(", "));
+            ApplicationController.logException(e);
         }
         
         return result;
@@ -154,27 +110,22 @@ public class PermissionController
     
     public boolean hasPermission(User user, String role)
     {
-        boolean hasPermission = defaultPermissions.containsKey(role) ? defaultPermissions.get(role).contains(user.getType()) : false;
+        boolean result = false;
         
-        if (!hasPermission)
+        try
         {
-            try
-            {
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("user_id", user.getId());
-                parameters.put("permission_name", role);
-
-                BigInteger count = (BigInteger) EntityService.getInstance().getViewValue(Arrays.asList("count(*)"), "user_permissions", parameters );
-                hasPermission = count.intValue() == 1;
-            }
-
-            catch (Exception ex)
-            {
-                ApplicationController.logException(ex);
-            }
+            result = (boolean) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.PERMISSION)
+                                                                                     .addParameter("user", user)
+                                                                                     .addParameter("role", role)
+                                                                                     .setWaitResponse(true));
         }
-
-        return hasPermission;
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
+        return result;
     }
     
     public Permission getPermission(PermissionItem item)
@@ -183,9 +134,9 @@ public class PermissionController
         
         try
         {
-            Parameter parameter = new Parameter(Permission.class.getDeclaredField("name"), item.getName(), Parameter.COMPARATOR_EQUALS);
-            
-            result = (Permission) EntityService.getInstance().getValue(Permission.class, Arrays.asList(parameter));
+            result = (Permission) EntityService.getInstance().getValue(Permission.class, new Parameter(Permission.class.getDeclaredField("name"),
+                                                                                                       item.getName(),
+                                                                                                       Parameter.COMPARATOR_EQUALS));
             
             if (result == null)
             {

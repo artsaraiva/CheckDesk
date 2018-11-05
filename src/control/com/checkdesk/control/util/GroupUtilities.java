@@ -56,18 +56,47 @@ public class GroupUtilities
         }
     }
     
-    public static Group getGroup(int groupId)
+    public static Group getGroup(Integer groupId)
+    {
+        return getGroup(groupId, true);
+    }
+    
+    public static Group getGroup(Integer groupId, boolean select)
     {
         Group result = null;
         
-        for (Group group : cacheGroup)
+        if (groupId != null)
         {
-            if (group.getId() == groupId)
+            for (Group group : cacheGroup)
             {
-                result = group;
+                if (group.getId() == groupId)
+                {
+                    result = group;
+                }
+            }
+
+            if (select && result == null)
+            {
+                try
+                {
+                    result = (Group) EntityService.getInstance().getValue(Group.class, groupId);
+                }
+
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
             }
         }
         
         return result;
+    }
+    
+    public static void cacheGroup(Group group)
+    {
+        if (!cacheGroup.contains(group))
+        {
+            cacheGroup.add(group);
+        }
     }
 }

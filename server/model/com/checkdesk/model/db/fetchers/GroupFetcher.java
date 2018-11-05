@@ -53,9 +53,9 @@ public class GroupFetcher
 
         List ids = EntityService.getInstance().getFieldValues(Group.class.getDeclaredField("id"),
                                                               Group.class,
-                                                              Arrays.asList(new Parameter(Group.class.getDeclaredField("id"),
-                                                                                          0,
-                                                                                          Parameter.COMPARATOR_MAX_VALUE)));
+                                                              new Parameter(Group.class.getDeclaredField("id"),
+                                                                            0,
+                                                                            Parameter.COMPARATOR_MAX_VALUE));
         int currentId = 0;
         
         if (!ids.isEmpty())

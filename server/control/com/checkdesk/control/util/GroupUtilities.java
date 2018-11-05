@@ -26,33 +26,36 @@ public class GroupUtilities
         allUser.setName("TODOS");
     }
 
-    public static Group getGroup(int groupId)
+    public static Group getGroup(Integer groupId)
     {
         return getGroup(groupId, false);
     }
     
-    public static Group getGroup(int groupId, boolean select)
+    public static Group getGroup(Integer groupId, boolean select)
     {
         Group result = null;
         
-        for (Group group : cacheGroup)
+        if (groupId != null)
         {
-            if (group.getId() == groupId)
+            for (Group group : cacheGroup)
             {
-                result = group;
+                if (group.getId() == groupId)
+                {
+                    result = group;
+                }
             }
-        }
-        
-        if (select && result == null)
-        {
-            try
+
+            if (select && result == null)
             {
-                result = (Group) EntityService.getInstance().getValue(Group.class, groupId);
-            }
-            
-            catch (Exception e)
-            {
-                ApplicationController.logException(e);
+                try
+                {
+                    result = (Group) EntityService.getInstance().getValue(Group.class, groupId);
+                }
+
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
             }
         }
         

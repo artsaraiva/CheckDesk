@@ -5,7 +5,6 @@
  */
 package com.checkdesk.views.editors;
 
-import com.checkdesk.model.data.Form;
 import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.views.panes.FormEditorPane;
 import com.checkdesk.views.util.EditorCallback;
@@ -38,6 +37,12 @@ public class FormEditor
     protected void obtainInput()
     {
         formPane.obtainInput();
+    }
+
+    @Override
+    protected boolean validateInput()
+    {
+        return formPane.validateInput();
     }
     
     private void initComponents()

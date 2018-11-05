@@ -131,26 +131,6 @@ public class Database
         return result;
     }
 
-    public List<String> queryStrings(String sql) throws Exception
-    {
-        statement = connection.createStatement();
-
-        ResultSet resultSet = statement.executeQuery(sql);
-
-        List<String> result = new ArrayList<>();
-
-        while (resultSet.next())
-        {
-            result.add(resultSet.getString(1));
-        }
-
-        resultSet.close();
-
-        statement.close();
-
-        return result;
-    }
-
     public Object query(String sql) throws Exception
     {
         statement = connection.createStatement();
@@ -177,7 +157,7 @@ public class Database
 
         ResultSet resultSet = statement.executeQuery(sql);
 
-        List<Object[]> result = null;
+        List<Object[]> result = new ArrayList<>();
 
         while (resultSet.next())
         {
@@ -189,6 +169,26 @@ public class Database
             }
             
             result.add(list);
+        }
+
+        resultSet.close();
+
+        statement.close();
+
+        return result;
+    }
+    
+    public List queryList(String sql, Class type) throws Exception
+    {
+        statement = connection.createStatement();
+
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        List result = new ArrayList();
+
+        while (resultSet.next())
+        {
+            result.add(resultSet.getObject(1, type));
         }
 
         resultSet.close();

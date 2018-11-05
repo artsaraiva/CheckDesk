@@ -42,7 +42,6 @@ public class HandleClient extends Thread
     {
         try
         {
-            
             out = new ObjectOutputStream(client.getOutputStream());
             in = new ObjectInputStream(client.getInputStream());
 
@@ -81,8 +80,15 @@ public class HandleClient extends Thread
                         }
                     }
                 }
+                
+                System.out.println("Client disconnected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                                   "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
+                                   "--------------------------------\n" );
+                
+                client.close();
             }
         }
+        
         catch (Exception ex)
         {
             ApplicationController.logException(ex);
@@ -96,12 +102,21 @@ public class HandleClient extends Thread
     
     public void notify(Serializable object) throws Exception
     {
-        ServerRequest request = new ServerRequest().setRequest(ServerRequest.NOTIFY)
-                                                   .addParameter("object", object)
-                                                   .setWaitResponse(false);
+        if (object != null)
+        {
+            ServerRequest request = new ServerRequest().setRequest(ServerRequest.NOTIFY)
+                                                       .addParameter("object", object)
+                                                       .setWaitResponse(false);
+
+            out.flush();
+            out.writeObject(request);
+        }
         
-        out.flush();
-        out.writeObject(request);
+        else
+        {
+            out.writeObject(null);
+            client.close();
+        }
     }
     
     public void download(File file) throws Exception

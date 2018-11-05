@@ -6,21 +6,21 @@ package com.checkdesk.model.data;
 public class Permission
         extends Entity
 {
-    private int viewersId;
+    private Integer viewersId;
     private String name;
 
     public Permission()
     {
     }
 
-    public int getViewersId()
+    public Integer getViewersId()
     {
         return this.viewersId;
     }
 
-    public void setViewersId(int viewersId)
+    public void setViewersId(Integer viewersId)
     {
-        this.viewersId = viewersId;
+        this.viewersId = viewersId == null || viewersId == 0 ? null : viewersId;
     }
 
     public String getName()

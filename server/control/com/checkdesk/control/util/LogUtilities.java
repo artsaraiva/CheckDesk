@@ -141,7 +141,7 @@ public class LogUtilities
     {
         List<Log> result = new ArrayList<>();
 
-        List<Parameter> parameters = new ArrayList<>();
+        Parameter[] parameters = new Parameter[1];
 
         try
         {
@@ -167,7 +167,7 @@ public class LogUtilities
                         break;
                 }
 
-                parameters = Arrays.asList(new Parameter(field, value, comparator));
+                parameters[0] = new Parameter(field, value, comparator);
             }
             
             result = EntityService.getInstance().getValues(Log.class, parameters);

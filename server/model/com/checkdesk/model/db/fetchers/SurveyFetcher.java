@@ -65,8 +65,8 @@ public class SurveyFetcher
                     value.getOwnerId()               + ", " +
                     value.getCategoryId()            + ", " +
                     value.getParticipantsId()        + ", " +
-                    value.getFormId()                + ", " +
                     value.getViewersId()             + ", " +
+                    value.getFormId()                + ", " +
                     value.getState()                 +
                " )"+
                " returning " + S.columns.ID;

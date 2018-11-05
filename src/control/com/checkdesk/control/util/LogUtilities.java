@@ -143,21 +143,27 @@ public class LogUtilities
     {
         List<Log> result = new ArrayList<>();
 
-        List<Parameter> parameters = new ArrayList<>();
+        Parameter[] parameters = new Parameter[0];
 
         try
         {
             if (from != null)
             {
-                parameters.add(new Parameter(Log.class.getDeclaredField("timestamp"), from, Parameter.COMPARATOR_DATE_FROM));
+                parameters = new Parameter[]
+                {
+                    new Parameter(Log.class.getDeclaredField("timestamp"), from, Parameter.COMPARATOR_DATE_FROM)
+                };
             }
 
             if (until != null)
             {
-                parameters.add(new Parameter(Log.class.getDeclaredField("timestamp"), until, Parameter.COMPARATOR_DATE_UNTIL));
+                parameters = new Parameter[]
+                {
+                    new Parameter(Log.class.getDeclaredField("timestamp"), until, Parameter.COMPARATOR_DATE_UNTIL)
+                };
             }
             
-            result = EntityService.getInstance().getValues(Log.class, parameters);
+            result = EntityService.getInstance().getValues(Log.class, true, parameters);
         }
 
         catch (Exception e)
@@ -189,11 +195,11 @@ public class LogUtilities
     {
         try
         {
-            Map<String,Object> parameters = new LinkedHashMap<>();
+            List parameters = new ArrayList();
             
-            parameters.put("table", table); 
-            parameters.put("from", new java.sql.Timestamp(from.getTime()));
-            parameters.put("until",  new java.sql.Timestamp(until.getTime()));
+            parameters.add(table); 
+            parameters.add(new java.sql.Timestamp(from.getTime()));
+            parameters.add(new java.sql.Timestamp(until.getTime()));
             
             EntityService.getInstance().executeFunction("transfer_logs_to_aux_table", parameters);
         }

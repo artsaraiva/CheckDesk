@@ -200,6 +200,25 @@ public class ApplicationController
                     {
                         result = isActiveLog();
                     }
+                    break;
+                    
+                case ServerRequest.CONFIGURATION:
+                    String key = (String) request.getParameter("key");
+                    
+                    if (request.getParameter("value") != null)
+                    {
+                        ConfigurationManager.getInstance().setString(key, (String) request.getParameter("value"));
+                    }
+                    
+                    else
+                    {
+                        result = ConfigurationManager.getInstance().getString(key, (String) request.getParameter("defaultValue"));
+                    }
+                    break;
+                    
+                case ServerRequest.PERMISSION:
+                    result = PermissionController.getInstance().handleRequest(request);
+                    break;
             }
         }
         

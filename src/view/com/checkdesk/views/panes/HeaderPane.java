@@ -109,17 +109,15 @@ public class HeaderPane
                     }
                     
                     JSONObject json = new JSONObject(sb.toString());
-                    System.out.println(json);
                     if(json.getJSONObject("superEntry") != null)
                     {
                         
                     }
                     
-                    //System.out.println(json.getJSONObject("entry").getJSONArray("sense").get(0));
-                   Alert alert = new Alert(Alert.AlertType.INFORMATION, "Veículo de rodas, para transporte de coisas ou pessoas. Carro de mão, pequeno veículo de uma só roda, para transporte de entulho, pedras.");
-                   alert.setTitle("Dicionário");
-                   alert.setHeaderText("Significado da palavra");
-                   alert.showAndWait();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Veículo de rodas, para transporte de coisas ou pessoas. Carro de mão, pequeno veículo de uma só roda, para transporte de entulho, pedras.");
+                    alert.setTitle("Dicionário");
+                    alert.setHeaderText("Significado da palavra");
+                    alert.showAndWait();
                     conn.disconnect();
 
                 }

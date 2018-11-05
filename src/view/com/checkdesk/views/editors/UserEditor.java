@@ -10,6 +10,9 @@ import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Validation;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -48,6 +51,8 @@ public class UserEditor
         phoneField.setText(value.getPhone());
         passwordField.setText(value.getPassword());
         typeField.setValue(UserUtilities.getType(value.getType()));
+
+        setValidations();
     }
 
     @Override
@@ -57,16 +62,115 @@ public class UserEditor
         source.setLogin(loginField.getText());
         source.setEmail(emailField.getText());
         source.setPhone(phoneField.getText());
-        
+
         String password = passwordField.getText();
-        
+
         if (!password.equals(source.getPassword()))
         {
             password = ApplicationController.hash(password);
         }
-        
+
         source.setPassword(password);
         source.setType(typeField.getValue().getValue());
+    }
+
+    private void setValidations()
+    {
+        addValidation(nameField);
+        addValidation(loginField, new Validation()
+        {
+            private String error;
+
+            @Override
+            public boolean validate()
+            {
+                boolean result = false;
+
+                String email = emailField.getText();
+
+                if (email == null || email.isEmpty())
+                {
+                    error = "Esse campo deve ser preenchido";
+                }
+
+                else
+                {
+                    try
+                    {
+                        result = UserUtilities.isUniqueLogin(source, email.toLowerCase());
+
+                        error = result ? "" : "O login informado já está sendo usado";
+                    }
+
+                    catch (Exception e)
+                    {
+                        ApplicationController.logException(e);
+                    }
+                }
+
+                return result;
+            }
+
+            @Override
+            public String getError()
+            {
+                return error;
+            }
+
+        });
+
+        addValidation(emailField, new Validation()
+        {
+            private String error;
+
+            @Override
+            public boolean validate()
+            {
+                boolean result = false;
+
+                String email = emailField.getText();
+
+                if (email == null || email.isEmpty())
+                {
+                    error = "Esse campo deve ser preenchido";
+                }
+
+                else
+                {
+                    Pattern pattern = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9._]*@[a-zA-Z0-9]+([.][a-zA-Z]+)+");
+                    Matcher matcher = pattern.matcher(email);
+
+                    if (!matcher.find() || !matcher.group().equals(email))
+                    {
+                        error = "O e-mail informado está inválido";
+                    }
+
+                    else
+                    {
+                        try
+                        {
+                            result = UserUtilities.isUniqueEmail(source, email.toLowerCase());
+
+                            error = result ? "" : "O e-mail informado já está sendo usado";
+                        }
+
+                        catch (Exception e)
+                        {
+                            ApplicationController.logException(e);
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            @Override
+            public String getError()
+            {
+                return error;
+            }
+        });
+        addValidation(passwordField);
     }
 
     private void initComponents()

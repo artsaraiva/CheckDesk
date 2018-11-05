@@ -64,8 +64,8 @@ public class FormDetails
             for (Question question : FormUtilities.getQuestions(source))
             {
                 table.addRow(question.getName(),
-                        FormUtilities.getQuestionType(question.getType()),
-                        question.getOptionId());
+                             FormUtilities.getQuestionType(question.getType()),
+                             FormUtilities.getOption(question.getOptionId()));
             }
 
             vbox.getChildren().add(table);

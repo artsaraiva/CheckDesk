@@ -13,9 +13,11 @@ import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.model.util.QuestionWrapper;
+import com.checkdesk.views.editors.DefaultEditor;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
-import com.checkdesk.views.pickers.AttachmentPicker;
+import com.checkdesk.views.pickers.AttachmentSelector;
+import com.checkdesk.views.util.Validation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +37,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DragEvent;
@@ -105,6 +108,18 @@ public class FormEditorPane
         }
         
         source.setQuestions(questions);
+    }
+    
+    public boolean validateInput()
+    {
+        boolean result = true;
+        
+        for (QuestionCell cell : questionCells)
+        {
+            result &= cell.validate();
+        }
+        
+        return result;
     }
 
     private void setSelected(QuestionCell selected)
@@ -278,9 +293,9 @@ public class FormEditorPane
             
             nameField.setText(question.getName());
             typeField.setValue(FormUtilities.getQuestionType(question.getType()));
-            optionSelector.setSelected(FormUtilities.getQuestionOption(question.getOptionId()));
+            optionSelector.setSelected(FormUtilities.getOption(question.getOptionId()));
             
-            attachmentPicker.setQuestion(question);
+            attachmentSelector.setQuestion(question);
         }
         
         public QuestionWrapper getSource()
@@ -289,10 +304,10 @@ public class FormEditorPane
             
             question.setName(nameField.getText());
             question.setType(typeField.getValue().getValue());
-            question.setOptionId(optionSelector.getSelected().getId());
+            question.setOptionId(optionSelector.getSelected() != null ? optionSelector.getSelected().getId() : null);
             question.setConstraints("");
             
-            source.setAttachments(new ArrayList(attachmentSelector.getSelected()));
+            source.setAttachments(attachmentSelector.getSelected());
 
             return source;
         }
@@ -303,6 +318,7 @@ public class FormEditorPane
             nameField.setPrefWidth(width - 15);
             typeField.setPrefWidth(width - 15);
             optionSelector.setPrefWidth(width - 15);
+            attachmentSelector.setPrefWidth(width - 15);
         }
         
         public void setEnable(boolean enable)
@@ -311,6 +327,63 @@ public class FormEditorPane
             nameField.setDisable(!enable);
             typeField.setDisable(!enable);
             optionSelector.setDisable(!enable);
+            attachmentSelector.setDisable(!enable);
+        }
+        
+        public boolean validate()
+        {
+            boolean result = false;
+
+            Validation validation = DefaultEditor.getTextValidation(nameField);
+
+            if (result = validation.validate())
+            {
+                nameField.setBorder( null );
+                nameField.setTooltip( null );
+                nameField.setStyle( "-fx-faint-focus-color: transparent;" );
+            }
+
+            else
+            {
+                nameField.setTooltip( new Tooltip( validation.getError() ) );
+                nameField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
+                                                                        BorderStrokeStyle.SOLID,
+                                                                        new CornerRadii( 5 ),
+                                                                        BorderWidths.DEFAULT,
+                                                                        new Insets( -1 ) ) ) );
+
+                nameField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
+            }
+            
+            if (typeField.getValue().getValue() == Question.TYPE_SINGLE_CHOICE ||
+                typeField.getValue().getValue() == Question.TYPE_MULTI_CHOICE)
+            {
+                validation = DefaultEditor.getTextValidation(optionSelector);
+                
+                boolean validate = validation.validate();
+                result &= validate;
+                
+                if (validate)
+                {
+                    nameField.setBorder( null );
+                    nameField.setTooltip( null );
+                    nameField.setStyle( "-fx-faint-focus-color: transparent;" );
+                }
+
+                else
+                {
+                    nameField.setTooltip( new Tooltip( validation.getError() ) );
+                    nameField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
+                                                                            BorderStrokeStyle.SOLID,
+                                                                            new CornerRadii( 5 ),
+                                                                            BorderWidths.DEFAULT,
+                                                                            new Insets( -1 ) ) ) );
+
+                    nameField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
+                }
+            }
+
+            return result;
         }
 
         private void initDragEvent()
@@ -400,8 +473,7 @@ public class FormEditorPane
             setPadding(new Insets(5));
             
             typeField.setItems(FXCollections.observableArrayList(FormUtilities.getQuestionTypes()));
-            optionSelector.setItems(FormUtilities.getQuestionOptions());
-            attachmentSelector.changePicker(attachmentPicker);
+            optionSelector.setItems(FormUtilities.getOptions());
 
             typeField.valueProperty().addListener((ObservableValue<? extends Item> value, Item oldValue, Item newValue) ->
             {
@@ -431,8 +503,7 @@ public class FormEditorPane
         private TextField nameField = new TextField();
         private ComboBox<Item> typeField = new ComboBox<>();
         private ItemSelector<Option> optionSelector = new ItemSelector<>();
-        private ItemSelector<List<Attachment>> attachmentSelector = new ItemSelector();
-        private AttachmentPicker attachmentPicker = new AttachmentPicker();
+        private AttachmentSelector attachmentSelector = new AttachmentSelector();
         
         private Border dragBorder = new Border(new BorderStroke(Paint.valueOf("#0066CC"),
                                                                 BorderStrokeStyle.DASHED,

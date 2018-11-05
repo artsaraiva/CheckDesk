@@ -6,7 +6,6 @@
 package com.checkdesk.control;
 
 import com.checkdesk.model.data.Survey;
-import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.ServerRequest;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,13 +28,14 @@ import org.controlsfx.control.Notifications;
 public class ServerConnection
 {
     private static ServerConnection serverConnection;
+    private static ConnectionListener connectionListener;
     
     public static ServerConnection getInstance()
     {
         if (serverConnection == null)
         {
-            String serverAddress = ConfigurationManager.getInstance().getString("server.address");
-            Integer serverPort = ConfigurationManager.getInstance().getInteger("server.port");
+            String serverAddress = ConfigurationManager.getInstance().getUserPropertie("server.address");
+            Integer serverPort = Integer.parseInt(ConfigurationManager.getInstance().getUserPropertie("server.port"));
             
             if (serverAddress != null && serverPort != null)
             {
@@ -91,15 +91,20 @@ public class ServerConnection
     
     private FileInputStream fis = null;
     private FileOutputStream fos = null;
+    
+    private Socket client;
    
     private ServerConnection(Socket client)
     {
         try
         {
+            this.client = client;
+            
             in = new ObjectInputStream(client.getInputStream());
             out = new ObjectOutputStream(client.getOutputStream());
             
-            new ConnectionListener(new Socket(client.getInetAddress(), client.getPort())).start();
+            connectionListener = new ConnectionListener(new Socket(client.getInetAddress(), client.getPort()));
+            connectionListener.start();
         }
         catch (Exception ex)
         {
@@ -165,6 +170,19 @@ public class ServerConnection
         fos.close();
         fos = null;
     }
+    
+    public void close() throws Exception
+    {
+        if (out != null)
+        {
+            out.writeObject(null);
+        }
+        
+        if (client != null)
+        {
+            client.close();
+        }
+    }
 }
 
 class ConnectionListener extends Thread
@@ -172,10 +190,14 @@ class ConnectionListener extends Thread
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     
+    private Socket client;
+    
     public ConnectionListener(Socket client)
     {
         try
         {
+            this.client = client;
+            
             in = new ObjectInputStream(client.getInputStream());
             out = new ObjectOutputStream(client.getOutputStream());
             
@@ -200,6 +222,8 @@ class ConnectionListener extends Thread
             {
                 handle(mens);
             }
+            
+            client.close();
         }
         
         catch (Exception e)

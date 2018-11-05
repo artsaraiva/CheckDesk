@@ -8,6 +8,7 @@ package com.checkdesk.control;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
+import com.checkdesk.model.util.ServerRequest;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javafx.scene.control.TreeItem;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -42,7 +42,6 @@ public class PermissionController
         return defaultInstance;
     }
     
-//    private TreeItem rootItem = new TreeItem(new PermissionItem("", "Permissões"));
     private Map<String, List<Integer>> defaultPermissions = new HashMap<>();
 
     private PermissionController()
@@ -56,12 +55,7 @@ public class PermissionController
         {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-            Document document = builder.parse(new File(new URI(ResourceLocator.getInstance().getConfigResource("permissions.xml"))));
-            
-            Node root = document.getDocumentElement();
-//            loadTreeChildren(root, rootItem);
-            
-            document = builder.parse(new File(new URI(ResourceLocator.getInstance().getConfigResource("profiles.xml"))));
+            Document document = builder.parse(new File(new URI(ResourceLocator.getInstance().getConfigResource("profiles.xml"))));
             
             NodeList list = document.getElementsByTagName("type");
             
@@ -77,27 +71,6 @@ public class PermissionController
         catch (Exception e)
         {
             ApplicationController.logException(e);
-        }
-    }
-    
-    private void loadTreeChildren(Node node, TreeItem parent)
-    {
-        if (node.getNodeType() == Node.ELEMENT_NODE)
-        {
-            Element element = (Element) node;
-            
-            TreeItem child = parent;
-            
-            if (element.hasAttribute("label"))
-            {
-//                child = new TreeItem(new PermissionItem(element.getAttribute("name"), element.getAttribute("label")));
-                parent.getChildren().add(child);
-            }
-            
-            for (int i = 0; i < node.getChildNodes().getLength(); i++)
-            {
-                loadTreeChildren(node.getChildNodes().item(i), child);
-            }
         }
     }
     
@@ -125,11 +98,23 @@ public class PermissionController
         }
     }
     
-//    public TreeItem getRootItem()
-//    {
-//        return rootItem;
-//    }
-
+    public Object handleRequest(ServerRequest request)
+    {
+        Object result = null;
+        
+        if (request.getParameter("permissionName") != null)
+        {
+            result = getUserTypes((String) request.getParameter("permissionName"));
+        }
+        
+        else
+        {
+            result = hasPermission((User) request.getParameter("user"), (String) request.getParameter("role"));
+        }
+        
+        return result;
+    }
+    
     public String getUserTypes(String permissionName)
     {
         String result = "";
@@ -162,8 +147,15 @@ public class PermissionController
                 parameters.put("user_id", user.getId());
                 parameters.put("permission_name", role);
 
-                BigInteger count = (BigInteger) EntityService.getInstance().getViewValue(Arrays.asList("count(*)"), "user_permissions", parameters );
-                hasPermission = count.intValue() == 1;
+                List<Object[]> result = EntityService.getInstance().getViewValue(Arrays.asList("count(*)"), "user_permissions", parameters );
+                long count = 0;
+                
+                if (!result.isEmpty() && result.get(0) != null && result.get(0).length > 0)
+                {
+                    count = (long) result.get(0)[0];
+                }
+                
+                hasPermission = count != 0;
             }
 
             catch (Exception ex)

@@ -7,6 +7,7 @@ package com.checkdesk.control.util;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.model.data.Entity;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
@@ -14,7 +15,6 @@ import com.checkdesk.views.editors.UserEditor;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.parts.Prompts;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -128,15 +128,13 @@ public class UserUtilities
 
     public static User login(String login, String password) throws Exception
     {
-        List<Parameter> parameters = Arrays.asList(new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
-                                                                 login.toLowerCase(),
-                                                                 Parameter.COMPARATOR_LOWER_CASE),
-
-                                                   new Parameter(User.class.getDeclaredField("password"),
-                                                                 password,
-                                                                 Parameter.COMPARATOR_EQUALS));
-
-        return (User) EntityService.getInstance().getValue(User.class, parameters);
+        return (User) EntityService.getInstance().getValue(User.class, new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+                                                                                     login.toLowerCase(),
+                                                                                     Parameter.COMPARATOR_LOWER_CASE),
+                    
+                                                                       new Parameter(User.class.getDeclaredField("password"),
+                                                                                     password,
+                                                                                     Parameter.COMPARATOR_EQUALS));
     }
 
     public static List<User> getUsers()
@@ -159,5 +157,76 @@ public class UserUtilities
     public static String getUserIcon(int userId)
     {
         return ResourceLocator.getInstance().getImageResource(getUser(userId).getLogin());
+    }
+    
+    public static String maskPhone( String phone )
+    {
+        String result = "";
+        phone = phone.replaceAll( "[^0-9]", "" );
+
+        // (__)|_____-|____
+        //  $1 |  $2  | $3 
+
+        // $1
+        int i = 2;
+        String split = phone.replaceFirst( "([0-9]{" + i + "})([0-9]{" + Math.max( 1, phone.length() - i ) + "})", "($1) " );
+        phone = phone.length() > i ? phone.substring( i ) : "";
+        result += split;
+
+        // $2
+        i = phone.length() > 8 ? 5 : 4;
+        split = phone.replaceFirst( "([0-9]{" + i + "})([0-9]{" + Math.max( 1, phone.length() - i ) + "})", "$1-" );
+        phone = phone.length() > i ? phone.substring( i ) : "";
+        result += split;
+
+        // $3
+        result += phone;
+        return result;
+    }
+    
+    public static boolean isUniqueLogin(User user, String login)
+    {
+        boolean result = false;
+        
+        try
+        {
+            Parameter[] parameters = new Parameter[]
+            {
+                new Parameter(User.class.getDeclaredField("login"), login, Parameter.COMPARATOR_EQUALS),
+                new Parameter(Entity.class.getDeclaredField("id"), user.getId(), Parameter.COMPARATOR_UNLIKE)
+            };
+            
+            result = EntityService.getInstance().countValues(User.class, parameters) == 0;
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
+        return result;
+    }
+    
+    public static boolean isUniqueEmail(User user, String email)
+    {
+        boolean result = false;
+        
+        try
+        {
+            Parameter[] parameters = new Parameter[]
+            {
+                new Parameter(User.class.getDeclaredField("email"), email, Parameter.COMPARATOR_EQUALS),
+                new Parameter(Entity.class.getDeclaredField("id"), user.getId(), Parameter.COMPARATOR_UNLIKE)
+            };
+            
+            result = EntityService.getInstance().countValues(User.class, parameters) == 0;
+        }
+        
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        
+        return result;
     }
 }

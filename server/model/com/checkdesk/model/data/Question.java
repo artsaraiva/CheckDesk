@@ -15,10 +15,12 @@ public class Question
     public static final int TYPE_NUMBER        = 6;
 
     private int formId;
-    private int optionId;
+    private Integer optionId;
     private String name;
     private int type;
     private String constraints;
+    private Integer parentId;
+    private int position;
 
     public Question()
     {
@@ -34,14 +36,14 @@ public class Question
         this.formId = formId;
     }
 
-    public int getOptionId()
+    public Integer getOptionId()
     {
         return this.optionId;
     }
 
-    public void setOptionId(int optionId)
+    public void setOptionId(Integer optionId)
     {
-        this.optionId = optionId;
+        this.optionId = optionId == null || optionId == 0 ? null : optionId;
     }
 
     public String getName()
@@ -72,6 +74,26 @@ public class Question
     public void setConstraints(String constraints)
     {
         this.constraints = constraints;
+    }
+
+    public Integer getParentId()
+    {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId)
+    {
+        this.parentId = parentId == null || parentId == 0 ? null : parentId;
+    }
+
+    public int getPosition()
+    {
+        return position;
+    }
+
+    public void setPosition(int position)
+    {
+        this.position = position;
     }
 
     @Override

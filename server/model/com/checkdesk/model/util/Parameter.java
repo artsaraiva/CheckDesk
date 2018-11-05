@@ -5,6 +5,7 @@
  */
 package com.checkdesk.model.util;
 
+import com.checkdesk.model.data.Entity;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
@@ -15,6 +16,11 @@ import java.lang.reflect.Field;
 public class Parameter
         implements Serializable
 {
+    public static final Parameter ACTIVE_STATE() throws Exception
+    {
+        return new Parameter(Entity.class.getDeclaredField("state"), Entity.STATE_ACTIVE, COMPARATOR_EQUALS);
+    }
+    
     public static final int COMPARATOR_EQUALS     = 0;
     public static final int COMPARATOR_LOWER_CASE = 1;
     public static final int COMPARATOR_DATE       = 2;

@@ -31,6 +31,8 @@ public class QuestionFetcher
         result.setConstraints(resultSet.getString(count++));
         result.setOptionId(resultSet.getInt(count++));
         result.setFormId(resultSet.getInt(count++));
+        result.setParentId(resultSet.getInt(count++));
+        result.setPosition(resultSet.getInt(count++));
         result.setState(resultSet.getInt(count++));
 
         return result;
@@ -48,6 +50,8 @@ public class QuestionFetcher
                     Q.columns.CONSTRAINTS + ", " +
                     Q.columns.REF_OPTION  + ", " +
                     Q.columns.REF_FORM    + ", " +
+                    Q.columns.REF_PARENT  + ", " +
+                    Q.columns.POSITION    + ", " +
                     Q.columns.STATE       +
                " ) values( " +
                     db.quote(value.getName())        + ", " +
@@ -55,6 +59,8 @@ public class QuestionFetcher
                     db.quote(value.getConstraints()) + ", " +
                     value.getOptionId()              + ", " +
                     value.getFormId()                + ", " +
+                    value.getParentId()              + ", " +
+                    value.getPosition()              + ", " +
                     value.getState()                 +
                " )"+
                " returning " + Q.columns.ID;
@@ -71,6 +77,8 @@ public class QuestionFetcher
                     Q.columns.CONSTRAINTS + " = " + db.quote(value.getConstraints()) + ", " +
                     Q.columns.REF_OPTION  + " = " + value.getOptionId()              + ", " +
                     Q.columns.REF_FORM    + " = " + value.getFormId()                + ", " +
+                    Q.columns.REF_PARENT  + " = " + value.getParentId()              + ", " +
+                    Q.columns.POSITION    + " = " + value.getPosition()              + ", " +
                     Q.columns.STATE       + " = " + value.getState()                 +
                " where " +
                     Q.columns.ID + " = " + value.getId();
@@ -86,5 +94,4 @@ public class QuestionFetcher
                " where " +
                     Q.columns.ID + " = " + value.getId();
     }
-
 }

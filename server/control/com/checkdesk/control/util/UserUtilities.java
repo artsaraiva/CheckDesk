@@ -81,12 +81,15 @@ public class UserUtilities
 
     public static User login(String login, String password) throws Exception
     {
-        List<Parameter> parameters = Arrays.asList(new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
-                                                                 login.toLowerCase(),
-                                                                 Parameter.COMPARATOR_LOWER_CASE),
-                                                    new Parameter(User.class.getDeclaredField("password"),
-                                                                  password,
-                                                                  Parameter.COMPARATOR_EQUALS));
+        Parameter[] parameters = new Parameter[]
+        {
+            new Parameter(User.class.getDeclaredField(login.contains("@") ? "email" : "login"),
+                          login.toLowerCase(),
+                          Parameter.COMPARATOR_LOWER_CASE),
+            new Parameter(User.class.getDeclaredField("password"),
+                          password,
+                          Parameter.COMPARATOR_EQUALS)
+        };
 
         return (User) EntityService.getInstance().getValue(User.class, parameters);
     }
@@ -116,9 +119,9 @@ public class UserUtilities
         {
             result = EntityService.getInstance().getFieldValues(User.class.getDeclaredField("email"),
                                                                 User.class,
-                                                                Arrays.asList(new Parameter(User.class.getDeclaredField("email"),
-                                                                                            "",
-                                                                                            Parameter.COMPARATOR_UNLIKE)));
+                                                                new Parameter(User.class.getDeclaredField("email"),
+                                                                              "",
+                                                                              Parameter.COMPARATOR_UNLIKE));
         }
 
         catch (Exception e)

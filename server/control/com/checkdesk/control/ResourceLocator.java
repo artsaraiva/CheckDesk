@@ -11,7 +11,6 @@ package com.checkdesk.control;
  */
 public class ResourceLocator
 {
-
     private static ResourceLocator instance;
 
     public static ResourceLocator getInstance()
@@ -24,8 +23,6 @@ public class ResourceLocator
         return instance;
     }
 
-    private String imagesPath;
-    private String stylePath;
     private String configPath;
 
     private ResourceLocator()
@@ -35,29 +32,7 @@ public class ResourceLocator
 
     private void load()
     {
-        imagesPath = getClass().getClassLoader().getResource( "images" ).toString() + "/";
-        stylePath = getClass().getClassLoader().getResource( "styles" ).toString() + "/";
         configPath = getClass().getClassLoader().getResource( "config" ).toString() + "/";
-    }
-
-    public String getImageResource( String name )
-    {
-        if (name == null)
-        {
-            name = "";
-        }
-        
-        if(!name.endsWith(".png"))
-        {
-            name += ".png";
-        }
-
-        return imagesPath + name;
-    }
-
-    public String getStyleResource( String name )
-    {
-        return stylePath + name;
     }
 
     public String getConfigResource( String name )

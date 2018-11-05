@@ -18,8 +18,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,7 @@ public class EntityService
     private static final int REQUEST_DELETE        = 2;
     private static final int REQUEST_SELECT_UNIQUE = 3;
     private static final int REQUEST_SELECT_LIST   = 4;
+    private static final int REQUEST_SELECT_COUNT  = 5;
     
     private static EntityService defaultInstance = null;
 
@@ -91,7 +95,7 @@ public class EntityService
                 else if (parameters.contains("function"))
                 {
                     result = executeFunction((String) request.getParameter("function"),
-                                             (HashMap) request.getParameter("parameters"));
+                                             (List) request.getParameter("parameters"));
                 }
                 
                 else 
@@ -110,7 +114,7 @@ public class EntityService
 
                     else if (parameters.contains("parameters"))
                     {
-                        result = getValue(clazz, (List) request.getParameter("parameters"));
+                        result = getValue(clazz, (Parameter[]) request.getParameter("parameters"));
                     }
                 }
             }
@@ -126,15 +130,20 @@ public class EntityService
                 {
                     result = getFieldValues(clazz.getDeclaredField((String) request.getParameter("field")),
                                             clazz,
-                                            (ArrayList) request.getParameter("parameters"));
+                                            (Parameter[]) request.getParameter("parameters"));
                 }
                 
                 else
                 {
-                    result = getValues(clazz, (ArrayList) request.getParameter("parameters"));
+                    result = getValues(clazz, (Parameter[]) request.getParameter("parameters"));
                 }
             }
             break;
+            
+            case REQUEST_SELECT_COUNT:
+            {
+                result = countValues((Class) request.getParameter("type"), (Parameter[]) request.getParameter("parameters"));
+            }
         }
         
         return result;
@@ -216,9 +225,9 @@ public class EntityService
 
     public Entity getValue(Class type, int id) throws Exception
     {
-        return getValue(type, Arrays.asList(new Parameter(Entity.class.getDeclaredField("id"),
+        return getValue(type, new Parameter(Entity.class.getDeclaredField("id"),
                                             id,
-                                            Parameter.COMPARATOR_EQUALS)));
+                                            Parameter.COMPARATOR_EQUALS));
     }
 
     public Entity getValue(Class type, Entity value) throws Exception
@@ -226,7 +235,7 @@ public class EntityService
         return getValue(type, value.getId());
     }
     
-    public Entity getValue(Class type, List<Parameter> parameters) throws Exception
+    public Entity getValue(Class type, Parameter... parameters) throws Exception
     {
         Database db = getDatabase();
 
@@ -280,22 +289,20 @@ public class EntityService
         }
     }
 
-    public Object executeFunction(String function, Map<String, Object> parameters) throws Exception
+    public Object executeFunction(String function, List parameters) throws Exception
     {
         Database db = getDatabase();
 
         try
         {
+            StringJoiner paramJoin = new StringJoiner(", ");
 
-            StringJoiner paramJoin = new StringJoiner(" and ");
-
-            for (Map.Entry<String, Object> entry : parameters.entrySet())
+            for (Object param : parameters)
             {
-                paramJoin.add(entry.getKey() + " = " + db.quote(entry.getValue()));
+                paramJoin.add(db.quote(param));
             }
 
-            String sql = "select " + function +
-                         " where " + paramJoin.toString();
+            String sql = "select " + function + " ( " + paramJoin.toString() + " )";
             
             return db.query(sql);
         }
@@ -308,10 +315,10 @@ public class EntityService
 
     public List getValues(Class type) throws Exception
     {
-        return getValues(type, new ArrayList<>());
+        return getValues(type, new Parameter[0]);
     }
 
-    public List getValues(Class type, List<Parameter> parameters) throws Exception
+    public List getValues(Class type, Parameter... parameters) throws Exception
     {
         Database db = getDatabase();
 
@@ -335,10 +342,10 @@ public class EntityService
 
     public List getFieldValues(Field field, Class type) throws Exception
     {
-        return getFieldValues(field, type, new ArrayList<>());
+        return getFieldValues(field, type, new Parameter[0]);
     }
 
-    public List getFieldValues(Field field, Class type, List<Parameter> parameters) throws Exception
+    public List getFieldValues(Field field, Class type, Parameter... parameters) throws Exception
     {
         Database db = getDatabase();
 
@@ -348,7 +355,7 @@ public class EntityService
             
             if (schema != null)
             {
-                return db.fetchAll(composeQuery(db, schema, field, parameters), schema.fetcher);
+                return db.queryList(composeQuery(db, schema, field, parameters), field.getType());
             }
             
             return null;
@@ -359,13 +366,45 @@ public class EntityService
             db.release();
         }
     }
-
-    private String composeQuery(Database db, Schema schema, List<Parameter> parameters) throws Exception
+    
+    public int countValues(Class type, Parameter... parameters) throws Exception
     {
-        return composeQuery(db, schema, null, parameters);
+        Database db = getDatabase();
+
+        try
+        {
+            Schema schema = Schemas.getSchema(type);
+            
+            if (schema != null)
+            {
+                return db.queryInt(composeQuery(db, schema, true, parameters));
+            }
+            
+            return 0;
+        }
+        
+        finally
+        {
+            db.release();
+        }
     }
 
-    private String composeQuery(Database db, Schema schema, Field field, List<Parameter> parameters) throws Exception
+    private String composeQuery(Database db, Schema schema, Parameter... parameters) throws Exception
+    {
+        return composeQuery(db, schema, null, false, parameters);
+    }
+
+    private String composeQuery(Database db, Schema schema, boolean queryCount, Parameter... parameters) throws Exception
+    {
+        return composeQuery(db, schema, null, queryCount, parameters);
+    }
+
+    private String composeQuery(Database db, Schema schema, Field field, Parameter... parameters) throws Exception
+    {
+        return composeQuery(db, schema, field, false, parameters);
+    }
+
+    private String composeQuery(Database db, Schema schema, Field field, boolean queryCount, Parameter... parameters) throws Exception
     {
         StringJoiner paramJoiner = new StringJoiner(" and ");
 
@@ -374,7 +413,14 @@ public class EntityService
             paramJoiner.add(getCondition(db, schema, parameter));
         }
         
-        if (field == null)
+        if (queryCount)
+        {
+            return "select count(*) " +
+                   " from " + schema.name +
+                   (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner;
+        }
+        
+        else if (field == null)
         {
             return schema.select +
                    (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner;
@@ -384,7 +430,7 @@ public class EntityService
         {
             return "select " + schema.getField(field.getName()) +
                    " from " + schema.name +
-                   " where " + paramJoiner;
+                   (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner;
         }
     }
 
@@ -461,11 +507,33 @@ public class EntityService
     private String getValue(Database db, Parameter parameter)
     {
         Object result = parameter.getValue();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         switch (parameter.getComparator())
         {
             case Parameter.COMPARATOR_LOWER_CASE:
                 result = parameter.getValue().toString().toLowerCase();
+                break;
+                
+            case Parameter.COMPARATOR_DATE:
+                if (result instanceof Date)
+                {
+                    result = df.format((Date) result);
+                }
+                break;
+
+            case Parameter.COMPARATOR_DATE_FROM:
+                if (result instanceof Date)
+                {
+                    result = df.format((Date) result);
+                }
+                break;
+
+            case Parameter.COMPARATOR_DATE_UNTIL:
+                if (result instanceof Date)
+                {
+                    result = df.format((Date) result);
+                }
                 break;
         }
 
@@ -476,6 +544,8 @@ public class EntityService
     {
         String result = null;
         String fieldName = schema.getField(parameter.getField());
+        
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         
         switch (parameter.getComparator())
         {
@@ -488,15 +558,15 @@ public class EntityService
                 break;
 
             case Parameter.COMPARATOR_DATE:
-                result = fieldName + " = " + getValue(db, parameter);
+                result = "to_char(" + fieldName + ", '" + ((SimpleDateFormat) df).toPattern().toUpperCase() + "') = " + getValue(db, parameter);
                 break;
 
             case Parameter.COMPARATOR_DATE_FROM:
-                result = fieldName + " >= " + getValue(db, parameter);
+                result = "to_char(" + fieldName + ", '" + df.toPattern().toUpperCase() + "') >= " + getValue(db, parameter);
                 break;
 
             case Parameter.COMPARATOR_DATE_UNTIL:
-                result = fieldName + " <= " + getValue(db, parameter);
+                result = "to_char(" + fieldName + ", '" + df.toPattern().toUpperCase() + "') <= " + getValue(db, parameter);
                 break;
                 
             case Parameter.COMPARATOR_UNLIKE:
