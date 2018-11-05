@@ -9,6 +9,7 @@ import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.parts.NavigationItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -17,8 +18,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 /**
  *
@@ -27,10 +30,8 @@ import javafx.scene.layout.HBox;
 public class NavigationPane
         extends ScrollPane
 {
-
     public static class Events
     {
-
         public static final EventType ON_SELECT = new EventType("onNavigationSelect");
     }
 
@@ -82,12 +83,14 @@ public class NavigationPane
             imageView.setFitHeight(24);
             imageView.setFitWidth(24);
 
+            HBox.setHgrow(item, Priority.ALWAYS);
+
             hbox.getChildren().addAll(item, imageView);
-            item.setOnMouseClicked(new EventHandler<MouseEvent>()
+            item.setOnMouseClicked((MouseEvent t) ->
             {
-                @Override
-                public void handle(MouseEvent t)
+                if (t.getButton() == MouseButton.PRIMARY)
                 {
+                    currentItem = item;
                     fireEvent(new Event(Events.ON_SELECT));
                 }
             });
@@ -103,7 +106,8 @@ public class NavigationPane
 
     private void resize()
     {
-        hbox.setPrefSize(getWidth(), getViewportBounds().getHeight());
+        hbox.setMinWidth(getWidth());
+        hbox.setPrefHeight(getViewportBounds().getHeight());
     }
 
     private void initComponents()
@@ -128,7 +132,22 @@ public class NavigationPane
         {
             resize();
         });
+
+        addEventFilter(MouseEvent.ANY, (MouseEvent event) ->
+        {
+            if (event.getButton() != MouseButton.MIDDLE)
+            {
+                event.consume();
+            }
+        });
     }
 
+    @Override
+    public String toString()
+    {
+        return uuid;
+    }
+    
+    private String uuid = UUID.randomUUID().toString();
     private HBox hbox = new HBox();
 }

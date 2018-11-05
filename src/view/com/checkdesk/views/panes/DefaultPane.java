@@ -19,7 +19,7 @@ public abstract class DefaultPane
 {
     public static class Events
     {
-        public static final EventType ON_CHANGE = new EventType("onPaneChange");
+        public static final EventType ON_CHANGE = new EventType("onCallChange");
     }
     
     public DefaultPane()
@@ -33,6 +33,10 @@ public abstract class DefaultPane
     public NavigationItem createNavigationItem(NavigationItem currentItem)
     {
         return null;
+    }
+    
+    public void setContext(Object context)
+    {
     }
     
     private void initComponets()

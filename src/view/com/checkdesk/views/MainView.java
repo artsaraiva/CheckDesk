@@ -96,7 +96,20 @@ public class MainView
         
         headerPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
         {
-            setCenter(headerPane.getNavigationItem() != null ? headerPane.getNavigationItem().getPane() : null);
+            DefaultPane pane = null;
+            NavigationItem item = headerPane.getNavigationItem();
+            
+            if (item != null)
+            {
+                pane = headerPane.getNavigationItem().getPane();
+                
+                if (pane != null)
+                {
+                    pane.setContext(item.getContext());
+                }
+            }
+            
+            setCenter(pane);
         });
 
         stage.setOnCloseRequest((WindowEvent t) ->

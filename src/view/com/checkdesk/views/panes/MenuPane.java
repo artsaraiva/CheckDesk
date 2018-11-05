@@ -9,9 +9,9 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.views.parts.MenuItem;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -81,10 +81,9 @@ public class MenuPane
             }
             menuItem.setDisable(p);
 
-            menuItem.setOnMouseClicked(new EventHandler<MouseEvent>()
+            menuItem.setOnMouseClicked((MouseEvent event) ->
             {
-                @Override
-                public void handle(MouseEvent event)
+                if (event.getButton() == MouseButton.PRIMARY)
                 {
                     selectMenuItem(menuItem);
                 }

@@ -44,14 +44,14 @@ public class ApplicationController
             e.printStackTrace();
             
             File file = new File("config" + File.separator + "logs");
-            
+
             if (!file.exists() || !file.isDirectory())
             {
                 file.mkdirs();
             }
             
             Date date = new Date();
-            
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
             file = new File(file.getAbsolutePath() + File.separator + dateFormat.format(date) + ".txt");

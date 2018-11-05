@@ -38,7 +38,6 @@ public class BrowseButton
 
         initComponents();
     }
-
     public DefaultPane getPane()
     {
         return pane;

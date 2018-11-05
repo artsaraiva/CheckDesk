@@ -62,6 +62,86 @@ public class HeaderPane
     {
         return navigationPane.getItem();
     }
+    
+    private void searchDictionary()
+    {
+        TextInputDialog dialog = new TextInputDialog("");
+
+        dialog.setTitle("Dicionário");
+        dialog.setHeaderText("Busque o significado de uma palavra");
+        dialog.setContentText("Palavra:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent((String name) ->
+        {
+            try
+            {
+                URL url = new URL("http://dicionario-aberto.net/search-json/" + name);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                if (conn.getResponseCode() != 200)
+                {
+                    throw new RuntimeException("Failed : HTTP error code : "
+                            + conn.getResponseCode());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        (conn.getInputStream())));
+
+                StringBuilder sb = new StringBuilder();
+
+                String line;
+                while ((line = br.readLine()) != null)
+                {
+                    sb.append(line);
+                }
+
+                JSONObject json = new JSONObject(sb.toString());
+                List<JSONObject> listEntries = new ArrayList();
+                StringJoiner definitions = new StringJoiner("<br/><br/>");
+
+                if (json.has("superEntry"))
+                {
+                    JSONArray superEntries = json.getJSONArray("superEntry");
+
+                    for (int i = 0; i < superEntries.length(); i++)
+                    {
+                        listEntries.add(superEntries.getJSONObject(i).getJSONObject("entry"));
+                    }
+                }
+                else
+                {
+                    listEntries.add(json.getJSONObject("entry"));
+                }
+
+                for (JSONObject entry : listEntries)
+                {
+                    JSONArray senses = entry.getJSONArray("sense");
+
+                    for (int i = 0; i < senses.length(); i++)
+                    {
+                        StringBuilder def = new StringBuilder();
+                        def.append("<b>def.")
+                           .append(senses.length() > 1 ? String.valueOf(i + 1) : "")
+                           .append("</b><br/>")
+                           .append(senses.getJSONObject(i).getString("def"));
+
+                        definitions.add(def);
+                    }
+                }
+
+                Prompts.showDefinitons(name, definitions.toString());
+                conn.disconnect();
+
+            }
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        });
+    }
 
     private void initComponents()
     {
@@ -82,82 +162,7 @@ public class HeaderPane
         {
             if(t.getButton()==MouseButton.PRIMARY)
             {
-                TextInputDialog dialog = new TextInputDialog("");
-
-                dialog.setTitle("Dicionário");
-                dialog.setHeaderText("Busque o significado de uma palavra");
-                dialog.setContentText("Palavra:");
-
-                Optional<String> result = dialog.showAndWait();
-
-                result.ifPresent((String name) ->
-                {
-                    try
-                    {
-                        URL url = new URL("http://dicionario-aberto.net/search-json/" + name);
-                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setRequestMethod("GET");
-
-                        if (conn.getResponseCode() != 200)
-                        {
-                            throw new RuntimeException("Failed : HTTP error code : "
-                                    + conn.getResponseCode());
-                        }
-
-                        BufferedReader br = new BufferedReader(new InputStreamReader(
-                                (conn.getInputStream())));
-
-                        StringBuilder sb = new StringBuilder();
-
-                        String line;
-                        while ((line = br.readLine()) != null)
-                        {
-                            sb.append(line);
-                        }
-
-                        JSONObject json = new JSONObject(sb.toString());
-                        List<JSONObject> listEntries = new ArrayList();
-                        StringJoiner definitions = new StringJoiner("<br/><br/>");
-
-                        if (json.has("superEntry"))
-                        {
-                            JSONArray superEntries = json.getJSONArray("superEntry");
-
-                            for (int i = 0; i < superEntries.length(); i++)
-                            {
-                                listEntries.add(superEntries.getJSONObject(i).getJSONObject("entry"));
-                            }
-                        }
-                        else
-                        {
-                            listEntries.add(json.getJSONObject("entry"));
-                        }
-
-                        for (JSONObject entry : listEntries)
-                        {
-                            JSONArray senses = entry.getJSONArray("sense");
-
-                            for (int i = 0; i < senses.length(); i++)
-                            {
-                                StringBuilder def = new StringBuilder();
-                                def.append("<b>def.")
-                                   .append(senses.length() > 1 ? String.valueOf(i + 1) : "")
-                                   .append("</b><br/>")
-                                   .append(senses.getJSONObject(i).getString("def"));
-
-                                definitions.add(def);
-                            }
-                        }
-
-                        Prompts.showDefinitons(name, definitions.toString());
-                        conn.disconnect();
-
-                    }
-                    catch (Exception e)
-                    {
-                        ApplicationController.logException(e);
-                    }
-                });
+                searchDictionary();
             }
         });
     }
