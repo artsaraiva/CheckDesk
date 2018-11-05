@@ -133,7 +133,7 @@ create table questions
     constraint pk_questions         primary key (id),
     constraint fk_questions_options foreign key (ref_option) references options(id),
     constraint fk_questions_form    foreign key (ref_form) references forms(id),
-    constraint fk_questions_parent  foreign key (ref_parent) references questions(id),
+    constraint fk_questions_parent  foreign key (ref_parent) references questions(id)
 );
 
 -- surveys

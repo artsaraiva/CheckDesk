@@ -5,10 +5,12 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.control.ServerConnection;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.web.WebView;
 
 /**
  *
@@ -62,6 +64,36 @@ public class Prompts
         
         dialogInput.showAndWait();
         ServerConnection.setConnectionSettings(dialogInput.getResult());
+    }
+    
+    public static void showDefinitons(String word, String html)
+    {
+        Alert dialogInfo = new Alert(Alert.AlertType.INFORMATION);
+        dialogInfo.getDialogPane().setPrefSize(600, 400);
+        dialogInfo.setTitle("Dicionário");
+        dialogInfo.setHeaderText("Significado: " + word);
+        
+        WebView webView = new WebView();
+        
+        webView.getEngine().loadContent("<style>body{font-size:12px;font-family:arial}</style><body class=\"details-html\" contenteditable=\"false\">" + html + "</body>");
+        
+        webView.setPrefHeight(-1);
+        
+        //calc height
+        webView.getEngine().documentProperty().addListener((obj, prev, newv) ->
+        {
+            String heightText = webView.getEngine().executeScript(
+                    "var body = document.body," +
+                    "    html = document.documentElement;" +
+                    "Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);"
+            ).toString();
+
+            Double height = Double.parseDouble(heightText.replace("px", "")) + 15;
+            webView.setPrefHeight(height);
+        });
+        
+        dialogInfo.getDialogPane().setContent(webView);
+        dialogInfo.showAndWait();
     }
 
 }

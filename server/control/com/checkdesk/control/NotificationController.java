@@ -78,7 +78,7 @@ public class NotificationController
                .append("    <table>")
                .append("        <tr>")
                .append("            <td>Data de criação:</td>")
-               .append("            <td>").append(DateFormat.getInstance().format(survey.getCreatedDate())).append("</td>")
+               .append("            <td>").append(DateFormat.getDateInstance().format(survey.getCreatedDate())).append("</td>")
                .append("        </tr>")
                .append("        <tr>")
                .append("            <td>Tipo:</td>")

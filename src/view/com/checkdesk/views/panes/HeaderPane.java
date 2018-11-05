@@ -6,25 +6,28 @@
 package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.views.parts.NavigationItem;
+import com.checkdesk.views.parts.Prompts;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.StringJoiner;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.Cursor;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -63,75 +66,103 @@ public class HeaderPane
     private void initComponents()
     {
         setHgrow(navigationPane, Priority.ALWAYS);
-        dictionaryButton.setText("Dicionário");
-        dictionaryButton.setMinWidth(55);
-        dictionaryButton.setMinHeight(125);
-        getChildren().addAll(userPane, navigationPane, dictionaryButton);
+        setStyle("-fx-background-color: #20202C;");
+        dictionaty.setImage(new Image(ResourceLocator.getInstance().getImageResource("hp_help.png")));
+        dictionaty.setFitWidth(40);
+        dictionaty.setFitHeight(40);
+        dictionaty.setCursor(Cursor.HAND);
+        getChildren().addAll(userPane, navigationPane, dictionaty);
 
         navigationPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
         {
             fireEvent(event);
         });
 
-        dictionaryButton.setOnAction((ActionEvent t) ->
+        dictionaty.setOnMouseClicked((MouseEvent t) ->
         {
-            TextInputDialog dialog = new TextInputDialog("");
-
-            dialog.setTitle("Dicionário");
-            dialog.setHeaderText("Busque o significado de uma palavra");
-            dialog.setContentText("Palavra:");
-
-            Optional<String> result = dialog.showAndWait();
-
-            result.ifPresent((String name) ->
+            if(t.getButton()==MouseButton.PRIMARY)
             {
-                try
+                TextInputDialog dialog = new TextInputDialog("");
+
+                dialog.setTitle("Dicionário");
+                dialog.setHeaderText("Busque o significado de uma palavra");
+                dialog.setContentText("Palavra:");
+
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent((String name) ->
                 {
-                    URL url = new URL("http://dicionario-aberto.net/search-json/" + name);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-
-                    if (conn.getResponseCode() != 200)
+                    try
                     {
-                        throw new RuntimeException("Failed : HTTP error code : "
-                                + conn.getResponseCode());
+                        URL url = new URL("http://dicionario-aberto.net/search-json/" + name);
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("GET");
+
+                        if (conn.getResponseCode() != 200)
+                        {
+                            throw new RuntimeException("Failed : HTTP error code : "
+                                    + conn.getResponseCode());
+                        }
+
+                        BufferedReader br = new BufferedReader(new InputStreamReader(
+                                (conn.getInputStream())));
+
+                        StringBuilder sb = new StringBuilder();
+
+                        String line;
+                        while ((line = br.readLine()) != null)
+                        {
+                            sb.append(line);
+                        }
+
+                        JSONObject json = new JSONObject(sb.toString());
+                        List<JSONObject> listEntries = new ArrayList();
+                        StringJoiner definitions = new StringJoiner("<br/><br/>");
+
+                        if (json.has("superEntry"))
+                        {
+                            JSONArray superEntries = json.getJSONArray("superEntry");
+
+                            for (int i = 0; i < superEntries.length(); i++)
+                            {
+                                listEntries.add(superEntries.getJSONObject(i).getJSONObject("entry"));
+                            }
+                        }
+                        else
+                        {
+                            listEntries.add(json.getJSONObject("entry"));
+                        }
+
+                        for (JSONObject entry : listEntries)
+                        {
+                            JSONArray senses = entry.getJSONArray("sense");
+
+                            for (int i = 0; i < senses.length(); i++)
+                            {
+                                StringBuilder def = new StringBuilder();
+                                def.append("<b>def.")
+                                   .append(senses.length() > 1 ? String.valueOf(i + 1) : "")
+                                   .append("</b><br/>")
+                                   .append(senses.getJSONObject(i).getString("def"));
+
+                                definitions.add(def);
+                            }
+                        }
+
+                        Prompts.showDefinitons(name, definitions.toString());
+                        conn.disconnect();
+
                     }
-
-                    BufferedReader br = new BufferedReader(new InputStreamReader(
-                            (conn.getInputStream())));
-
-                    StringBuilder sb = new StringBuilder();
-
-                    String line;
-                    while ((line = br.readLine()) != null)
+                    catch (Exception e)
                     {
-                        sb.append(line);
+                        ApplicationController.logException(e);
                     }
-                    
-                    JSONObject json = new JSONObject(sb.toString());
-                    if(json.getJSONObject("superEntry") != null)
-                    {
-                        
-                    }
-                    
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Veículo de rodas, para transporte de coisas ou pessoas. Carro de mão, pequeno veículo de uma só roda, para transporte de entulho, pedras.");
-                    alert.setTitle("Dicionário");
-                    alert.setHeaderText("Significado da palavra");
-                    alert.showAndWait();
-                    conn.disconnect();
-
-                }
-                catch (Exception e)
-                {
-
-                    ApplicationController.logException(e);
-
-                }
-            });
+                });
+            }
         });
     }
 
     private LoggedUserPane userPane = new LoggedUserPane();
     private NavigationPane navigationPane = new NavigationPane();
-    private Button dictionaryButton = new Button();
+    private ImageView dictionaty = new ImageView();
 }
