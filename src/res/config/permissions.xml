@@ -33,4 +33,6 @@ and open the template in the editor.
         <item name="delete.form" label="Excluir Formulário"/>
     </item>
     <item name="edit.log" label="Ativar/Desativar auditorias"/>
+    <item name="export.form" label="Exportar Formulário"/>
+    <item name="import.form" label="Importar Formulário"/>
 </permissions>

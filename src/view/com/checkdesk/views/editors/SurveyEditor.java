@@ -28,6 +28,7 @@ import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.ItemPicker;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Validation;
+import java.io.File;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.scene.control.ComboBox;
@@ -39,6 +40,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
+import javafx.stage.FileChooser;
 
 /**
  *
@@ -47,10 +49,11 @@ import javafx.scene.web.HTMLEditor;
 public class SurveyEditor
         extends DefaultEditor<SurveyWrapper>
 {
-    private static final int PAGE_INFO         = 0;
+
+    private static final int PAGE_INFO = 0;
     private static final int PAGE_PARTICIPANTS = 1;
-    private static final int PAGE_FORM         = 2;
-    
+    private static final int PAGE_FORM = 2;
+
     private int pageIndex = 0;
 
     public SurveyEditor(EditorCallback<SurveyWrapper> callback)
@@ -70,11 +73,11 @@ public class SurveyEditor
         typeField.setItems(SurveyUtilities.getItems());
         ownerSelector.setItems(UserUtilities.getUsers());
         categorySelector.setItems(CategoryUtilities.getCategories());
-        
+
         this.source = value;
 
         Survey survey = source.getSurvey();
-        
+
         titleField.setText(survey.getTitle());
         createdField.setDate(survey.getCreatedDate());
         typeField.setValue(SurveyUtilities.getType(survey.getType()));
@@ -83,7 +86,7 @@ public class SurveyEditor
         viewersTable.setGroup(survey.getParticipantsId());
         ownerSelector.setSelected(UserUtilities.getUser(survey.getOwnerId()));
         categorySelector.setSelected(CategoryUtilities.getCategory(survey.getOwnerId()));
-        
+
         setValidations();
     }
 
@@ -91,7 +94,7 @@ public class SurveyEditor
     protected void obtainInput()
     {
         Survey survey = source.getSurvey();
-        
+
         survey.setTitle(titleField.getText());
         survey.setType(typeField.getValue().getValue());
         survey.setInfo(infoField.getHtmlText());
@@ -99,7 +102,7 @@ public class SurveyEditor
         survey.setViewersId(viewersTable.createGroup().getGroupId());
         survey.setOwnerId(ownerSelector.getSelected().getId());
         survey.setCategoryId(categorySelector.getSelected().getId());
-        
+
         formPane.obtainInput();
     }
 
@@ -152,7 +155,7 @@ public class SurveyEditor
                 {
                     getDialogPane().setContent(browsePane);
                 }
-                
+
                 else
                 {
                     formPane = new FormEditorPane();
@@ -166,7 +169,7 @@ public class SurveyEditor
 
     private void showAddForm()
     {
-        FormEditorPane pane = (FormEditorPane) editButton.getPane();
+        FormEditorPane pane = (FormEditorPane) addButton.getPane();
 
         source.setFormWrapper(new FormWrapper(new Form()));
 
@@ -191,7 +194,30 @@ public class SurveyEditor
             getDialogPane().setContent(formPane = pane);
         }
     }
-    
+
+    private void showImportForm()
+    {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(FormUtilities.XML_FILTER);
+        File file = chooser.showOpenDialog(getDialogPane().getScene().getWindow());
+
+        if (file != null)
+        {
+            FormWrapper formWrapper = FormUtilities.importForm(file);
+
+            if (formWrapper != null)
+            {
+                source.setFormWrapper(formWrapper);
+                
+                FormEditorPane pane = (FormEditorPane) editButton.getPane();
+                pane.setSource(source.getFormWrapper());
+                pane.setEnable(PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), editButton.getRole()));
+
+                getDialogPane().setContent(formPane = pane);
+            }
+        }
+    }
+
     private void setValidations()
     {
         addValidation(titleField);
@@ -199,22 +225,22 @@ public class SurveyEditor
         addValidation(createdField, new Validation()
         {
             private String error = "";
-            
+
             @Override
             public boolean validate()
             {
                 boolean result = false;
-                
-                if ( createdField.getDate() == null )
+
+                if (createdField.getDate() == null)
                 {
-                    error  = "Esse campo deve ser preenchido";
+                    error = "Esse campo deve ser preenchido";
                 }
-                
+
                 else
                 {
                     result = true;
                 }
-                
+
                 return result;
             }
 
@@ -223,7 +249,7 @@ public class SurveyEditor
             {
                 return error;
             }
-        } );
+        });
         addValidation(categorySelector);
     }
 
@@ -274,7 +300,8 @@ public class SurveyEditor
         browsePane.setButtons(new BrowseButton[]
         {
             addButton,
-            editButton
+            editButton,
+            importButton
         });
 
         browsePane.addEventHandler(BrowsePane.Events.ON_SELECT, (Event event) ->
@@ -290,6 +317,14 @@ public class SurveyEditor
                 {
                     showEditForm();
                 }
+
+                else
+                {
+                    if (browsePane.getSelectedButton() == importButton)
+                    {
+                        showImportForm();
+                    }
+                }
             }
         });
     }
@@ -299,13 +334,13 @@ public class SurveyEditor
 
     private Label titleLabel = new Label("Título");
     private TextField titleField = new TextField();
-    
+
     private Label ownerLabel = new Label("Autor:");
     private ItemSelector<User> ownerSelector = new ItemSelector();
 
     private Label createdLabel = new Label("Criado em:");
     private DatePicker createdField = new DatePicker();
-    
+
     private Label categoryLabel = new Label("Categoria:");
     private ItemSelector<Category> categorySelector = new ItemSelector();
 
@@ -325,5 +360,6 @@ public class SurveyEditor
     private BrowsePane browsePane = new BrowsePane();
     private BrowseButton addButton = new BrowseButton(new FormEditorPane(), "Nova", "bi_users.png", "add.form");
     private BrowseButton editButton = new BrowseButton(new FormEditorPane(), "Editar", "bi_forms.png", "edit.form");
+    private BrowseButton importButton = new BrowseButton(new FormEditorPane(), "Importar", "bi_forms.png", "import.form");
     private FormEditorPane formPane;
 }

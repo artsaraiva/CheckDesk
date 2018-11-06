@@ -5,6 +5,8 @@
  */
 package com.checkdesk.control;
 
+import java.io.InputStream;
+
 /**
  *
  * @author arthu
@@ -38,5 +40,10 @@ public class ResourceLocator
     public String getConfigResource( String name )
     {
         return configPath + name;
+    }
+    
+    public InputStream getConfigStream(String name)
+    {
+        return getClass().getClassLoader().getResourceAsStream("config/" + name);
     }
 }

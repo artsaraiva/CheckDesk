@@ -24,6 +24,8 @@ and open the template in the editor.
         <item name="edit.log" allow="true"/>
         <item name="delete.user" allow="true"/>
         <item name="delete.survey" allow="true"/>
+        <item name="export.form" allow="true"/>
+        <item name="import.form" allow="true"/>
         <item name="delete.form" allow="true"/>
     </type>
     <type value="1" name="Admin">
@@ -40,6 +42,8 @@ and open the template in the editor.
         <item name="edit.user" allow="true"/>
         <item name="edit.survey" allow="true"/>
         <item name="edit.form" allow="true"/>
+        <item name="export.form" allow="true"/>
+        <item name="import.form" allow="true"/>
     </type>
     <type value="2" name="Operator">
         <item name="view.surveys" allow="true"/>

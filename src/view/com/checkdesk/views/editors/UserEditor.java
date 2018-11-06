@@ -9,6 +9,7 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
+import com.checkdesk.views.parts.MaskField;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Validation;
 import java.util.regex.Matcher;
@@ -215,7 +216,7 @@ public class UserEditor
     private TextField emailField = new TextField();
 
     private Label phoneLabel = new Label("Fone");
-    private TextField phoneField = new TextField();
+    private MaskField phoneField = new MaskField(MaskField.MASK_PHONE);
 
     private Label passwordLabel = new Label("Senha");
     private PasswordField passwordField = new PasswordField();

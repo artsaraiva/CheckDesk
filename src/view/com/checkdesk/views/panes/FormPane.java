@@ -9,6 +9,7 @@ import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.AttachmentUtilities;
 import com.checkdesk.control.util.FormUtilities;
+import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Question;
@@ -73,7 +74,7 @@ public class FormPane
 
         table.setActions(new MenuItem[]
         {
-            editItem, deleteItem, attachmentItem
+            editItem, deleteItem, attachmentItem, exportItem
         });
         selectionBox.getChildren().addAll(filterBox, table);
 
@@ -128,11 +129,14 @@ public class FormPane
     private MenuItem editItem = new MenuItem("Editar");
     private MenuItem deleteItem = new MenuItem("Excluir");
     private MenuItem attachmentItem = new MenuItem("Anexos");
+    private MenuItem exportItem = new MenuItem("Exportar");
     {
         editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.form"));
 
         deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "delete.form"));
 
+        exportItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "export.form"));
+        
         editItem.setOnAction((ActionEvent t) ->
         {
             FormUtilities.editForm(table.getSelectedItem());
@@ -148,6 +152,12 @@ public class FormPane
         attachmentItem.setOnAction((ActionEvent t) ->
         {
             downloadAttachment();
+        });
+        
+        exportItem.setOnAction((ActionEvent t) ->
+        {
+            FormUtilities.exportForm(table.getSelectedItem());
+            refreshContent();
         });
     }
     
