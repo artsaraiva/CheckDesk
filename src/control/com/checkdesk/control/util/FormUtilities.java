@@ -23,6 +23,7 @@ import com.checkdesk.views.parts.Prompts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javafx.event.Event;
 import javafx.scene.chart.Chart;
@@ -37,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -53,7 +55,7 @@ public class FormUtilities
     public static final Item TYPE_MULTI_CHOICE = new Item("Escolha Multipla", Question.TYPE_MULTI_CHOICE);
     public static final Item TYPE_DATE = new Item("Data", Question.TYPE_DATE);
     public static final Item TYPE_NUMBER = new Item("Número", Question.TYPE_NUMBER);
-    
+
     public static final FileChooser.ExtensionFilter XML_FILTER = new FileChooser.ExtensionFilter("eXtensible Markup Language file", "*.xml");
 
     public static void addForm()
@@ -214,10 +216,6 @@ public class FormUtilities
                 viewersId.appendChild(doc.createTextNode(String.valueOf(form.getViewersId())));
                 rootElement.appendChild(viewersId);
 
-                Element state = doc.createElement("state");
-                state.appendChild(doc.createTextNode(String.valueOf(form.getState())));
-                rootElement.appendChild(state);
-
                 Element questions = doc.createElement("questions");
                 rootElement.appendChild(questions);
 
@@ -225,26 +223,22 @@ public class FormUtilities
                 {
                     Element element = doc.createElement("question");
                     questions.appendChild(element);
-                    
+
                     Attr attrName = doc.createAttribute("name");
                     attrName.setValue(question.getName());
                     element.setAttributeNode(attrName);
-                    
+
                     Attr attrType = doc.createAttribute("type");
                     attrType.setValue(String.valueOf(question.getType()));
                     element.setAttributeNode(attrType);
-                    
+
                     Attr attrConstraints = doc.createAttribute("constraints");
                     attrConstraints.setValue(question.getConstraints());
                     element.setAttributeNode(attrConstraints);
-                    
+
                     Attr attrOptionId = doc.createAttribute("optionId");
                     attrOptionId.setValue(String.valueOf(question.getOptionId()));
                     element.setAttributeNode(attrOptionId);
-                    
-                    Attr attrState = doc.createAttribute("state");
-                    attrState.setValue(String.valueOf(question.getState()));
-                    element.setAttributeNode(attrState);
                 }
 
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -261,80 +255,108 @@ public class FormUtilities
             }
         }
     }
-    
+
     public static FormWrapper importForm(File file)
     {
-//        try
-//        {
-//            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-//            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-//            Document doc = docBuilder.parse(file);
-//
-//            NodeList rootElement = doc.getElementsByTagName("form");
-//            
-//            if(rootElement != null)
-//            {
-//                
-//            }
-//
-//            Element name = doc.createElement("name");
-//            name.appendChild(doc.createTextNode(form.getName()));
-//            rootElement.appendChild(name);
-//
-//            Element info = doc.createElement("info");
-//            info.appendChild(doc.createTextNode(form.getInfo()));
-//            rootElement.appendChild(info);
-//
-//            Element viewersId = doc.createElement("viewersId");
-//            viewersId.appendChild(doc.createTextNode(String.valueOf(form.getViewersId())));
-//            rootElement.appendChild(viewersId);
-//
-//            Element state = doc.createElement("state");
-//            state.appendChild(doc.createTextNode(String.valueOf(form.getState())));
-//            rootElement.appendChild(state);
-//
-//            Element questions = doc.createElement("questions");
-//            rootElement.appendChild(questions);
-//
-//            for (Question question : getQuestions(form))
-//            {
-//                Element element = doc.createElement("question");
-//                questions.appendChild(element);
-//
-//                Attr attrName = doc.createAttribute("name");
-//                attrName.setValue(question.getName());
-//                element.setAttributeNode(attrName);
-//
-//                Attr attrType = doc.createAttribute("type");
-//                attrType.setValue(String.valueOf(question.getType()));
-//                element.setAttributeNode(attrType);
-//
-//                Attr attrConstraints = doc.createAttribute("constraints");
-//                attrConstraints.setValue(question.getConstraints());
-//                element.setAttributeNode(attrConstraints);
-//
-//                Attr attrOptionId = doc.createAttribute("optionId");
-//                attrOptionId.setValue(String.valueOf(question.getOptionId()));
-//                element.setAttributeNode(attrOptionId);
-//
-//                Attr attrState = doc.createAttribute("state");
-//                attrState.setValue(String.valueOf(question.getState()));
-//                element.setAttributeNode(attrState);
-//            }
-//
-//            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-//            Transformer transformer = transformerFactory.newTransformer();
-//            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-//            DOMSource source = new DOMSource(doc);
-//            StreamResult result = new StreamResult(file);
-//
-//            transformer.transform(source, result);
-//        }
-//        catch (Exception e)
-//        {
-//            ApplicationController.logException(e);
-//        }
-        return null;
+        Form form = null;
+        List<Question> questionList = new ArrayList<>();
+
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
+
+            doc.getDocumentElement().normalize();
+
+            NodeList nListForms = doc.getElementsByTagName("form");
+
+            Node formNode = nListForms.item(0);
+
+            String formName = null;
+            String formInfo = null;
+            Integer formViewersId = null;
+
+            if (formNode.getNodeType() == Node.ELEMENT_NODE)
+            {
+
+                Element formElement = (Element) formNode;
+
+                formName = formElement.getElementsByTagName("name").item(0).getTextContent();
+                formInfo = formElement.getElementsByTagName("name").item(0).getTextContent();
+                formViewersId = parseIntIgnoreException(formElement.getElementsByTagName("viewersId").item(0).getTextContent());
+
+                if (formName != null && formInfo != null)
+                {
+                    form = new Form();
+
+                    form.setName(formName);
+                    form.setInfo(formInfo);
+                    form.setViewersId(formViewersId);
+
+                    NodeList nListQuestions = doc.getElementsByTagName("question");
+
+                    for (int i = 0; i < nListQuestions.getLength(); i++)
+                    {
+                        try
+                        {
+                            Node questions = nListQuestions.item(i);
+                            String questionName = null;
+                            Integer questionType = null;
+                            String questionsConstraints = null;
+                            Integer questionOptionId = null;
+
+                            if (questions.getNodeType() == Node.ELEMENT_NODE)
+                            {
+
+                                Element question = (Element) questions;
+
+                                questionName = question.getAttribute("name");
+                                questionType = Integer.parseInt(question.getAttribute("type"));
+                                questionsConstraints = question.getAttribute("constraints");
+                                questionOptionId = parseIntIgnoreException(question.getAttribute("optionId"));
+                            }
+
+                            if (questionName != null && questionType != null && questionsConstraints != null)
+                            {
+                                Question question = new Question();
+
+                                question.setName(questionName);
+                                question.setType(questionType);
+                                question.setConstraints(questionsConstraints);
+                                question.setOptionId(questionOptionId);
+
+                                questionList.add(question);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            ApplicationController.logException(e);
+                        }
+                    }
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+        return form != null ? new FormWrapper(form, questionList) : null;
+    }
+
+    private static Integer parseIntIgnoreException(String string)
+    {
+        Integer result = null;
+        try
+        {
+            result = Integer.parseInt(string);
+        }
+        catch (Exception e)
+        {
+            //Silent
+        }
+        return result;
     }
 
     public static Form getForm(int formId)
