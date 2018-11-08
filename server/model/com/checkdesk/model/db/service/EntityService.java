@@ -355,7 +355,7 @@ public class EntityService
             
             if (schema != null)
             {
-                return db.queryList(composeQuery(db, schema, field, parameters), field.getType());
+                return db.queryList(composeQuery(db, schema, field, parameters));
             }
             
             return null;

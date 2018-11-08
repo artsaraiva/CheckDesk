@@ -61,7 +61,7 @@ public class SurveyUtilities
                 }
             }
 
-        }).show();
+        }).showAndWait();
     }
 
     public static void editSurvey(Survey survey)

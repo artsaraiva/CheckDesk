@@ -178,7 +178,7 @@ public class Database
         return result;
     }
     
-    public List queryList(String sql, Class type) throws Exception
+    public List queryList(String sql) throws Exception
     {
         statement = connection.createStatement();
 
@@ -188,7 +188,7 @@ public class Database
 
         while (resultSet.next())
         {
-            result.add(resultSet.getObject(1, type));
+            result.add(resultSet.getObject(1));
         }
 
         resultSet.close();
