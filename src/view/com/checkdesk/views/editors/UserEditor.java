@@ -87,9 +87,9 @@ public class UserEditor
             {
                 boolean result = false;
 
-                String email = emailField.getText();
+                String login = loginField.getText();
 
-                if (email == null || email.isEmpty())
+                if (login == null || login.isEmpty())
                 {
                     error = "Esse campo deve ser preenchido";
                 }
@@ -98,7 +98,7 @@ public class UserEditor
                 {
                     try
                     {
-                        result = UserUtilities.isUniqueLogin(source, email.toLowerCase());
+                        result = UserUtilities.isUniqueLogin(source, login.toLowerCase());
 
                         error = result ? "" : "O login informado já está sendo usado";
                     }

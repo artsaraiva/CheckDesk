@@ -47,6 +47,11 @@ public class OptionPicker
         getDialogPane().setPrefHeight(400);
         
         list.setShowAddPane(true);
+        list.setActions(new MenuItem[]
+        {
+            editItem,
+            deleteItem
+        });
         
         list.addEventHandler(DefaultTable.Events.ON_ADD, (event) ->
         {

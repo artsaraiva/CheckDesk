@@ -375,6 +375,6 @@ public class SurveyEditor
     private BrowsePane browsePane = new BrowsePane();
     private BrowseButton addButton = new BrowseButton(new FormEditorPane(), "Nova", "bi_users.png", "add.form");
     private BrowseButton editButton = new BrowseButton(new FormEditorPane(), "Editar", "bi_forms.png", "edit.form");
-    private BrowseButton importButton = new BrowseButton(new FormEditorPane(), "Importar", "bi_forms.png", "import.form");
+    private BrowseButton importButton = new BrowseButton(new FormEditorPane(), "Importar", "bi_import.png", "import.form");
     private FormEditorPane formPane;
 }

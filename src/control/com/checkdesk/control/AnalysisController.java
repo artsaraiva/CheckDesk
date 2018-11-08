@@ -49,15 +49,9 @@ public class AnalysisController
             max += item.getValue();
             PieChart.Data data = new PieChart.Data(item.getLabel(), item.getValue());
             chart.getData().add(data);
-        }
-        
-        for (PieChart.Data data : chart.getData())
-        {
-            Tooltip tip = new Tooltip();
             
-            tip.setText(String.format("%.2f%%", data.getPieValue() * 100 / max));
-            Tooltip.install(data.getNode(), tip);
-        };
+            Tooltip.install(data.getNode(), new Tooltip(String.format("%.0f", data.getPieValue())));
+        }
         
         return chart;
     }

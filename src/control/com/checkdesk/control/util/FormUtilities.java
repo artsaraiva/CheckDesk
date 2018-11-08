@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.scene.chart.Chart;
 import javafx.stage.FileChooser;
@@ -283,7 +285,7 @@ public class FormUtilities
                 Element formElement = (Element) formNode;
 
                 formName = formElement.getElementsByTagName("name").item(0).getTextContent();
-                formInfo = formElement.getElementsByTagName("name").item(0).getTextContent();
+                formInfo = formElement.getElementsByTagName("info").item(0).getTextContent();
                 formViewersId = parseIntIgnoreException(formElement.getElementsByTagName("viewersId").item(0).getTextContent());
 
                 if (formName != null && formInfo != null)
@@ -573,6 +575,11 @@ public class FormUtilities
         }
 
         return result;
+    }
+    
+    public static ObservableList<Item> getOptionTypes()
+    {
+        return FXCollections.observableArrayList(new Item("Não tem tipo", 0));
     }
     
     public static List<OptionItem> getOptionItems(Option option)

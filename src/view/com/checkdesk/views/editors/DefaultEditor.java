@@ -344,6 +344,19 @@ public class DefaultEditor<T>
     private class Pane
             extends DialogPane
     {
+        public Pane()
+        {
+            widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
+            {
+                DefaultEditor.this.resize();
+            });
+
+            heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
+            {
+                DefaultEditor.this.resize();
+            });
+        }
+        
         @Override
         protected Node createButton(ButtonType bt)
         {

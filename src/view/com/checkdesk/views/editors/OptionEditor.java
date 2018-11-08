@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.editors;
 
+import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.OptionItem;
@@ -121,20 +122,21 @@ public class OptionEditor
     @Override
     public void resize()
     {
-        tabPane.setPrefSize(getWidth(), getHeight());
-        
-        
-        double max = 0;
-        
-        for (Node node : gridPane.getChildren())
+        if (tabPane != null && gridPane != null)
         {
-            if (node instanceof Label)
+            tabPane.setPrefSize(getWidth(), getHeight());
+            double max = 0;
+        
+            for (Node node : gridPane.getChildren())
             {
-                max = Math.max(max, ((Label) node).getWidth());
+                if (node instanceof Label)
+                {
+                    max = Math.max(max, ((Label) node).getWidth());
+                }
             }
-        }
 
-        minWidthLabel.set(max);
+            minWidthLabel.set(max);
+        }
     }
     
     private void setSelected(ItemCell selected)
@@ -175,13 +177,14 @@ public class OptionEditor
     
     private void initComponents()
     {
-        getDialogPane().setPrefSize(650, 500);
+        setWidth(650);
+        setHeight(400);
         
         //GeneralTab
         int count = 0;
         
+        typeField.setItems(FormUtilities.getOptionTypes());
         VBox.setVgrow(viewersTable, Priority.ALWAYS);
-        
         GridPane.setValignment(viewersLabel, VPos.TOP);
         
         gridPane.setVgap(10);
@@ -203,6 +206,8 @@ public class OptionEditor
         //ListTab
         listbox.setSpacing(5);
 
+        ScrollPane pane = new ScrollPane(listbox);
+        HBox.setHgrow(pane, Priority.ALWAYS);
         HBox.setHgrow(listbox, Priority.ALWAYS);
         HBox.setHgrow(addPane, Priority.ALWAYS);
         
@@ -211,7 +216,7 @@ public class OptionEditor
         
         listbox.getChildren().add(addPane);
         
-        listTab.setContent(new ScrollPane(listbox));        
+        listTab.setContent(pane);
         
         generalTab.setClosable( false );
         listTab.setClosable( false );
@@ -299,6 +304,7 @@ public class OptionEditor
             valueField.setText(source.getValue());
             
             validate();
+            resize();
         }
         
         public OptionItem getSource()
@@ -311,7 +317,7 @@ public class OptionEditor
         
         private void resize()
         {
-            double width = OptionEditor.this.getWidth() / getChildren().size();
+            double width = tabPane.getWidth() / getChildren().size();
             nameField.setPrefWidth(width - 15);
             valueField.setPrefWidth(width - 15);
         }
@@ -379,6 +385,9 @@ public class OptionEditor
         {
             setSpacing(10);
             setPadding(new Insets(5));
+            
+            nameField.setPromptText("Nome");
+            valueField.setPromptText("Valor");
             
             getChildren().addAll(nameField, valueField);
 
