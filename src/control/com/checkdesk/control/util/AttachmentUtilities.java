@@ -99,7 +99,7 @@ public class AttachmentUtilities
         {
             if (attachment.getId() == 0)
             {
-                attachment = (Attachment) EntityService.getInstance().save(attachment);
+                attachment = (Attachment) EntityService.getInstance().insert(attachment);
             }
 
             else

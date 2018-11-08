@@ -40,7 +40,7 @@ public class LogUtilities
     {
         try
         {
-            EntityService.getInstance().save(log);
+            EntityService.getInstance().insert(log);
         }
 
         catch (Exception e)

@@ -11,12 +11,14 @@ import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
+import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.DefaultEditor;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.AttachmentSelector;
+import com.checkdesk.views.pickers.OptionPicker;
 import com.checkdesk.views.util.Validation;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +72,7 @@ public class FormEditorPane
     private FormWrapper source;
     private ObservableList<QuestionCell> questionCells = FXCollections.observableArrayList();
     private QuestionCell selectedCell = null;
+    private boolean onlyOptions = false;
 
     public FormEditorPane()
     {
@@ -79,6 +82,7 @@ public class FormEditorPane
     public void setSource(FormWrapper value)
     {
         this.source = value;
+        this.onlyOptions = source.getType() == Survey.TYPE_TOTEM;
         
         Form form = source.getForm();
         
@@ -292,10 +296,20 @@ public class FormEditorPane
             Question question = source.getQuestion();
             
             nameField.setText(question.getName());
-            typeField.setValue(FormUtilities.getQuestionType(question.getType()));
+            
+            Item selected = FormUtilities.getQuestionType(question.getType());
+            
+            if (!typeField.getItems().contains(selected))
+            {
+                selected = typeField.getItems().get(0);
+            }
+            
+            typeField.setValue(selected);
             optionSelector.setSelected(FormUtilities.getOption(question.getOptionId()));
             
             attachmentSelector.setQuestion(question);
+            
+            validate();
         }
         
         public QuestionWrapper getSource()
@@ -365,21 +379,21 @@ public class FormEditorPane
                 
                 if (validate)
                 {
-                    nameField.setBorder( null );
-                    nameField.setTooltip( null );
-                    nameField.setStyle( "-fx-faint-focus-color: transparent;" );
+                    optionSelector.setBorder( null );
+                    optionSelector.setTooltip( null );
+                    optionSelector.setStyle( "-fx-faint-focus-color: transparent;" );
                 }
 
                 else
                 {
-                    nameField.setTooltip( new Tooltip( validation.getError() ) );
-                    nameField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
+                    optionSelector.setTooltip( new Tooltip( validation.getError() ) );
+                    optionSelector.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
                                                                             BorderStrokeStyle.SOLID,
                                                                             new CornerRadii( 5 ),
                                                                             BorderWidths.DEFAULT,
                                                                             new Insets( -1 ) ) ) );
 
-                    nameField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
+                    optionSelector.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
                 }
             }
 
@@ -472,7 +486,8 @@ public class FormEditorPane
             setSpacing(10);
             setPadding(new Insets(5));
             
-            typeField.setItems(FXCollections.observableArrayList(FormUtilities.getQuestionTypes()));
+            typeField.setItems(FXCollections.observableArrayList(FormUtilities.getQuestionTypes(onlyOptions)));
+            optionSelector.changePicker(new OptionPicker());
             optionSelector.setItems(FormUtilities.getOptions());
 
             typeField.valueProperty().addListener((ObservableValue<? extends Item> value, Item oldValue, Item newValue) ->

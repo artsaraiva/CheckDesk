@@ -155,70 +155,78 @@ public class ApplicationController
         
         if (request != null)
         {
-            switch (request.getRequest())
+            try
             {
-                case ServerRequest.DATABASE:
-                    if (request.getParameter("request") == null)
-                    {
-                        result = login((String) request.getParameter("user"), (String) request.getParameter("password"));
-                    }
-                    
-                    else
-                    {
-                        result = EntityService.getInstance().handleRequest(this, request);
-                    }
-                    break;
-                
-                case ServerRequest.NOTIFY:
-                    Serializable object = request.getParameter("object");
-                    
-                    NotificationController.getInstance().sendNotification(object);
-                    Main.notify(object);
-                    break;
-                    
-                case ServerRequest.DOWNLOAD:
-                    Attachment attachment = (Attachment) request.getParameter("object");
-                    AttachmentUtilities.download(attachment, client);
-                    break;
-                    
-                case ServerRequest.UPLOAD:
-                    attachment = (Attachment) request.getParameter("object");
-                    AttachmentUtilities.upload(attachment, client);
-                    break;
-                    
-                case ServerRequest.FINISH_FILE:
-                    client.finishUpload();
-                    break;
-                    
-                case ServerRequest.ACTIVE_LOG:
-                    if (request.getParameter("newValue") != null)
-                    {
-                        setActiveLog((boolean) request.getParameter("newValue"));
-                    }
-                    
-                    else
-                    {
-                        result = isActiveLog();
-                    }
-                    break;
-                    
-                case ServerRequest.CONFIGURATION:
-                    String key = (String) request.getParameter("key");
-                    
-                    if (request.getParameter("value") != null)
-                    {
-                        ConfigurationManager.getInstance().setString(key, (String) request.getParameter("value"));
-                    }
-                    
-                    else
-                    {
-                        result = ConfigurationManager.getInstance().getString(key, (String) request.getParameter("defaultValue"));
-                    }
-                    break;
-                    
-                case ServerRequest.PERMISSION:
-                    result = PermissionController.getInstance().handleRequest(request);
-                    break;
+                switch (request.getRequest())
+                {
+                    case ServerRequest.DATABASE:
+                        if (request.getParameter("request") == null)
+                        {
+                            result = login((String) request.getParameter("user"), (String) request.getParameter("password"));
+                        }
+
+                        else
+                        {
+                            result = EntityService.getInstance().handleRequest(this, request);
+                        }
+                        break;
+
+                    case ServerRequest.NOTIFY:
+                        Serializable object = request.getParameter("object");
+
+                        NotificationController.getInstance().sendNotification(object);
+                        Main.notify(object);
+                        break;
+
+                    case ServerRequest.DOWNLOAD:
+                        Attachment attachment = (Attachment) request.getParameter("object");
+                        AttachmentUtilities.download(attachment, client);
+                        break;
+
+                    case ServerRequest.UPLOAD:
+                        attachment = (Attachment) request.getParameter("object");
+                        AttachmentUtilities.upload(attachment, client);
+                        break;
+
+                    case ServerRequest.FINISH_FILE:
+                        client.finishUpload();
+                        break;
+
+                    case ServerRequest.ACTIVE_LOG:
+                        if (request.getParameter("newValue") != null)
+                        {
+                            setActiveLog((boolean) request.getParameter("newValue"));
+                        }
+
+                        else
+                        {
+                            result = isActiveLog();
+                        }
+                        break;
+
+                    case ServerRequest.CONFIGURATION:
+                        String key = (String) request.getParameter("key");
+
+                        if (request.getParameter("value") != null)
+                        {
+                            ConfigurationManager.getInstance().setString(key, (String) request.getParameter("value"));
+                        }
+
+                        else
+                        {
+                            result = ConfigurationManager.getInstance().getString(key, (String) request.getParameter("defaultValue"));
+                        }
+                        break;
+
+                    case ServerRequest.PERMISSION:
+                        result = PermissionController.getInstance().handleRequest(request);
+                        break;
+                }
+            }
+            
+            catch (Exception e)
+            {
+                logException(e);
             }
         }
         

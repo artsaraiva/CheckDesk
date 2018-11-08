@@ -50,7 +50,7 @@ public class SurveyUtilities
                     FormUtilities.saveForm(getSource().getFormWrapper());
 
                     getSource().getSurvey().setFormId(getSource().getFormWrapper().getForm().getId());
-                    Survey survey = (Survey) EntityService.getInstance().save(getSource().getSurvey());
+                    Survey survey = (Survey) EntityService.getInstance().insert(getSource().getSurvey());
 
                     ApplicationController.getInstance().notify(survey);
                 }

@@ -34,7 +34,7 @@ public class GroupUtilities
             {
                 if (group.getId() == 0)
                 {
-                    EntityService.getInstance().save(group);
+                    EntityService.getInstance().insert(group);
                 }
 
                 else

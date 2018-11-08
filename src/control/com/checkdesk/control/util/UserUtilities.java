@@ -42,7 +42,7 @@ public class UserUtilities
             {
                 try
                 {
-                    EntityService.getInstance().save(getSource());
+                    EntityService.getInstance().insert(getSource());
                 }
 
                 catch (Exception e)

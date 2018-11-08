@@ -10,12 +10,14 @@ import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.GroupUtilities;
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.views.details.util.DetailsCaption;
 import com.checkdesk.views.details.util.DetailsTable;
 import com.checkdesk.views.details.util.Table;
 import javafx.scene.Node;
+import javafx.scene.chart.Chart;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -59,6 +61,8 @@ public class SurveyDetails
 
         if (source != null)
         {
+            Form form = FormUtilities.getForm(source.getFormId());
+            
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
                     new DetailsTable(75).addItem("Data de criação", source.getCreatedDate())
@@ -67,21 +71,7 @@ public class SurveyDetails
                                         .addItem("Categoria", CategoryUtilities.getCategory(source.getCategoryId()))
                                         .addItem("Participantes", GroupUtilities.getGroup(source.getParticipantsId(), true))
                                         .addItemHtml("Informações", source.getInfo())
-                                        .addItem("Formulário", FormUtilities.getForm(source.getFormId())));
-
-            Table table = new Table("Pergunta", "Tipo", "Opções");
-
-            if (source.getFormId() != 0)
-            {
-                for (Question question : FormUtilities.getQuestions(source.getFormId()))
-                {
-                    table.addRow(question.getName(),
-                                 FormUtilities.getQuestionType(question.getType()),
-                                 FormUtilities.getOption(question.getOptionId()));
-                }
-            }
-
-            vbox.getChildren().add(table);
+                                        .addChart("Formulário", FormUtilities.getQuestionChart(form)));
         }
     }
 

@@ -6,6 +6,7 @@
 package com.checkdesk.views.details.util;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.Item;
 import com.checkdesk.model.data.Group;
 import java.text.DateFormat;
 import java.util.Date;
@@ -14,10 +15,13 @@ import java.util.StringJoiner;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.chart.Chart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 
 /**
@@ -139,6 +143,22 @@ public class DetailsTable
         }
         
         return joiner.toString();
+    }
+
+    public DetailsTable addChart(String label, Chart chart)
+    {
+        if (label != null)
+        {
+            addRow(countRow++, getItemLabel(label), chart);
+        }
+        
+        else
+        {
+            addRow(countRow++, chart);
+            setColumnSpan(chart, 2);
+        }
+        
+        return this;
     }
 
     private void initComponents()

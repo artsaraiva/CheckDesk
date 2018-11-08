@@ -14,7 +14,6 @@ import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Category;
 import com.checkdesk.model.data.Form;
-import com.checkdesk.model.data.Group;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.data.User;
 import com.checkdesk.model.util.FormWrapper;
@@ -29,6 +28,7 @@ import com.checkdesk.views.pickers.ItemPicker;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.util.Validation;
 import java.io.File;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.scene.control.ComboBox;
@@ -171,7 +171,10 @@ public class SurveyEditor
     {
         FormEditorPane pane = (FormEditorPane) addButton.getPane();
 
-        source.setFormWrapper(new FormWrapper(new Form()));
+        FormWrapper wrapper = new FormWrapper(new Form());
+        wrapper.setType(typeField.getSelectionModel().getSelectedItem().getValue());
+        
+        source.setFormWrapper(wrapper);
 
         pane.setSource(source.getFormWrapper());
         getDialogPane().setContent(formPane = pane);
@@ -187,7 +190,10 @@ public class SurveyEditor
 
         if (picker.getSelected() != null)
         {
-            source.setFormWrapper(new FormWrapper(picker.getSelected().clone()));
+            FormWrapper wrapper = new FormWrapper(picker.getSelected().clone());
+            wrapper.setType(typeField.getSelectionModel().getSelectedItem().getValue());
+            
+            source.setFormWrapper(wrapper);
             pane.setSource(source.getFormWrapper());
             pane.setEnable(PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), editButton.getRole()));
 
@@ -207,6 +213,7 @@ public class SurveyEditor
 
             if (formWrapper != null)
             {
+                formWrapper.setType(typeField.getSelectionModel().getSelectedItem().getValue());
                 source.setFormWrapper(formWrapper);
                 
                 FormEditorPane pane = (FormEditorPane) editButton.getPane();
@@ -325,6 +332,14 @@ public class SurveyEditor
                         showImportForm();
                     }
                 }
+            }
+        });
+        
+        typeField.valueProperty().addListener((ObservableValue<? extends Item> observableValue, Item oldValue, Item newValue) ->
+        {
+            if (source.getFormWrapper() != null)
+            {
+                source.getFormWrapper().setType(typeField.getSelectionModel().getSelectedItem().getValue());
             }
         });
     }

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
@@ -67,6 +69,21 @@ public class DefaultEditor<T>
             }
 
         };
+    };
+    
+    protected final DoubleProperty minWidthLabel = new DoublePropertyBase()
+    {
+        @Override
+        public Object getBean()
+        {
+            return DefaultEditor.this;
+        }
+
+        @Override
+        public String getName()
+        {
+            return "minWidthLabel";
+        }
     };
     
     protected EditorCallback callback;

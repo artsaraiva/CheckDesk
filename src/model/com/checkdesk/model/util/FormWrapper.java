@@ -19,6 +19,7 @@ public class FormWrapper
 {
     private Form form;
     private List<QuestionWrapper> questions;
+    private int type;
 
     public FormWrapper(Form form)
     {
@@ -54,5 +55,15 @@ public class FormWrapper
     public void setQuestions(List<QuestionWrapper> questions)
     {
         this.questions = questions;
+    }
+
+    public int getType()
+    {
+        return type;
+    }
+
+    public void setType(int type)
+    {
+        this.type = type;
     }
 }

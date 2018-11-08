@@ -46,17 +46,17 @@ public class EntityService
     {
     }
 
-    public Entity save(Serializable entity) throws Exception
+    public Entity insert(Entity entity) throws Exception
     {
         return (Entity) ServerConnection.getInstance().say(newRequest(REQUEST_INSERT).addParameter("object", entity));
     }
 
-    public Entity update(Serializable entity) throws Exception
+    public Entity update(Entity entity) throws Exception
     {
         return (Entity) ServerConnection.getInstance().say(newRequest(REQUEST_UPDATE).addParameter("object", entity));
     }
 
-    public void delete(Serializable entity) throws Exception
+    public void delete(Entity entity) throws Exception
     {
         ServerConnection.getInstance().say(newRequest(REQUEST_DELETE).addParameter("object", entity));
     }
@@ -113,7 +113,7 @@ public class EntityService
         
         if (!showInactive)
         {
-            p.add(Parameter.ACTIVE_STATE());
+            p.add(Parameter.NOT_INACTIVE_STATE());
         }
         
         return (List) ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_LIST).addParameter("type", type)
@@ -153,7 +153,7 @@ public class EntityService
         
         if (!showInactive)
         {
-            p.add(Parameter.ACTIVE_STATE());
+            p.add(Parameter.NOT_INACTIVE_STATE());
         }
         
         return (int) ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_COUNT).addParameter("type", type)

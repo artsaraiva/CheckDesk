@@ -5,15 +5,19 @@
  */
 package com.checkdesk.control.util;
 
+import com.checkdesk.control.AnalysisController;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
+import com.checkdesk.model.data.OptionItem;
 import com.checkdesk.model.data.Question;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.FormWrapper;
+import com.checkdesk.model.util.OptionWrapper;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.FormEditor;
+import com.checkdesk.views.editors.OptionEditor;
 import com.checkdesk.views.util.EditorCallback;
 import com.checkdesk.views.parts.Prompts;
 import java.io.File;
@@ -21,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javafx.event.Event;
+import javafx.scene.chart.Chart;
 import javafx.stage.FileChooser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -123,13 +128,13 @@ public class FormUtilities
     {
         if (formWrapper.getForm().getId() == 0)
         {
-            formWrapper.setForm((Form) EntityService.getInstance().save(formWrapper.getForm()));
+            formWrapper.setForm((Form) EntityService.getInstance().insert(formWrapper.getForm()));
 
             for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
             {
                 questionWrapper.getQuestion().setFormId(formWrapper.getForm().getId());
 
-                questionWrapper.setQuestion((Question) EntityService.getInstance().save(questionWrapper.getQuestion()));
+                questionWrapper.setQuestion((Question) EntityService.getInstance().insert(questionWrapper.getQuestion()));
                 AttachmentUtilities.saveAttachments(questionWrapper);
             }
         }
@@ -137,9 +142,9 @@ public class FormUtilities
         else
         {
             List<Question> oldQuestions = EntityService.getInstance().getValues(Question.class,
-                    new Parameter(Question.class.getDeclaredField("formId"),
-                            formWrapper.getForm().getId(),
-                            Parameter.COMPARATOR_EQUALS));
+                                                                                new Parameter(Question.class.getDeclaredField("formId"),
+                                                                                        formWrapper.getForm().getId(),
+                                                                                        Parameter.COMPARATOR_EQUALS));
             for (Question deletable : oldQuestions)
             {
                 boolean delete = true;
@@ -164,7 +169,7 @@ public class FormUtilities
             {
                 if (questionWrapper.getQuestion().getId() == 0)
                 {
-                    questionWrapper.setQuestion((Question) EntityService.getInstance().save(questionWrapper.getQuestion()));
+                    questionWrapper.setQuestion((Question) EntityService.getInstance().insert(questionWrapper.getQuestion()));
                 }
 
                 else
@@ -384,13 +389,131 @@ public class FormUtilities
 
     public static List<Item> getQuestionTypes()
     {
+        return getQuestionTypes(false);
+    }
+    
+    public static List<Item> getQuestionTypes(boolean onlyOptions)
+    {
+        if (onlyOptions)
+        {
+            return Arrays.asList(TYPE_SINGLE_CHOICE, TYPE_MULTI_CHOICE);
+        }
+        
         return Arrays.asList(TYPE_CATEGORY,
-                TYPE_SMALL_TEXT,
-                TYPE_LARGE_TEXT,
-                TYPE_SINGLE_CHOICE,
-                TYPE_MULTI_CHOICE,
-                TYPE_DATE,
-                TYPE_NUMBER);
+                             TYPE_SMALL_TEXT,
+                             TYPE_LARGE_TEXT,
+                             TYPE_SINGLE_CHOICE,
+                             TYPE_MULTI_CHOICE,
+                             TYPE_DATE,
+                             TYPE_NUMBER);
+    }
+    
+    public static void addOption()
+    {
+        new OptionEditor(new EditorCallback<OptionWrapper>(new OptionWrapper(new Option()))
+        {
+            @Override
+            public void handle(Event t)
+            {
+                try
+                {
+                    OptionWrapper wrapper = getSource();
+                    
+                    wrapper.setOption((Option) EntityService.getInstance().insert(wrapper.getOption()));
+                    
+                    for (OptionItem item : wrapper.getItems())
+                    {
+                        item.setOptionId(wrapper.getOption().getId());
+                        
+                        EntityService.getInstance().insert(item);
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
+            }
+        }).showAndWait();
+    }
+    
+    public static void editOption(Option option)
+    {
+        new OptionEditor(new EditorCallback<OptionWrapper>(new OptionWrapper(option))
+        {
+            @Override
+            public void handle(Event t)
+            {
+                try
+                {
+                    OptionWrapper wrapper = getSource();
+                    
+                    List<OptionItem> oldItems = EntityService.getInstance().getValues(OptionItem.class,
+                                                                                      new Parameter(OptionItem.class.getDeclaredField("optionId"),
+                                                                                                    wrapper.getOption().getId(),
+                                                                                                    Parameter.COMPARATOR_EQUALS));
+                    for (OptionItem deletable : oldItems)
+                    {
+                        boolean delete = true;
+
+                        for (OptionItem item : wrapper.getItems())
+                        {
+                            if (deletable.equals(item))
+                            {
+                                delete = false;
+                                break;
+                            }
+                        }
+
+                        if (delete)
+                        {
+                            EntityService.getInstance().delete(deletable);
+                        }
+                    }
+
+                    for (OptionItem item : wrapper.getItems())
+                    {
+                        if (item.getId() == 0)
+                        {
+                            EntityService.getInstance().insert(item);
+                        }
+
+                        else
+                        {
+                            EntityService.getInstance().update(item);
+                        }
+                    }
+
+                    EntityService.getInstance().update(wrapper.getOption());
+                }
+
+                catch (Exception e)
+                {
+                    ApplicationController.logException(e);
+                }
+            }
+        }).showAndWait();
+    }
+    
+    public static void deleteOption(final Option option)
+    {
+        if (Prompts.confirm("Exlusão de Opção", "Deseja realmente excluir a opção?"))
+        {
+            try
+            {
+                for (OptionItem item : getOptionItems(option))
+                {
+                    EntityService.getInstance().delete(item);
+                }
+
+                EntityService.getInstance().delete(option);
+            }
+
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        }
     }
 
     public static Option getOption(Integer optionId)
@@ -429,6 +552,25 @@ public class FormUtilities
 
         return result;
     }
+    
+    public static List<OptionItem> getOptionItems(Option option)
+    {
+        List<OptionItem> result = new ArrayList<>();
+
+        try
+        {
+            result = EntityService.getInstance().getValues(OptionItem.class, true, new Parameter(OptionItem.class.getDeclaredField("optionId"),
+                                                                                                 option.getId(),
+                                                                                                 Parameter.COMPARATOR_EQUALS));
+        }
+
+        catch (Exception e)
+        {
+            ApplicationController.logException(e);
+        }
+
+        return result;
+    }
 
     public static List<Question> getQuestions(Form form)
     {
@@ -456,5 +598,35 @@ public class FormUtilities
         }
 
         return result;
+    }
+    
+    public static Chart getQuestionChart(Form form)
+    {
+        List<Item> items = new ArrayList<>();
+        
+        for (Item item : getQuestionTypes())
+        {
+            try
+            {
+                int count = EntityService.getInstance().countValues(Question.class, new Parameter(Question.class.getDeclaredField("type"),
+                                                                                                  item.getValue(),
+                                                                                                  Parameter.COMPARATOR_EQUALS),
+                                                                                    new Parameter(Question.class.getDeclaredField("formId"),
+                                                                                                  form.getId(),
+                                                                                                  Parameter.COMPARATOR_EQUALS));
+
+                if (count > 0)
+                {
+                    items.add(new Item(item.getLabel(), count));
+                }
+            }
+            
+            catch (Exception e)
+            {
+                ApplicationController.logException(e);
+            }
+        }
+        
+        return AnalysisController.createChart(AnalysisController.PIE_CHART, form.toString(), items);
     }
 }

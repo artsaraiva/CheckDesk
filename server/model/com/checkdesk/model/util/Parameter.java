@@ -16,9 +16,9 @@ import java.lang.reflect.Field;
 public class Parameter
         implements Serializable
 {
-    public static final Parameter ACTIVE_STATE() throws Exception
+    public static final Parameter NOT_INACTIVE_STATE() throws Exception
     {
-        return new Parameter(Entity.class.getDeclaredField("state"), Entity.STATE_ACTIVE, COMPARATOR_EQUALS);
+        return new Parameter(Entity.class.getDeclaredField("state"), Entity.STATE_INACTIVE, COMPARATOR_UNLIKE);
     }
     
     public static final int COMPARATOR_EQUALS     = 0;

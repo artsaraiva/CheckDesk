@@ -141,13 +141,13 @@ public class PermissionController
             if (result == null)
             {
                 Group group = new Group();
-                EntityService.getInstance().save(group);
+                EntityService.getInstance().insert(group);
                 
                 result = new Permission();
                 result.setViewersId(group.getGroupId());
                 result.setName(item.getName());
                 
-                EntityService.getInstance().save(result);
+                EntityService.getInstance().insert(result);
             }
         }
         

@@ -57,18 +57,8 @@ public class FormDetails
         {
             vbox.getChildren().addAll(
                     new DetailsCaption(source.toString()),
-                    new DetailsTable(75).addItemHtml("Informações", source.getInfo()));
-
-            Table table = new Table("Pergunta", "Tipo", "Opções");
-
-            for (Question question : FormUtilities.getQuestions(source))
-            {
-                table.addRow(question.getName(),
-                             FormUtilities.getQuestionType(question.getType()),
-                             FormUtilities.getOption(question.getOptionId()));
-            }
-
-            vbox.getChildren().add(table);
+                    new DetailsTable(75).addItemHtml("Informações", source.getInfo())
+                                        .addChart(null, FormUtilities.getQuestionChart(source)));
         }
     }
 
