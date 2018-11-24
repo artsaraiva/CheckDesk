@@ -17,7 +17,10 @@ import java.util.List;
  */
 public class Database
 {
-    private static final String DB_URL = ConfigurationManager.getInstance().getString("db.url");
+    private static final String DB_PROTOCOL = ConfigurationManager.getInstance().getString("db.protocol");
+    private static final String DB_ADDRESS = ConfigurationManager.getInstance().getString("db.address");
+    private static final String DB_PORT = ConfigurationManager.getInstance().getString("db.port");
+    private static final String DB_NAME = ConfigurationManager.getInstance().getString("db.name");
     private static final String DB_USER = ConfigurationManager.getInstance().getString("db.user");
     private static final String DB_PASSWORD = ConfigurationManager.getInstance().getString("db.password");
     private static final String DB_DRIVER = ConfigurationManager.getInstance().getString("db.driver");
@@ -47,7 +50,9 @@ public class Database
     {
         if (connection == null || connection.isClosed())
         {
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            String url = "jdbc:" + DB_PROTOCOL + "//" + DB_ADDRESS + ":"+ DB_PORT + "/" + DB_NAME;
+            
+            connection = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
         }
     }
 
