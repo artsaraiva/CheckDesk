@@ -7,6 +7,7 @@ package com.checkdesk.control;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -19,7 +20,7 @@ public class ConfigurationManager
     public static Properties loadProperties(File file)
     {
         Properties properties = null;
-        
+
         try
         {
             if ( file == null )
@@ -29,20 +30,19 @@ public class ConfigurationManager
 
             if (file.exists())
             {
-                InputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
-
-                properties = new Properties();
-                properties.load(fileInputStream);
-
-                fileInputStream.close();
+                try (InputStream fileInputStream = new FileInputStream(file.getAbsolutePath()))
+                {
+                    properties = new Properties();
+                    properties.load(fileInputStream);
+                }
             }
-
         }
 
-        catch (Exception e)
+        catch (IOException e)
         {
+            e.printStackTrace(System.out);
         }
-        
+
         return properties;
     }
 }
