@@ -41,6 +41,8 @@ public class BackupController
 
     private void loadProperties()
     {
+        databaseProperties = ConfigurationManager.loadProperties(null);
+        
         while (databaseProperties == null)
         {
             Alert dialogInfo = new Alert(Alert.AlertType.INFORMATION);

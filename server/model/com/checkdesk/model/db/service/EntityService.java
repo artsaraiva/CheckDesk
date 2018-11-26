@@ -55,6 +55,7 @@ public class EntityService
 
     private EntityService() throws Exception
     {
+        getDatabase();
     }
 
     public Object handleRequest(ApplicationController controller, ServerRequest request) throws Exception

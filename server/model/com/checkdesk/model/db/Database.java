@@ -50,7 +50,7 @@ public class Database
     {
         if (connection == null || connection.isClosed())
         {
-            String url = "jdbc:" + DB_PROTOCOL + "//" + DB_ADDRESS + ":"+ DB_PORT + "/" + DB_NAME;
+            String url = "jdbc:" + DB_PROTOCOL + "://" + DB_ADDRESS + ":"+ DB_PORT + "/" + DB_NAME;
             
             connection = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
         }
