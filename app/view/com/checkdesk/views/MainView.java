@@ -6,21 +6,31 @@
 package com.checkdesk.views;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.control.ConfigurationManager;
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.ReleaseUtilities;
 import com.checkdesk.views.panes.DefaultPane;
 import com.checkdesk.views.panes.HeaderPane;
 import com.checkdesk.views.panes.MenuPane;
 import com.checkdesk.views.panes.NavigationPane;
 import com.checkdesk.views.parts.MenuItem;
 import com.checkdesk.views.parts.NavigationItem;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -29,6 +39,7 @@ import javafx.stage.WindowEvent;
 public class MainView
         extends Application
 {
+
     private Stage stage;
     private Set<DefaultPane> panesCache = new HashSet<>();
 
@@ -48,10 +59,11 @@ public class MainView
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();
-        
+
         ApplicationController.getInstance().setRootWindow(stage);
+         showRealeaseFile();
     }
-    
+
     private void selectMenuItem(MenuItem selected)
     {
         headerPane.setNavigationItem(new NavigationItem(selected.getPane(), selected.getName()));
@@ -73,12 +85,17 @@ public class MainView
 
             pane.refreshContent();
         }
-        
+
         borderPane.setCenter(pane);
     }
 
-    private void initComponents()
+    public void showRealeaseFile()
     {
+        ReleaseUtilities.showRelease();
+    }
+
+    private void initComponents()
+    { 
         borderPane.setTop(headerPane);
         borderPane.setLeft(menuPane);
 
@@ -93,22 +110,22 @@ public class MainView
         {
             selectMenuItem(menuPane.getSelectedItem());
         });
-        
+
         headerPane.addEventHandler(NavigationPane.Events.ON_SELECT, (Event event) ->
         {
             DefaultPane pane = null;
             NavigationItem item = headerPane.getNavigationItem();
-            
+
             if (item != null)
             {
                 pane = headerPane.getNavigationItem().getPane();
-                
+
                 if (pane != null)
                 {
                     pane.setContext(item.getContext());
                 }
             }
-            
+
             setCenter(pane);
         });
 

@@ -72,6 +72,7 @@ public class RegisterPane
         new BrowseButton(new UserPane(), "Usuários", "bi_users.png", "view.users"),
         new BrowseButton(new FormPane(), "Formulários", "bi_forms.png", "view.forms"),
         new BrowseButton(new PermissionPane(), "Permissões", "bi_permissions.png", "view.permissions"),
-        new BrowseButton(new LogPane(), "Auditorias", "bi_logs.png", "view.logs")
+        new BrowseButton(new LogPane(), "Auditorias", "bi_logs.png", "view.logs"),
+        new BrowseButton(new ReleasePane(), "Releases", "bi_logs.png", "view.logs")
     };
 }

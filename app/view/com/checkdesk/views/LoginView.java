@@ -8,6 +8,7 @@ package com.checkdesk.views;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.control.ServerConnection;
+import com.checkdesk.control.license.LicenseController;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.views.parts.Prompts;
 import javafx.application.Application;
@@ -63,12 +64,59 @@ public class LoginView
         stage.show();
 
         resize();
+        
+        validateLicense();
     }
 
     private void resize()
     {
         vbox.setLayoutY((pane.getHeight() - vbox.getHeight()) / 2);
         vbox.setLayoutX((pane.getWidth() - vbox.getWidth()) / 2);
+    }
+    
+    private void validateLicense()
+    {
+        int result = LicenseController.getInstance().validateLicense();
+        
+        boolean blockLogin = true;
+        
+        switch (result)
+        {
+            case LicenseController.FILE_NOT_FOUND:
+                Prompts.error("Arquivo não encontrado", "O aquivo de licença não foi encontrado ou está vazio.\n" +
+                                                        "Por favor, comunique a área responsável.");
+                break;
+                
+            case LicenseController.FILE_CORRUPTED:
+                Prompts.error("Arquivo corrompido", "O aquivo de licença foi corrompido ou modificado.\n" +
+                                                    "Por favor, comunique a área responsável.");
+                break;
+                
+            case LicenseController.INVALID_START:
+                Prompts.error("Data inválida", "A licença tem data de início maior que a atual.\n" +
+                                               "Por favor, comunique a área responsável.");
+                break;
+                
+            case LicenseController.LICENSE_EXPIRED:
+                Prompts.error("Data inválida", "A licença está expirada.\n" +
+                                               "Por favor, comunique a área responsável.");
+                break;
+                
+            case LicenseController.LAST_DAYS:
+                int daysToExpire = LicenseController.getInstance().daysToExpire();
+                Prompts.info("Licença expirando", "A data limite da licença está chegando.\n" +
+                                                  daysToExpire + " dias para expirar.\n" +
+                                                  "Por favor, comunique a área responsável.");
+                
+                blockLogin = false;
+                break;
+                
+            default:
+                blockLogin = false;
+                break;
+        }
+        
+        loginButton.setDisable(blockLogin);
     }
 
     private void validateLogin()
