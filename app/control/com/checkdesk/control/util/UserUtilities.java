@@ -12,7 +12,7 @@ import com.checkdesk.model.data.User;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.views.editors.UserEditor;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.parts.Prompts;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class UserUtilities
     {
         User user = new User();
 
-        new UserEditor(new EditorCallback<User>(user)
+        new UserEditor(new Callback<User>(user)
         {
             @Override
             public void handle(Event t)
@@ -55,7 +55,7 @@ public class UserUtilities
 
     public static void editUser(User user)
     {
-        new UserEditor(new EditorCallback<User>(user)
+        new UserEditor(new Callback<User>(user)
         {
             @Override
             public void handle(Event t)

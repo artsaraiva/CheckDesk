@@ -45,9 +45,10 @@ public class Main extends Thread
             EntityService.getInstance();
             ServerSocket serverSocket = new ServerSocket(PORT);
 
-            System.out.println("Server started: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+            System.out.println("--------------------------------\n" +
+                               "Server started: " + new Timestamp(System.currentTimeMillis()) + "\n" +
                                "IP Address: " + Inet4Address.getLocalHost().getHostAddress() + ":" + PORT + "\n" +
-                               "--------------------------------\n" );
+                               "--------------------------------\n");
             
             while (true)
             {

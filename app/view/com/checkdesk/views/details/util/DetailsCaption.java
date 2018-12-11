@@ -44,7 +44,7 @@ public class DetailsCaption
         setHgrow(this, Priority.ALWAYS);
         setHgrow(titleLabel, Priority.ALWAYS);
         
-        getChildren().addAll(titleLabel);
+        getChildren().add(titleLabel);
         
         if (icon != null)
         {

@@ -6,6 +6,7 @@
 package com.checkdesk.views.panes;
 
 import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.AnswerUtilities;
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.HomeTable;
@@ -36,16 +37,7 @@ public class HomePane
     @Override
     public void refreshContent()
     {
-        User user1 = new User();
-        user1.setLogin("login1");
-        User user2 = new User();
-        user2.setLogin("login2");
-        User user3 = new User();
-        user3.setLogin("login3");
-        User user4 = new User();
-        user4.setLogin("test_user");
-
-        pendingList.setSurveys(SurveyUtilities.getPendingSurvey());
+        pendingList.setAnswers(AnswerUtilities.getOwnedAnswers());
         createdList.setSurveys(SurveyUtilities.getOwnedSurvey());
     }
 

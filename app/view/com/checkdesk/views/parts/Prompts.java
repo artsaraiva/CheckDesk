@@ -69,6 +69,19 @@ public class Prompts
         return dialogConfirm.getResult() == btnSim;
     }
 
+    public static String input(String message, String content)
+    {
+        TextInputDialog dialogInput = new TextInputDialog();
+        dialogInput.getDialogPane().setPrefSize(400, 200);
+        dialogInput.setTitle("Entrada de Dados");
+        dialogInput.setHeaderText(message);
+        dialogInput.setContentText(content);
+        dialogInput.getDialogPane().getButtonTypes().remove(ButtonType.CANCEL);
+        dialogInput.showAndWait();
+
+        return dialogInput.getResult();
+    }
+
     public static void editConnectionSettings()
     {
         TextInputDialog dialogInput = new TextInputDialog();

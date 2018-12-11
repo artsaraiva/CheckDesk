@@ -80,10 +80,10 @@ public class EntityService
                                                                                    .addParameter("parameters", new HashMap(parameters)));
     }
 
-    public void executeFunction(String function, List parameters) throws Exception
+    public Object executeFunction(String function, List parameters) throws Exception
     {
-        ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("function", function)
-                                                                            .addParameter("parameters", new ArrayList(parameters)));
+        return ServerConnection.getInstance().say(newRequest(REQUEST_SELECT_UNIQUE).addParameter("function", function)
+                                                                                   .addParameter("parameters", new ArrayList(parameters)));
     }
 
     public Object getValue(Class type, Parameter... parameters) throws Exception

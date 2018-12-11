@@ -60,6 +60,11 @@ public class EditorButton
         {
             result = "ei_previous.png";
         }
+        
+        if (type.getButtonData() == ButtonBar.ButtonData.APPLY)
+        {
+            result = "ei_apply.png";
+        }
 
         return ResourceLocator.getInstance().getImageResource(result);
     }

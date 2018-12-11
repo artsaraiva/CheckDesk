@@ -57,10 +57,12 @@ public class HandleClient extends Thread
             else
             {
                 controller = ApplicationController.getInstance();
-                System.out.println("Client connected: " + new Timestamp(System.currentTimeMillis()) + "\n"
-                        + "IP Address: " + client.getInetAddress().getHostAddress() + "\n"
-                        + "--------------------------------\n");
 
+                System.out.println("--------------------------------\n" +
+                                   "Client connected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                                   "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
+                                   "--------------------------------\n" );
+                
                 ServerRequest request = (ServerRequest) first;
 
                 out.writeObject(controller.handle(request, this));
@@ -82,11 +84,11 @@ public class HandleClient extends Thread
                         }
                     }
                 }
-
-                System.out.println("Client disconnected: " + new Timestamp(System.currentTimeMillis()) + "\n"
-                        + "IP Address: " + client.getInetAddress().getHostAddress() + "\n"
-                        + "--------------------------------\n");
-
+                
+                System.out.println("--------------------------------\n" +
+                                   "Client disconnected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                                   "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
+                                   "--------------------------------\n" );
                 client.close();
             }
         }

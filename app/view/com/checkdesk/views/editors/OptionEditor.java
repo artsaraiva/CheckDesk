@@ -5,13 +5,14 @@
  */
 package com.checkdesk.views.editors;
 
+import com.checkdesk.control.ValidationController;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.OptionItem;
 import com.checkdesk.model.util.OptionWrapper;
 import com.checkdesk.views.parts.GroupTable;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.util.Validation;
 import java.util.UUID;
 import javafx.beans.value.ObservableValue;
@@ -58,34 +59,34 @@ public class OptionEditor
     private OptionWrapper source = null;
     private ObservableList<ItemCell> itemCells = FXCollections.observableArrayList();
     private ItemCell selectedCell = null;
-    
-    public OptionEditor(EditorCallback<OptionWrapper> callback)
+
+    public OptionEditor(Callback<OptionWrapper> callback)
     {
         super(callback);
-        
+
         initComponents();
-        
+
         setTitle("Editor de Opções");
         setHeaderText("Editor de Opções");
 
         setSource(callback.getSource());
     }
-    
-    public void setSource(OptionWrapper value)
+
+    private void setSource(OptionWrapper value)
     {
         this.source = value;
-        
+
         Option option = source.getOption();
-        
+
         nameField.setText(option.getName());
-        typeField.getSelectionModel().select(null);
+        typeField.getSelectionModel().select(0);
         viewersTable.setGroup(option.getViewersId());
-        
+
         for (OptionItem item : source.getItems())
         {
             addItem(item);
         }
-        
+
         resize();
     }
 
@@ -93,30 +94,17 @@ public class OptionEditor
     public void obtainInput()
     {
         Option option = source.getOption();
-        
+
         option.setName(nameField.getText());
         option.setType(typeField.getSelectionModel().getSelectedItem().getValue());
         option.setViewersId(viewersTable.createGroup().getGroupId());
-        
+
         source.getItems().clear();
-        
+
         for (ItemCell cell : itemCells)
         {
             source.getItems().add(cell.getSource());
         }
-    }
-    
-    @Override
-    public boolean validateInput()
-    {
-        boolean result = true;
-        
-        for (ItemCell cell : itemCells)
-        {
-            result &= cell.validate();
-        }
-        
-        return result;
     }
 
     @Override
@@ -126,7 +114,7 @@ public class OptionEditor
         {
             tabPane.setPrefSize(getWidth(), getHeight());
             double max = 0;
-        
+
             for (Node node : gridPane.getChildren())
             {
                 if (node instanceof Label)
@@ -138,7 +126,7 @@ public class OptionEditor
             minWidthLabel.set(max);
         }
     }
-    
+
     private void setSelected(ItemCell selected)
     {
         this.selectedCell = selected;
@@ -148,7 +136,7 @@ public class OptionEditor
             cell.setBackground(cell == selected ? background : null);
         }
     }
-    
+
     private void addItem(OptionItem item)
     {
         ItemCell itemCell = new ItemCell(item);
@@ -157,52 +145,54 @@ public class OptionEditor
         listbox.getChildren().add(itemCells.size(), itemCell);
         itemCells.add(itemCell);
     }
-    
+
     public void setEnable(boolean enable)
     {
         addPane.setDisable(!enable);
-        
-        if(!enable)
+
+        if (!enable)
         {
             addPane.setStyle("-fx-border-color: #CBC7C7");
         }
-        
+
         removeItem.setDisable(!enable);
-        
+
         for (ItemCell cell : itemCells)
         {
             cell.setEnable(enable);
         }
     }
-    
+
     private void initComponents()
     {
+        addValidation(nameField);
+
         setWidth(650);
         setHeight(400);
-        
+
         //GeneralTab
         int count = 0;
-        
+
         typeField.setItems(FormUtilities.getOptionTypes());
         VBox.setVgrow(viewersTable, Priority.ALWAYS);
         GridPane.setValignment(viewersLabel, VPos.TOP);
-        
+
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.TOP_LEFT);
-        
+
         gridPane.addRow(count++, nameLabel, nameField);
         gridPane.addRow(count++, typeLabel, typeField);
         gridPane.addRow(count++, viewersLabel, viewersTable);
-        
+
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
-        col1.minWidthProperty().bind( minWidthLabel );
-        col2.setHgrow( Priority.ALWAYS );
-        
+        col1.minWidthProperty().bind(minWidthLabel);
+        col2.setHgrow(Priority.ALWAYS);
+
         gridPane.getColumnConstraints().addAll(col1, col2);
-        
-        generalTab.setContent( gridPane );
-        
+
+        generalTab.setContent(gridPane);
+
         //ListTab
         listbox.setSpacing(5);
 
@@ -210,20 +200,20 @@ public class OptionEditor
         HBox.setHgrow(pane, Priority.ALWAYS);
         HBox.setHgrow(listbox, Priority.ALWAYS);
         HBox.setHgrow(addPane, Priority.ALWAYS);
-        
+
         addPane.getStyleClass().add("add-pane");
         addPane.getChildren().add(new Label("Adicionar"));
-        
+
         listbox.getChildren().add(addPane);
-        
+
         listTab.setContent(pane);
-        
-        generalTab.setClosable( false );
-        listTab.setClosable( false );
-        
-        tabPane.getTabs().addAll( generalTab, listTab );
-        getDialogPane().setContent( tabPane );
-        
+
+        generalTab.setClosable(false);
+        listTab.setClosable(false);
+
+        tabPane.getTabs().addAll(generalTab, listTab);
+        getDialogPane().setContent(tabPane);
+
         listbox.setOnContextMenuRequested((ContextMenuEvent event) ->
         {
             contextMenu.show(selectedCell, event.getScreenX(), event.getScreenY());
@@ -235,38 +225,40 @@ public class OptionEditor
             {
                 OptionItem item = new OptionItem();
                 item.setOptionId(source.getOption().getId());
-                
+
                 addItem(item);
             }
         });
     }
-    
+
     private TabPane tabPane = new TabPane();
     private Tab generalTab = new Tab("Geral");
     private Tab listTab = new Tab("Itens");
-    
+
     //GeneralTab
     private GridPane gridPane = new GridPane();
-    
+
     private Label nameLabel = new Label("Nome");
     private TextField nameField = new TextField();
-    
+
     private Label typeLabel = new Label("Tipo");
     private ComboBox<Item> typeField = new ComboBox<>();
-    
+
     private Label viewersLabel = new Label("Autorizações:");
     private GroupTable viewersTable = new GroupTable();
-    
+
     //ListTab
     private VBox listbox = new VBox();
     private HBox addPane = new HBox();
-    
+
     private Background background = new Background(new BackgroundFill(Paint.valueOf("#B0B0B0"),
                                                                       CornerRadii.EMPTY,
                                                                       Insets.EMPTY));
 
     private ContextMenu contextMenu = new ContextMenu();
     private MenuItem removeItem = new MenuItem("Excluir");
+
+    
     {
         removeItem.setOnAction((ActionEvent event) ->
         {
@@ -278,10 +270,10 @@ public class OptionEditor
                 selectedCell = null;
             }
         });
-        
+
         contextMenu.getItems().add(removeItem);
     }
-    
+
     private class ItemCell
             extends HBox
     {
@@ -292,21 +284,20 @@ public class OptionEditor
             setId(UUID.randomUUID().toString());
 
             initComponents();
-            
+
             setSource(source);
         }
 
         private void setSource(OptionItem value)
         {
             this.source = value;
-            
+
             nameField.setText(source.getName());
             valueField.setText(source.getValue());
-            
-            validate();
+
             resize();
         }
-        
+
         public OptionItem getSource()
         {
             source.setName(nameField.getText());
@@ -314,88 +305,39 @@ public class OptionEditor
 
             return source;
         }
-        
+
         private void resize()
         {
             double width = tabPane.getWidth() / getChildren().size();
             nameField.setPrefWidth(width - 15);
             valueField.setPrefWidth(width - 15);
         }
-        
+
         public void setEnable(boolean enable)
         {
             setDisable(!enable);
             nameField.setDisable(!enable);
             valueField.setDisable(!enable);
         }
-        
-        public boolean validate()
-        {
-            boolean result = false;
-
-            Validation validation = DefaultEditor.getTextValidation(nameField);
-
-            if (result = validation.validate())
-            {
-                nameField.setBorder( null );
-                nameField.setTooltip( null );
-                nameField.setStyle( "-fx-faint-focus-color: transparent;" );
-            }
-
-            else
-            {
-                nameField.setTooltip( new Tooltip( validation.getError() ) );
-                nameField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
-                                                                        BorderStrokeStyle.SOLID,
-                                                                        new CornerRadii( 5 ),
-                                                                        BorderWidths.DEFAULT,
-                                                                        new Insets( -1 ) ) ) );
-
-                nameField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
-            }
-            
-            validation = DefaultEditor.getTextValidation(valueField);
-
-            boolean validate = validation.validate();
-            result &= validate;
-
-            if (validate)
-            {
-                valueField.setBorder( null );
-                valueField.setTooltip( null );
-                valueField.setStyle( "-fx-faint-focus-color: transparent;" );
-            }
-
-            else
-            {
-                valueField.setTooltip( new Tooltip( validation.getError() ) );
-                valueField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
-                                                                        BorderStrokeStyle.SOLID,
-                                                                        new CornerRadii( 5 ),
-                                                                        BorderWidths.DEFAULT,
-                                                                        new Insets( -1 ) ) ) );
-
-                valueField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
-            }
-
-            return result;
-        }
 
         private void initComponents()
         {
+            addValidation(nameField);
+            addValidation(valueField);
+
             setSpacing(10);
             setPadding(new Insets(5));
-            
+
             nameField.setPromptText("Nome");
             valueField.setPromptText("Valor");
-            
+
             getChildren().addAll(nameField, valueField);
 
             setOnMouseClicked((MouseEvent event) ->
             {
                 setSelected(this);
             });
-            
+
             widthProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) ->
             {
                 resize();

@@ -6,21 +6,20 @@
 package com.checkdesk.control.util;
 
 import com.checkdesk.control.ApplicationController;
+import com.checkdesk.model.data.Answer;
 import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
 import com.checkdesk.model.util.SurveyWrapper;
 import com.checkdesk.views.editors.SurveyEditor;
 import com.checkdesk.views.parts.Prompts;
-import com.checkdesk.views.util.EditorCallback;
-import java.io.File;
+import com.checkdesk.views.util.Callback;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
-import javafx.stage.FileChooser;
 
 /**
  *
@@ -40,7 +39,7 @@ public class SurveyUtilities
         survey.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         survey.setOwnerId(ApplicationController.getInstance().getActiveUser().getId());
 
-        new SurveyEditor(new EditorCallback<SurveyWrapper>(new SurveyWrapper(survey))
+        new SurveyEditor(new Callback<SurveyWrapper>(new SurveyWrapper(survey))
         {
             @Override
             public void handle(Event t)
@@ -66,7 +65,7 @@ public class SurveyUtilities
 
     public static void editSurvey(Survey survey)
     {
-        new SurveyEditor(new EditorCallback<SurveyWrapper>(new SurveyWrapper(survey))
+        new SurveyEditor(new Callback<SurveyWrapper>(new SurveyWrapper(survey))
         {
             @Override
             public void handle(Event t)
@@ -138,23 +137,6 @@ public class SurveyUtilities
         return result;
     }
     
-    public static List<Survey> getPendingSurvey()
-    {
-        List<Survey> result = new ArrayList<>();
-
-        try
-        {
-            result = EntityService.getInstance().getValues(Survey.class);
-        }
-
-        catch (Exception e)
-        {
-            ApplicationController.logException(e);
-        }
-
-        return result;
-    }
-    
     public static List<Survey> getOwnedSurvey()
     {
         List<Survey> result = new ArrayList<>();
@@ -192,6 +174,25 @@ public class SurveyUtilities
             }
         }
 
+        return result;
+    }
+    
+    public static double percentageFor(Survey survey)
+    {
+        double result = 0;
+        
+        List<Answer> answers = AnswerUtilities.getAnswers(survey);
+        
+        for (Answer answer : answers)
+        {
+            result += AnswerUtilities.percentageFor(answer);
+        }
+        
+        if (!answers.isEmpty())
+        {
+            result = result / answers.size();
+        }
+        
         return result;
     }
 }

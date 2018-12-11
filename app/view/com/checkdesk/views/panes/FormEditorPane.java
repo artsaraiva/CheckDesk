@@ -5,9 +5,9 @@
  */
 package com.checkdesk.views.panes;
 
+import com.checkdesk.control.ValidationController;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
-import com.checkdesk.model.data.Attachment;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.Question;
@@ -21,16 +21,16 @@ import com.checkdesk.views.pickers.AttachmentSelector;
 import com.checkdesk.views.pickers.OptionPicker;
 import com.checkdesk.views.util.Validation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -40,15 +40,15 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -70,9 +70,11 @@ public class FormEditorPane
         extends DefaultPane
 {
     private FormWrapper source;
-    private ObservableList<QuestionCell> questionCells = FXCollections.observableArrayList();
-    private QuestionCell selectedCell = null;
+    private Map<QuestionWrapper, TreeItem<QuestionWrapper>> questionMap = new HashMap<>();
+    private Map<TreeItem<QuestionWrapper>, QuestionCell> itemMap = new HashMap<>();
     private boolean onlyOptions = false;
+    
+    private List<Validation> validations = new ArrayList<>();
 
     public FormEditorPane()
     {
@@ -83,90 +85,106 @@ public class FormEditorPane
     {
         this.source = value;
         this.onlyOptions = source.getType() == Survey.TYPE_TOTEM;
-        
+
         Form form = source.getForm();
-        
+
         nameField.setText(form.getName());
         viewersTable.setGroup(form.getViewersId());
-        infoField.setHtmlText(form.getInfo());
         
-        for (QuestionWrapper questionWrapper : source.getQuestions())
+        if (form.getInfo() != null && !form.getInfo().isEmpty())
         {
-            addItem(questionWrapper);
+            infoField.setHtmlText(form.getInfo());
+        }
+
+        addQuestions(null, source.getQuestions());
+    }
+
+    private void addQuestions(QuestionWrapper parent, Map<QuestionWrapper, List<QuestionWrapper>> questions)
+    {
+        TreeItem<QuestionWrapper> parentItem = questionMap.get(parent);
+        
+        List<QuestionWrapper> list = questions.get(parent);
+        
+        if (list != null)
+        {
+            for (QuestionWrapper wrapper : list)
+            {
+                TreeItem<QuestionWrapper> item = new TreeItem<>(wrapper);
+                questionMap.put(wrapper, item);
+
+                parentItem.getChildren().add(item);
+
+                addQuestions(wrapper, questions);
+            }
         }
     }
 
     public void obtainInput()
     {
         Form form = source.getForm();
-        
+
         form.setName(nameField.getText());
         form.setViewersId(viewersTable.createGroup().getGroupId());
         form.setInfo(infoField.getHtmlText());
-        
-        List<QuestionWrapper> questions = new ArrayList<>();
-        
-        for (QuestionCell cell : questionCells)
-        {
-            questions.add(cell.getSource());
-        }
+
+        Map<QuestionWrapper, List<QuestionWrapper>> questions = new HashMap<>();
+
+        populateMap(questionTree.getRoot(), questions);
         
         source.setQuestions(questions);
     }
     
-    public boolean validateInput()
+    private void populateMap(TreeItem<QuestionWrapper> item, Map<QuestionWrapper, List<QuestionWrapper>> map)
     {
-        boolean result = true;
+        List<QuestionWrapper> list = map.get(item.getValue());
         
-        for (QuestionCell cell : questionCells)
+        if (list == null)
         {
-            result &= cell.validate();
+            map.put(item.getValue(), list = new ArrayList<>());
         }
         
-        return result;
-    }
-
-    private void setSelected(QuestionCell selected)
-    {
-        this.selectedCell = selected;
-
-        for (QuestionCell cell : questionCells)
+        for (TreeItem<QuestionWrapper> child : item.getChildren())
         {
-            cell.setBackground(cell == selected ? background : null);
+            list.add(itemMap.get(child).getSource());
+            populateMap(child, map);
         }
     }
 
-    private void addItem(QuestionWrapper questionWrapper)
+    public List<Validation> getValidations()
     {
-        QuestionCell questionCell = new QuestionCell(questionWrapper);
-        HBox.setHgrow(questionCell, Priority.ALWAYS);
+        return validations;
+    }
 
-        listbox.getChildren().add(questionCells.size(), questionCell);
-        questionCells.add(questionCell);
+    private void addItem()
+    {
+        Question question = new Question();
+        question.setFormId(source.getForm().getId());
+        
+        questionTree.getRoot().getChildren().add(new TreeItem<>(new QuestionWrapper(question)));
     }
 
     @Override
     protected void resize()
     {
         tabPane.setPrefSize(getWidth(), getHeight());
-        listbox.setPrefWidth(getWidth());
+        questionTree.setPrefWidth(getWidth());
     }
 
     @Override
-    public void refreshContent(){}
-    
+    public void refreshContent() {}
+
     public void setEnable(boolean enable)
     {
         addPane.setDisable(!enable);
-        
-        if(!enable)
+
+        if (!enable)
         {
             addPane.setStyle("-fx-border-color: #CBC7C7");
         }
-        
+
         removeItem.setDisable(!enable);
-        
-        for (QuestionCell cell : questionCells)
+
+        for (QuestionCell cell : itemMap.values())
         {
             cell.setEnable(enable);
         }
@@ -176,60 +194,89 @@ public class FormEditorPane
     {
         //GeneralTab
         int count = 0;
+
+//        infoField.setHtmlText("<body><font face=\"Times New Roman\"></font face></body></html>");
         
         VBox.setVgrow(viewersTable, Priority.ALWAYS);
         VBox.setVgrow(infoField, Priority.ALWAYS);
-        
+
         GridPane.setValignment(viewersLabel, VPos.TOP);
         GridPane.setValignment(infoLabel, VPos.TOP);
-        
+
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.TOP_LEFT);
-        
+
         gridPane.addRow(count++, nameLabel, nameField);
         gridPane.addRow(count++, viewersLabel, viewersTable);
         gridPane.addRow(count++, infoLabel, infoField);
-        
+
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setHgrow(Priority.ALWAYS);
 
         gridPane.getColumnConstraints().addAll(col1, col2);
-        
-        generalTab.setContent(gridPane);
-        
-        //ListTab
-        listbox.setSpacing(5);
 
-        HBox.setHgrow(listbox, Priority.ALWAYS);
-        HBox.setHgrow(addPane, Priority.ALWAYS);
+        generalTab.setContent(gridPane);
+
+        //ListTab
+        TreeItem<QuestionWrapper> root = new TreeItem<>();
+        questionMap.put(null, root);
+        questionTree.setRoot(root);
+        questionTree.setShowRoot(false);
+        questionTree.setContextMenu(contextMenu);
         
+        HBox.setHgrow(vbox, Priority.ALWAYS);
+        HBox.setHgrow(addPane, Priority.ALWAYS);
+
         addPane.getStyleClass().add("add-pane");
         addPane.getChildren().add(new Label("Adicionar"));
-        
-        listbox.getChildren().add(addPane);
-        
-        listTab.setContent(new ScrollPane(listbox));
-        
+
+        vbox.getChildren().addAll(questionTree, addPane);
+
+        listTab.setContent(new ScrollPane(vbox));
+
         generalTab.setClosable(false);
         listTab.setClosable(false);
         tabPane.getTabs().addAll(generalTab, listTab);
-        
+
         getChildren().add(tabPane);
 
-        listbox.setOnContextMenuRequested((ContextMenuEvent event) ->
+        questionTree.setCellFactory((TreeView<QuestionWrapper> tree) ->
         {
-            contextMenu.show(selectedCell, event.getScreenX(), event.getScreenY());
+            return new TreeCell<QuestionWrapper>()
+            {
+                @Override
+                protected void updateItem(QuestionWrapper item, boolean empty)
+                {
+                    super.updateItem(item, empty);
+                    
+                    if (item == null || empty)
+                    {
+                        setGraphic(null);
+                    }
+                    
+                    else
+                    {
+                        QuestionCell cell = itemMap.get(getTreeItem());
+                        
+                        if (cell == null)
+                        {
+                            itemMap.put(getTreeItem(), cell = new QuestionCell(this));
+                        }
+                        
+                        cell.updateCell(this);
+                        
+                        setGraphic(cell);
+                    }
+                }
+            };
         });
-
+        
         addPane.setOnMouseClicked((MouseEvent event) ->
         {
             if (event.getButton() == MouseButton.PRIMARY)
             {
-                Question question = new Question();
-                question.setFormId(source.getForm().getId());
-                
-                addItem(new QuestionWrapper(question));
+                addItem();
             }
         });
     }
@@ -237,104 +284,108 @@ public class FormEditorPane
     private TabPane tabPane = new TabPane();
     private Tab generalTab = new Tab("Geral");
     private Tab listTab = new Tab("Perguntas");
-    
+
     //GeneralTab
     private GridPane gridPane = new GridPane();
     private Label nameLabel = new Label("Nome:");
     private TextField nameField = new TextField();
-    
+
     private Label viewersLabel = new Label("Autorizações:");
     private GroupTable viewersTable = new GroupTable();
-    
+
     private Label infoLabel = new Label("Informações:");
     private HTMLEditor infoField = new HTMLEditor();
-    
-    //ListTab
-    private VBox listbox = new VBox();
-    private HBox addPane = new HBox();
 
-    private Background background = new Background(new BackgroundFill(Paint.valueOf("#B0B0B0"),
-                                                                      CornerRadii.EMPTY,
-                                                                      Insets.EMPTY));
+    //ListTab
+    private VBox vbox = new VBox();
+    private TreeView<QuestionWrapper> questionTree = new TreeView<>();
+    private HBox addPane = new HBox();
 
     private ContextMenu contextMenu = new ContextMenu();
     private MenuItem removeItem = new MenuItem("Excluir");
     {
         removeItem.setOnAction((ActionEvent event) ->
         {
-            if (selectedCell != null)
-            {
-                questionCells.remove(selectedCell);
-                listbox.getChildren().remove(selectedCell);
-
-                selectedCell = null;
-            }
+            TreeItem selected = questionTree.getSelectionModel().getSelectedItem();
+            TreeItem parent = selected.getParent();
+            
+            int index = parent.getChildren().indexOf(selected);
+            
+            parent.getChildren().addAll(index, selected.getChildren());
+            parent.getChildren().remove(selected);
+            
+            itemMap.remove(selected);
         });
-        
+
         contextMenu.getItems().add(removeItem);
     }
 
     private class QuestionCell
             extends HBox
     {
-        private QuestionWrapper source;
-
-        public QuestionCell(QuestionWrapper question)
+        private static final int DRAG_TOP    = 1;
+        private static final int DRAG_CENTER = 2;
+        private static final int DRAG_BOTTOM = 3;
+        
+        private TreeCell<QuestionWrapper> cell;
+        
+        public QuestionCell(TreeCell<QuestionWrapper> cell)
         {
             setId(UUID.randomUUID().toString());
 
             initDragEvent();
             initComponents();
             
-            setSource(question);
+            setSource(cell);
         }
 
-        private void setSource(QuestionWrapper source)
+        private void setSource(TreeCell<QuestionWrapper> cell)
         {
-            this.source = source;
+            this.cell = cell;
             
-            Question question = source.getQuestion();
-            
-            nameField.setText(question.getName());
-            
-            Item selected = FormUtilities.getQuestionType(question.getType());
-            
-            if (!typeField.getItems().contains(selected))
+            if (cell.getTreeItem() != null)
             {
-                selected = typeField.getItems().get(0);
+                Question question = cell.getTreeItem().getValue().getQuestion();
+
+                nameField.setText(question.getName());
+                typeField.setValue(FormUtilities.getQuestionType(question.getType()));
+                optionSelector.setSelected(FormUtilities.getOption(question.getOptionId()));
+
+                attachmentSelector.setQuestion(question);
             }
+        }
+        
+        public void updateCell(TreeCell<QuestionWrapper> cell)
+        {
+            this.cell = cell;
             
-            typeField.setValue(selected);
-            optionSelector.setSelected(FormUtilities.getOption(question.getOptionId()));
-            
-            attachmentSelector.setQuestion(question);
-            
-            validate();
+            cell.setBorder(borderNone);
+            cell.getTreeItem().setExpanded(true);
         }
         
         public QuestionWrapper getSource()
         {
-            Question question = source.getQuestion();
-            
+            Question question = cell.getTreeItem().getValue().getQuestion();
+
             question.setName(nameField.getText());
             question.setType(typeField.getValue().getValue());
             question.setOptionId(optionSelector.getSelected() != null ? optionSelector.getSelected().getId() : null);
             question.setConstraints("");
-            
-            source.setAttachments(attachmentSelector.getSelected());
 
-            return source;
+            cell.getTreeItem().getValue().setAttachments(attachmentSelector.getSelected());
+
+            return cell.getTreeItem().getValue();
         }
-        
+
         private void resize()
         {
-            double width = FormEditorPane.this.getWidth() / getChildren().size();
+            double width = getWidth() / getChildren().size();
             nameField.setPrefWidth(width - 15);
             typeField.setPrefWidth(width - 15);
             optionSelector.setPrefWidth(width - 15);
             attachmentSelector.setPrefWidth(width - 15);
         }
-        
+
         public void setEnable(boolean enable)
         {
             setDisable(!enable);
@@ -342,74 +393,59 @@ public class FormEditorPane
             typeField.setDisable(!enable);
             optionSelector.setDisable(!enable);
             attachmentSelector.setDisable(!enable);
-        }
-        
-        public boolean validate()
-        {
-            boolean result = false;
-
-            Validation validation = DefaultEditor.getTextValidation(nameField);
-
-            if (result = validation.validate())
+            
+            if (enable)
             {
-                nameField.setBorder( null );
-                nameField.setTooltip( null );
-                nameField.setStyle( "-fx-faint-focus-color: transparent;" );
+                initDragEvent();
+            }
+            
+            else
+            {
+                cancelDragEvent();
+            }
+        }
+
+        private int dragOption(double eventY)
+        {
+            int result;
+            
+            double height = this.getHeight();
+
+            double top = height * (1.0 / 3.0);
+            double bottom = height * (2.0 / 3.0);
+
+            if (typeField.getValue().getValue() != Question.TYPE_CATEGORY)
+            {
+                top = height * (1.0 / 2.0);
+                bottom = height * (1.0 / 2.0);
+            }
+
+            if (eventY <= top)
+            {
+                result = DRAG_TOP;
+            }
+
+            else if (eventY >= bottom)
+            {
+                result = DRAG_BOTTOM;
             }
 
             else
             {
-                nameField.setTooltip( new Tooltip( validation.getError() ) );
-                nameField.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
-                                                                        BorderStrokeStyle.SOLID,
-                                                                        new CornerRadii( 5 ),
-                                                                        BorderWidths.DEFAULT,
-                                                                        new Insets( -1 ) ) ) );
-
-                nameField.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
+                result = DRAG_CENTER;
             }
             
-            if (typeField.getValue().getValue() == Question.TYPE_SINGLE_CHOICE ||
-                typeField.getValue().getValue() == Question.TYPE_MULTI_CHOICE)
-            {
-                validation = DefaultEditor.getTextValidation(optionSelector);
-                
-                boolean validate = validation.validate();
-                result &= validate;
-                
-                if (validate)
-                {
-                    optionSelector.setBorder( null );
-                    optionSelector.setTooltip( null );
-                    optionSelector.setStyle( "-fx-faint-focus-color: transparent;" );
-                }
-
-                else
-                {
-                    optionSelector.setTooltip( new Tooltip( validation.getError() ) );
-                    optionSelector.setBorder( new Border( new BorderStroke( Paint.valueOf( "#FF0000" ),
-                                                                            BorderStrokeStyle.SOLID,
-                                                                            new CornerRadii( 5 ),
-                                                                            BorderWidths.DEFAULT,
-                                                                            new Insets( -1 ) ) ) );
-
-                    optionSelector.setStyle( "-fx-focus-color: transparent;-fx-faint-focus-color: transparent;" );
-                }
-            }
-
             return result;
         }
-
+        
         private void initDragEvent()
         {
-            final HBox thisCell = this;
+            final QuestionCell thisCell = this;
 
             setAlignment(Pos.CENTER);
 
             setOnDragDetected(event ->
             {
-                setSelected(this);
-                
                 Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent content = new ClipboardContent();
                 content.putString(thisCell.getId());
@@ -423,21 +459,33 @@ public class FormEditorPane
                 if (event.getGestureSource() != thisCell &&
                     event.getDragboard().hasString())
                 {
-                    event.acceptTransferModes(TransferMode.MOVE);
+                    QuestionCell dragged = (QuestionCell) questionTree.lookup("#" + event.getDragboard().getString());
+                    
+                    if (!this.isChild(dragged))
+                    {
+                        event.acceptTransferModes(TransferMode.MOVE);
+
+                        switch (dragOption(event.getY()))
+                        {
+                            case DRAG_TOP:
+                                cell.setBorder(borderTop);
+                                cell.setOpacity(0.6);
+                                break;
+
+                            case DRAG_CENTER:
+                                cell.setBorder(borderAll);
+                                cell.setOpacity(0.3);
+                                break;
+
+                            case DRAG_BOTTOM:
+                                cell.setBorder(borderBottom);
+                                cell.setOpacity(0.6);
+                                break;
+                        }
+                    }
                 }
 
                 event.consume();
-            });
-
-            setOnDragEntered(event ->
-            {
-                if (event.getGestureSource() != thisCell &&
-                    event.getDragboard().hasString())
-                {
-                    setOpacity(0.3);
-                    setBorder(dragBorder);
-                    setPadding(new Insets(3));
-                }
             });
 
             setOnDragExited(event ->
@@ -445,30 +493,42 @@ public class FormEditorPane
                 if (event.getGestureSource() != thisCell &&
                     event.getDragboard().hasString())
                 {
-                    setOpacity(1);
-                    setBorder(null);
-                    setPadding(new Insets(5));
+                    cell.setOpacity(1);
+                    cell.setBorder(borderNone);
                 }
             });
 
             setOnDragDropped(event ->
             {
-                Dragboard db = event.getDragboard();
+                Dragboard dragboard = event.getDragboard();
                 boolean success = false;
 
-                if (db.hasString())
+                if (dragboard.hasString())
                 {
-                    QuestionCell dbCell = (QuestionCell) listbox.lookup("#" + db.getString());
+                    TreeItem dragged = ((QuestionCell) questionTree.lookup("#" + dragboard.getString())).cell.getTreeItem();
+                    dragged.getParent().getChildren().remove(dragged);
 
-                    ObservableList<Node> items = FXCollections.observableArrayList(listbox.getChildren());
+                    TreeItem dropped = cell.getTreeItem();
 
-                    int draggedIdx = items.indexOf(dbCell);
-                    int thisIdx = items.indexOf(thisCell);
-
-                    items.set(draggedIdx, thisCell);
-                    items.set(thisIdx, dbCell);
-
-                    listbox.getChildren().setAll(items);
+                    int index = dropped.getParent().getChildren().indexOf(dropped);
+                    
+                    switch (dragOption(event.getY()))
+                    {
+                        case DRAG_TOP:
+                            dropped.getParent().getChildren().add(index, dragged);
+                            questionTree.getSelectionModel().select(dragged);
+                            break;
+                            
+                        case DRAG_CENTER:
+                            dropped.getChildren().add(dragged);
+                            dropped.setExpanded(true);
+                            break;
+                            
+                        case DRAG_BOTTOM:
+                            dropped.getParent().getChildren().add(index + 1, dragged);
+                            questionTree.getSelectionModel().select(dragged);
+                            break;
+                    }
 
                     success = true;
                 }
@@ -480,12 +540,65 @@ public class FormEditorPane
 
             setOnDragDone(DragEvent::consume);
         }
+        
+        private void cancelDragEvent()
+        {
+            setOnDragDetected(null);
+            setOnDragOver(null);
+            setOnDragExited(null);
+            setOnDragDropped(null);
+            setOnDragDone(null);
+        }
+        
+        private boolean isChild(QuestionCell parent)
+        {
+            boolean result = false;
+            
+            TreeItem item = cell.getTreeItem();
+            
+            while (item != questionTree.getRoot())
+            {
+                if (item == parent.cell.getTreeItem())
+                {
+                    result = true;
+                    break;
+                }
+                
+                item = item.getParent();
+            }
+            
+            return result;
+        }
 
         private void initComponents()
         {
-            setSpacing(10);
-            setPadding(new Insets(5));
+            validations.add(ValidationController.addValidation(nameField));
+            validations.add(new Validation(optionSelector, optionSelector.focusedProperty(), Validation.getCallback(optionSelector))
+            {
+                @Override
+                protected String validate()
+                {
+                    String error = "";
+
+                    if (typeField.getValue().getValue() == Question.TYPE_SINGLE_CHOICE ||
+                        typeField.getValue().getValue() == Question.TYPE_MULTI_CHOICE)
+                    {
+                        if (optionSelector.getText() != null && !optionSelector.getText().isEmpty())
+                        {
+                            error = "Esse campo deve ser preenchido";
+                        }
+                    }
+
+                    return error;
+                }
+            });
             
+            setSpacing(10);
+            setPadding(new Insets(8, 0, 8, 0));
+
+            VBox.setVgrow(this, Priority.ALWAYS);
+            HBox.setHgrow(this, Priority.ALWAYS);
+
             typeField.setItems(FXCollections.observableArrayList(FormUtilities.getQuestionTypes(onlyOptions)));
             optionSelector.changePicker(new OptionPicker());
             optionSelector.setItems(FormUtilities.getOptions());
@@ -500,15 +613,10 @@ public class FormEditorPane
                 {
                     getChildren().remove(optionSelector);
                 }
-                
+
                 resize();
             });
 
-            setOnMouseClicked((MouseEvent event) ->
-            {
-                setSelected(this);
-            });
-            
             widthProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) ->
             {
                 resize();
@@ -519,9 +627,28 @@ public class FormEditorPane
         private ComboBox<Item> typeField = new ComboBox<>();
         private ItemSelector<Option> optionSelector = new ItemSelector<>();
         private AttachmentSelector attachmentSelector = new AttachmentSelector();
-        
-        private Border dragBorder = new Border(new BorderStroke(Paint.valueOf("#0066CC"),
-                                                                BorderStrokeStyle.DASHED,
+
+        private Validation optionValidation = ValidationController.addValidation(optionSelector);
+
+        private Border borderTop = new Border(new BorderStroke(Paint.valueOf("#0066CC"), null, null, null,
+                                                               BorderStrokeStyle.DASHED, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE,
+                                                               CornerRadii.EMPTY,
+                                                               new BorderWidths(2),
+                                                               Insets.EMPTY));
+
+        private Border borderBottom = new Border(new BorderStroke(null, null, Paint.valueOf("#0066CC"), null,
+                                                                  BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.DASHED, BorderStrokeStyle.NONE,
+                                                                  CornerRadii.EMPTY,
+                                                                  new BorderWidths(2),
+                                                                  Insets.EMPTY));
+
+        private Border borderAll = new Border(new BorderStroke(Paint.valueOf("#0066CC"),
+                                                               BorderStrokeStyle.DASHED,
+                                                               CornerRadii.EMPTY,
+                                                               new BorderWidths(2)));
+
+        private Border borderNone = new Border(new BorderStroke(null,
+                                                                BorderStrokeStyle.NONE,
                                                                 CornerRadii.EMPTY,
                                                                 new BorderWidths(2)));
     }

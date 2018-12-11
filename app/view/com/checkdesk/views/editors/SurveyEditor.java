@@ -7,6 +7,7 @@ package com.checkdesk.views.editors;
 
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
+import com.checkdesk.control.ValidationController;
 import com.checkdesk.control.util.CategoryUtilities;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.control.util.Item;
@@ -25,9 +26,10 @@ import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
 import com.checkdesk.views.pickers.ItemPicker;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.util.Validation;
 import java.io.File;
+import java.util.List;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
@@ -56,7 +58,7 @@ public class SurveyEditor
 
     private int pageIndex = 0;
 
-    public SurveyEditor(EditorCallback<SurveyWrapper> callback)
+    public SurveyEditor(Callback<SurveyWrapper> callback)
     {
         super(callback);
 
@@ -81,7 +83,12 @@ public class SurveyEditor
         titleField.setText(survey.getTitle());
         createdField.setDate(survey.getCreatedDate());
         typeField.setValue(SurveyUtilities.getType(survey.getType()));
-        infoField.setHtmlText(survey.getInfo() != null ? survey.getInfo() : "");
+        
+        if (survey.getInfo() != null && !survey.getInfo().isEmpty())
+        {
+            infoField.setHtmlText(survey.getInfo());
+        }
+        
         participantsTable.setGroup(survey.getParticipantsId());
         viewersTable.setGroup(survey.getParticipantsId());
         ownerSelector.setSelected(UserUtilities.getUser(survey.getOwnerId()));
@@ -107,9 +114,12 @@ public class SurveyEditor
     }
 
     @Override
-    protected boolean validateInput()
+    public List<Validation> getValidations()
     {
-        return super.validateInput() && formPane.validateInput();
+        List<Validation> validations = super.getValidations();
+        validations.addAll(formPane.getValidations());
+        
+        return validations;
     }
 
     @Override
@@ -229,34 +239,7 @@ public class SurveyEditor
     {
         addValidation(titleField);
         addValidation(ownerSelector);
-        addValidation(createdField, new Validation()
-        {
-            private String error = "";
-
-            @Override
-            public boolean validate()
-            {
-                boolean result = false;
-
-                if (createdField.getDate() == null)
-                {
-                    error = "Esse campo deve ser preenchido";
-                }
-
-                else
-                {
-                    result = true;
-                }
-
-                return result;
-            }
-
-            @Override
-            public String getError()
-            {
-                return error;
-            }
-        });
+        addValidation(ValidationController.addValidation(createdField));
         addValidation(categorySelector);
     }
 
@@ -271,6 +254,8 @@ public class SurveyEditor
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
+        infoField.setHtmlText("<html><body><font face=\"Times New Roman\"></font face></body></html>");
+        
         int count = 0;
 
         HBox.setHgrow(typeField, Priority.ALWAYS);

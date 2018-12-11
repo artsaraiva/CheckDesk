@@ -8,9 +8,13 @@ package com.checkdesk.views.panes;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.control.util.SurveyUtilities;
+import com.checkdesk.model.data.Answer;
 import com.checkdesk.model.data.Survey;
+import com.checkdesk.model.util.AnswerWrapper;
 import com.checkdesk.views.details.SurveyDetails;
 import com.checkdesk.views.parts.DefaultTable;
+import com.checkdesk.views.util.Callback;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.value.ObservableValue;
@@ -43,17 +47,55 @@ public class SurveyPane
     @Override
     protected void resize()
     {
-        selectionBox.setPrefWidth(getWidth() / 3);
-        detailsPane.setPrefWidth(getWidth() * 2 / 3);
-        selectionBox.setPrefHeight(getHeight());
-        detailsPane.setPrefHeight(getHeight());
+        if (getChildren().get(0) == hbox)
+        {
+            selectionBox.setPrefWidth(getWidth() / 3);
+            detailsPane.setPrefWidth(getWidth() * 2 / 3);
+            selectionBox.setPrefHeight(getHeight());
+            detailsPane.setPrefHeight(getHeight());
+        }
+        
+        else
+        {
+            ((DefaultPane) getChildren().get(0)).setPrefSize(getWidth(), getHeight());
+        }
     }
 
     @Override
     public void refreshContent()
     {
+        getChildren().clear();
+        getChildren().add(hbox);
+        
         surveyTable.setItems(items = SurveyUtilities.getValues());
         detailsPane.refreshContent();
+    }
+    
+    private void answerSurvey()
+    {
+        if (surveyTable.getSelectedItem() != null)
+        {
+            Answer answer = new Answer();
+            answer.setSurveyId(surveyTable.getSelectedItem().getId());
+            answer.setOccurredDate(new Timestamp(System.currentTimeMillis()));
+            answer.setOwnerId(ApplicationController.getInstance().getActiveUser().getId());
+            answer.setFeedback("");
+
+            AnswerPane pane = new AnswerPane(new Callback<AnswerWrapper>(new AnswerWrapper(answer))
+            {
+                @Override
+                public void handle(Event t)
+                {
+                    refreshContent();
+                }
+            } );
+            
+            getChildren().clear();
+            getChildren().add(pane);
+            pane.refreshContent();
+            pane.setPrefSize(getWidth(), getHeight());
+            pane.resize();
+        }
     }
     
     private void initComponents()
@@ -69,7 +111,7 @@ public class SurveyPane
 
         surveyTable.setActions(new MenuItem[]
         {
-            editItem, deleteItem
+            answerItem, editItem, deleteItem
         });
         selectionBox.getChildren().addAll(filterBox, surveyTable);
 
@@ -106,8 +148,7 @@ public class SurveyPane
             surveyTable.setItems(filterList);
         });
 
-        surveyTable.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
-                .getActiveUser(), "add.survey"));
+        surveyTable.setAddButtonDisabled(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "add.survey"));
     }
     
     private HBox hbox = new HBox();
@@ -120,14 +161,17 @@ public class SurveyPane
     private DefaultTable<Survey> surveyTable = new DefaultTable<>();
     private SurveyDetails detailsPane = new SurveyDetails();
     
+    private MenuItem answerItem = new MenuItem("Responder");
     private MenuItem editItem = new MenuItem("Editar");
     private MenuItem deleteItem = new MenuItem("Excluir");
     {
-        editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
-                .getActiveUser(), "edit.survey"));
+        editItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "edit.survey"));
+        deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance().getActiveUser(), "delete.survey"));
 
-        deleteItem.setDisable(!PermissionController.getInstance().hasPermission(ApplicationController.getInstance()
-                .getActiveUser(), "delete.survey"));
+        answerItem.setOnAction((ActionEvent t) ->
+        {
+            answerSurvey();
+        });
 
         editItem.setOnAction((ActionEvent t) ->
         {
