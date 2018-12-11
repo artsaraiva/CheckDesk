@@ -62,7 +62,7 @@ public class HeaderPane
     {
         return navigationPane.getItem();
     }
-    
+
     private void searchDictionary()
     {
         TextInputDialog dialog = new TextInputDialog("");
@@ -124,9 +124,9 @@ public class HeaderPane
                     {
                         StringBuilder def = new StringBuilder();
                         def.append("<b>def.")
-                           .append(senses.length() > 1 ? String.valueOf(i + 1) : "")
-                           .append("</b><br/>")
-                           .append(senses.getJSONObject(i).getString("def"));
+                                .append(senses.length() > 1 ? String.valueOf(i + 1) : "")
+                                .append("</b><br/>")
+                                .append(senses.getJSONObject(i).getString("def"));
 
                         definitions.add(def);
                     }
@@ -143,11 +143,45 @@ public class HeaderPane
         });
     }
 
+    private void centerImage()
+    {
+        Image img = dictionaty.getImage();
+        
+        if (img != null)
+        {
+            double w = 0;
+            double h = 0;
+
+            double ratioX = dictionaty.getFitWidth() / img.getWidth();
+            double ratioY = dictionaty.getFitHeight() / img.getHeight();
+
+            double reducCoeff = 0;
+            if (ratioX >= ratioY)
+            {
+                reducCoeff = ratioY;
+            }
+            else
+            {
+                reducCoeff = ratioX;
+            }
+
+            w = img.getWidth() * reducCoeff;
+            h = img.getHeight() * reducCoeff;
+
+            dictionaty.setX((dictionaty.getFitWidth() - w) / 2);
+            dictionaty.setY((dictionaty.getFitHeight() - h) / 2);
+
+        }
+    }
+
     private void initComponents()
     {
         setHgrow(navigationPane, Priority.ALWAYS);
-        setStyle("-fx-background-color: #20202C;");
+        getStyleClass().add("scroll-pane");
+        
         dictionaty.setImage(new Image(ResourceLocator.getInstance().getImageResource("hp_help.png")));
+        centerImage();
+        
         dictionaty.setFitWidth(40);
         dictionaty.setFitHeight(40);
         dictionaty.setCursor(Cursor.HAND);
@@ -160,7 +194,7 @@ public class HeaderPane
 
         dictionaty.setOnMouseClicked((MouseEvent t) ->
         {
-            if(t.getButton()==MouseButton.PRIMARY)
+            if (t.getButton() == MouseButton.PRIMARY)
             {
                 searchDictionary();
             }

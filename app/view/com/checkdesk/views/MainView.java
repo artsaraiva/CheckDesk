@@ -11,6 +11,7 @@ import com.checkdesk.control.ResourceLocator;
 import com.checkdesk.control.util.ReleaseUtilities;
 import com.checkdesk.views.panes.DefaultPane;
 import com.checkdesk.views.panes.HeaderPane;
+import com.checkdesk.views.panes.LoggedUserPane;
 import com.checkdesk.views.panes.MenuPane;
 import com.checkdesk.views.panes.NavigationPane;
 import com.checkdesk.views.parts.MenuItem;
@@ -61,7 +62,7 @@ public class MainView
         stage.show();
 
         ApplicationController.getInstance().setRootWindow(stage);
-         showRealeaseFile();
+        showRealeaseFile();
     }
 
     private void selectMenuItem(MenuItem selected)
@@ -95,7 +96,7 @@ public class MainView
     }
 
     private void initComponents()
-    { 
+    {
         borderPane.setTop(headerPane);
         borderPane.setLeft(menuPane);
 
@@ -127,6 +128,21 @@ public class MainView
             }
 
             setCenter(pane);
+        });
+
+        headerPane.addEventHandler(LoggedUserPane.Events.LOG_OUT, (Event event) ->
+        {
+            try
+            {
+                new LoginView().start(new Stage());
+                ApplicationController.getInstance().reset();
+                stage.close();
+            }
+
+            catch (Exception e)
+            {
+                ApplicationController.getInstance().logException(e);
+            }
         });
 
         stage.setOnCloseRequest((WindowEvent t) ->

@@ -16,6 +16,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -25,6 +27,7 @@ import javafx.stage.Window;
  */
 public class ApplicationController
 {
+
     private static ApplicationController defaultInstance;
 
     public static ApplicationController getInstance()
@@ -37,19 +40,35 @@ public class ApplicationController
         return defaultInstance;
     }
 
+    public static void reset()
+    {
+        try
+        {
+            defaultInstance.close();
+            ServerConnection.getInstance().reset();
+        }
+        catch (Exception e)
+        {
+            logException(e);
+        }
+
+        defaultInstance = null;
+
+    }
+
     public static void logException(Throwable e)
     {
         try
         {
             e.printStackTrace();
-            
+
             File file = new File("config" + File.separator + "logs");
 
             if (!file.exists() || !file.isDirectory())
             {
                 file.mkdirs();
             }
-            
+
             Date date = new Date();
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -57,7 +76,7 @@ public class ApplicationController
             file = new File(file.getAbsolutePath() + File.separator + dateFormat.format(date) + ".txt");
 
             PrintWriter printWriter = new PrintWriter(new FileOutputStream(file, true));
-            
+
             try
             {
                 e.printStackTrace(printWriter);
@@ -103,12 +122,12 @@ public class ApplicationController
         {
             return (boolean) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.ACTIVE_LOG).setWaitResponse(true));
         }
-        
+
         catch (Exception e)
         {
             logException(e);
         }
-        
+
         return false;
     }
 
@@ -117,10 +136,10 @@ public class ApplicationController
         try
         {
             ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.ACTIVE_LOG)
-                                                                  .addParameter("newValue", activeLog)
-                                                                  .setWaitResponse(false));
+                    .addParameter("newValue", activeLog)
+                    .setWaitResponse(false));
         }
-        
+
         catch (Exception e)
         {
             logException(e);
@@ -133,7 +152,7 @@ public class ApplicationController
     private ApplicationController()
     {
     }
-    
+
     public void close() throws Exception
     {
         defaultInstance = null;
@@ -151,16 +170,16 @@ public class ApplicationController
         try
         {
             activeUser = (User) ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DATABASE)
-                                                                                      .addParameter("user", login)
-                                                                                      .addParameter("password", hash(password))
-                                                                                      .setWaitResponse(true));
+                    .addParameter("user", login)
+                    .addParameter("password", hash(password))
+                    .setWaitResponse(true));
         }
-        
+
         catch (Exception e)
         {
             logException(e);
         }
-        
+
         return activeUser;
     }
 
@@ -173,22 +192,22 @@ public class ApplicationController
     {
         this.rootWindow = rootWindow;
     }
-    
+
     public void notify(Serializable object)
     {
         try
         {
             ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.NOTIFY)
-                                                                  .addParameter("object", object)
-                                                                  .setWaitResponse(false));
+                    .addParameter("object", object)
+                    .setWaitResponse(false));
         }
-        
+
         catch (Exception e)
         {
             logException(e);
         }
     }
-    
+
     public void saveFile(Attachment attachment)
     {
         try
@@ -196,34 +215,34 @@ public class ApplicationController
             if (attachment.getAttachment() != null)
             {
                 ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.UPLOAD)
-                                                                      .addParameter("object", attachment)
-                                                                      .setWaitResponse(false));
-                
+                        .addParameter("object", attachment)
+                        .setWaitResponse(false));
+
                 ServerConnection.getInstance().sendFile(attachment.getAttachment());
             }
         }
-        
+
         catch (Exception e)
         {
             logException(e);
         }
     }
-    
+
     public void downloadFile(Attachment attachment)
     {
         try
         {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialFileName( attachment.toString() );
+            fileChooser.setInitialFileName(attachment.toString());
             File file = fileChooser.showSaveDialog(getRootWindow());
-            
+
             ServerConnection.getInstance().say(new ServerRequest().setRequest(ServerRequest.DOWNLOAD)
-                                                                  .addParameter("object", attachment)
-                                                                  .setWaitResponse(false));
-            
+                    .addParameter("object", attachment)
+                    .setWaitResponse(false));
+
             ServerConnection.getInstance().receiveFile(file);
         }
-        
+
         catch (Exception e)
         {
             logException(e);

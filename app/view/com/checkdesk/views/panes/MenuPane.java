@@ -8,6 +8,7 @@ package com.checkdesk.views.panes;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.PermissionController;
 import com.checkdesk.views.parts.MenuItem;
+import com.checkdesk.views.parts.Prompts;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
@@ -31,6 +32,7 @@ public class MenuPane
     {
 
         public static final EventType<Event> EVENT_SELECT = new EventType<Event>("onSelectItem");
+
     }
 
     private MenuItem selectedItem;
@@ -89,7 +91,7 @@ public class MenuPane
                 }
             });
         }
-
+        
         getChildren().addAll(menuItems);
     }
 

@@ -183,6 +183,12 @@ public class ServerConnection
             client.close();
         }
     }
+    
+    public void reset()
+    {
+        serverConnection = null;
+        connectionListener = null;
+    }
 }
 
 class ConnectionListener extends Thread

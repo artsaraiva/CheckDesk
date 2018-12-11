@@ -53,6 +53,8 @@ and open the template in the editor.
     -fx-border-width: 2;
     -fx-border-color: #CDCDCD;
     -fx-border-style: solid;
+    -fx-border-radius: 10;
+     -fx-padding: 3;
 }
 
 /* -------- DEFAULT_TABLE -------- */
@@ -110,4 +112,11 @@ and open the template in the editor.
 .navigation-pane-button
 {
     opacity: 0.2;
+}
+
+.scroll-pane{
+    -fx-background-color: #20202C;
+}
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
 }
