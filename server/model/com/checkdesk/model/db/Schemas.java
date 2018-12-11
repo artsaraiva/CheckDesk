@@ -14,17 +14,18 @@ public class Schemas
     private static final Map<Class, Schema> mapping = new HashMap<Class, Schema>();
     static
     {
-        mapping.put(Answer.class,     new Answers(null));
-        mapping.put(Attachment.class, new Attachments(null));
-        mapping.put(Category.class,   new Categories(null));
-        mapping.put(Form.class,       new Forms(null));
-        mapping.put(Log.class,        new Logs(null));
-        mapping.put(OptionItem.class, new OptionItems(null));
-        mapping.put(Option.class,     new Options(null));
-        mapping.put(Permission.class, new Permissions(null));
-        mapping.put(Question.class,   new Questions(null));
-        mapping.put(Survey.class,     new Surveys(null));
-        mapping.put(User.class,       new Users(null));
+        mapping.put(Answer.class,         new Answers(null));
+        mapping.put(Attachment.class,     new Attachments(null));
+        mapping.put(Category.class,       new Categories(null));
+        mapping.put(Form.class,           new Forms(null));
+        mapping.put(Log.class,            new Logs(null));
+        mapping.put(OptionItem.class,     new OptionItems(null));
+        mapping.put(Option.class,         new Options(null));
+        mapping.put(Permission.class,     new Permissions(null));
+        mapping.put(Question.class,       new Questions(null));
+        mapping.put(Survey.class,         new Surveys(null));
+        mapping.put(User.class,           new Users(null));
+        mapping.put(QuestionAnswer.class, new QuestionAnswers(null));
     }
     
     public static Schema getSchema(Class type)
@@ -789,6 +790,12 @@ public class Schemas
             
             return result;
         }
+
+        @Override
+        public String orderBy()
+        {
+            return columns.REF_PARENT + " nulls first, " + columns.POSITION;
+        }
     }
     
     public static class Surveys extends Schema
@@ -964,6 +971,78 @@ public class Schemas
         public String getField(String field)
         {
             return field;
+        }
+    }
+    public static class QuestionAnswers extends Schema
+    {
+        public static class Columns
+        {
+            public final String REF_ANSWER;
+            public final String REF_QUESTION;
+            public final String VALUE;
+
+            public Columns(String alias)
+            {
+                if (!alias.isEmpty())
+                {
+                    alias += ".";
+                }
+
+                REF_ANSWER   = alias + "ref_answer";
+                REF_QUESTION = alias + "ref_question";
+                VALUE        = alias + "value";
+            }
+
+            @Override
+            public String toString()
+            {
+                return REF_ANSWER   + ", " +
+                       REF_QUESTION + ", " +
+                       VALUE;
+            }
+        }
+
+        private final String TABLE_NAME = "question_answers";
+        public final Columns columns;
+        
+        private QuestionAnswers(String alias)
+        {
+            name = alias != null ? TABLE_NAME + " " + alias : TABLE_NAME;
+
+            columns = new Columns(alias != null ? alias : TABLE_NAME);
+
+            select = "select " + columns + " from " + name;
+            
+            fetcher = new QuestionAnswersFetcher();
+        }
+
+        @Override
+        public Schema alias(String alias)
+        {
+            return new QuestionAnswers(alias);
+        }
+
+        @Override
+        public String getField(String field)
+        {
+            String result = field;
+            
+            switch (result)
+            {
+                case "answerId":
+                    result = columns.REF_ANSWER;
+                    break;
+                    
+                case "questionId":
+                    result = columns.REF_QUESTION;
+                    break;
+                    
+                case "value":
+                    result = columns.VALUE;
+                    break;
+            }
+            
+            return result;
         }
     }
 }

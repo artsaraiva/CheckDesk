@@ -10,7 +10,7 @@ import com.checkdesk.control.util.Item;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.User;
 import com.checkdesk.views.parts.MaskField;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.util.Validation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +30,7 @@ import javafx.scene.layout.Priority;
 public class UserEditor
         extends DefaultEditor<User>
 {
-    public UserEditor(EditorCallback<User> callback)
+    public UserEditor(Callback<User> callback)
     {
         super(callback);
 
@@ -78,15 +78,13 @@ public class UserEditor
     private void setValidations()
     {
         addValidation(nameField);
-        addValidation(loginField, new Validation()
+        addValidation(new Validation(loginField)
         {
-            private String error;
-
             @Override
-            public boolean validate()
+            protected String validate()
             {
-                boolean result = false;
-
+                String error = "";
+                
                 String login = loginField.getText();
 
                 if (login == null || login.isEmpty())
@@ -98,9 +96,7 @@ public class UserEditor
                 {
                     try
                     {
-                        result = UserUtilities.isUniqueLogin(source, login.toLowerCase());
-
-                        error = result ? "" : "O login informado já está sendo usado";
+                        error = UserUtilities.isUniqueLogin(source, login.toLowerCase()) ? "" : "O login informado já está sendo usado";
                     }
 
                     catch (Exception e)
@@ -108,26 +104,17 @@ public class UserEditor
                         ApplicationController.logException(e);
                     }
                 }
-
-                return result;
-            }
-
-            @Override
-            public String getError()
-            {
+                
                 return error;
             }
-
         });
 
-        addValidation(emailField, new Validation()
+        addValidation(new Validation(emailField)
         {
-            private String error;
-
             @Override
-            public boolean validate()
+            protected String validate()
             {
-                boolean result = false;
+                String error = "";
 
                 String email = emailField.getText();
 
@@ -150,9 +137,7 @@ public class UserEditor
                     {
                         try
                         {
-                            result = UserUtilities.isUniqueEmail(source, email.toLowerCase());
-
-                            error = result ? "" : "O e-mail informado já está sendo usado";
+                            error = UserUtilities.isUniqueEmail(source, email.toLowerCase()) ? "" : "O e-mail informado já está sendo usado";
                         }
 
                         catch (Exception e)
@@ -162,12 +147,6 @@ public class UserEditor
                     }
                 }
 
-                return result;
-            }
-
-            @Override
-            public String getError()
-            {
                 return error;
             }
         });

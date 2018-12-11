@@ -5,10 +5,13 @@
  */
 package com.checkdesk.views.parts;
 
-import com.checkdesk.control.ResourceLocator;
+import com.checkdesk.control.util.AnswerUtilities;
+import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
+import com.checkdesk.model.data.Answer;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
+import java.util.Date;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
@@ -29,37 +32,33 @@ import javafx.scene.shape.Circle;
 public class HomeTableItem
         extends GridPane
 {
-    private Survey survey;
-
     public HomeTableItem(Survey survey)
     {
-        setSource(survey);
+        setSource(survey.getOwnerId(), survey.getTitle(), survey.getCreatedDate(), SurveyUtilities.percentageFor(survey));
+        initComponents();
+    }
+    
+    public HomeTableItem(Answer answer)
+    {
+        setSource(answer.getOwnerId(), SurveyUtilities.getValue(answer.getSurveyId()).getTitle(), answer.getOccurredDate(), AnswerUtilities.percentageFor(answer));
         initComponents();
     }
 
-    private void setSource(Survey survey)
+    private void setSource(int ownerId, String title, Date date, double percentage)
     {
-        this.survey = survey;
-
-        iconUser.setImage(new Image(UserUtilities.getUserIcon(survey.getOwnerId())));
+        iconUser.setImage(new Image(UserUtilities.getUserIcon(ownerId)));
         iconUser.setFitHeight(70);
         iconUser.setFitWidth(70);
         
-        surveyLabel.setText(survey.getTitle());
+        surveyLabel.setText(title);
 
         DateFormat df = DateFormat.getDateInstance();
-        dueLabel.setText(df.format(survey.getCreatedDate()));
+        dueLabel.setText(df.format(date));
         
-        double randomValue = Math.random();
-        progressIndicator.setProgress(randomValue);
-        tooltip.setText(String.format("%.2f%%", randomValue * 100));
+        progressIndicator.setProgress(percentage);
+        tooltip.setText(String.format("%.2f%%", percentage * 100));
     }
     
-    public Survey getSurvey()
-    {
-        return survey;
-    }
-
     private void initComponents()
     {
         iconUser.setClip(new Circle(35, 35, 35, Paint.valueOf("#FFFFFF")));

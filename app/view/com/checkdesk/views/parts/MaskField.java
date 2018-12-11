@@ -17,14 +17,12 @@ import javafx.scene.control.TextField;
  */
 public class MaskField
         extends TextField
-        implements Validation
 {
     public static final int MASK_NONE = -1;
     public static final int MASK_PHONE = 0;
 
-    private String error;
-
     private int mode;
+    private Validation validation;
 
     public MaskField()
     {
@@ -34,52 +32,25 @@ public class MaskField
     public MaskField(int m)
     {
         this.mode = m;
+        this.validation = new MaskValidation();
 
-        lengthProperty().addListener(new ChangeListener<Number>()
+        lengthProperty().addListener((ObservableValue<? extends Number> ov, Number oldLenght, Number newLenght) ->
         {
-            @Override
-            public void changed(ObservableValue<? extends Number> ov, Number oldLenght, Number newLenght)
+            String result = "";
+            
+            switch (mode)
             {
-                String result = "";
-
-                switch (mode)
+                case MASK_PHONE:
                 {
-                    case MASK_PHONE:
-                    {
-                        result = UserUtilities.maskPhone(getText());
-                    }
-                    break;
-                }
-
-                setText(result);
-
-                positionCaret(newLenght.intValue());
-            }
-
-        });
-    }
-
-    @Override
-    public boolean validate()
-    {
-        error = "";
-
-        if (getText() == null || getText().isEmpty())
-        {
-            error = "Esse campo deve ser preenchido";
-        }
-
-        switch (mode)
-        {
-            case MASK_PHONE:
-                if (error.isEmpty() && getValue().length() < 10)
-                {
-                    error = "Esse campo está incompleto";
+                    result = UserUtilities.maskPhone(getText());
                 }
                 break;
-        }
+            }
 
-        return error.isEmpty();
+            setText(result);
+            
+            positionCaret(newLenght.intValue());
+        });
     }
 
     public int getLimit()
@@ -96,12 +67,6 @@ public class MaskField
         return result;
     }
 
-    @Override
-    public String getError()
-    {
-        return error;
-    }
-
     public String getValue()
     {
         String result = getText();
@@ -116,5 +81,42 @@ public class MaskField
         }
 
         return result;
+    }
+    
+    public Validation getValidation()
+    {
+        return validation;
+    }
+    
+    private class MaskValidation
+            extends Validation
+    {
+        public MaskValidation()
+        {
+            super(MaskField.this);
+        }
+        
+        @Override
+        public String validate()
+        {
+            String error = "";
+
+            if (getText() == null || getText().isEmpty())
+            {
+                error = "Esse campo deve ser preenchido";
+            }
+
+            switch (mode)
+            {
+                case MASK_PHONE:
+                    if (error.isEmpty() && getValue().length() < 10)
+                    {
+                        error = "Esse campo está incompleto";
+                    }
+                    break;
+            }
+
+            return error;
+        }
     }
 }

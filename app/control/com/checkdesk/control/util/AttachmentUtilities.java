@@ -13,7 +13,7 @@ import com.checkdesk.model.util.Parameter;
 import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.AttachmentEditor;
 import com.checkdesk.views.parts.Prompts;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.event.Event;
@@ -28,7 +28,7 @@ public class AttachmentUtilities
     {
         List<Attachment> result = new ArrayList();
         
-        if (question.getId() != 0)
+        if (question != null && question.getId() != 0)
         {
             try
             {
@@ -51,7 +51,7 @@ public class AttachmentUtilities
     {
         final boolean[] b = {false};
         
-        new AttachmentEditor(new EditorCallback<Attachment>(attachment)
+        new AttachmentEditor(new Callback<Attachment>(attachment)
         {
             @Override
             public void handle(Event t)

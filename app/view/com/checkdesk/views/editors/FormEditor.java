@@ -7,7 +7,9 @@ package com.checkdesk.views.editors;
 
 import com.checkdesk.model.util.FormWrapper;
 import com.checkdesk.views.panes.FormEditorPane;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
+import com.checkdesk.views.util.Validation;
+import java.util.List;
 
 /**
  *
@@ -16,7 +18,7 @@ import com.checkdesk.views.util.EditorCallback;
 public class FormEditor
         extends DefaultEditor<FormWrapper>
 {
-    public FormEditor(EditorCallback<FormWrapper> callback)
+    public FormEditor(Callback<FormWrapper> callback)
     {
         super(callback);
         
@@ -40,9 +42,9 @@ public class FormEditor
     }
 
     @Override
-    protected boolean validateInput()
+    public List<Validation> getValidations()
     {
-        return formPane.validateInput();
+        return formPane.getValidations();
     }
     
     private void initComponents()

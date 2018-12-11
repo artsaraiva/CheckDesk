@@ -10,6 +10,7 @@ import com.checkdesk.model.util.ServerRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -55,7 +56,8 @@ public class HandleClient extends Thread
             else
             {
                 controller = ApplicationController.getInstance();
-                System.out.println("Client connected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                System.out.println("--------------------------------\n" +
+                                   "Client connected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
                                    "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
                                    "--------------------------------\n" );
                 
@@ -81,7 +83,8 @@ public class HandleClient extends Thread
                     }
                 }
                 
-                System.out.println("Client disconnected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
+                System.out.println("--------------------------------\n" +
+                                   "Client disconnected: " + new Timestamp(System.currentTimeMillis()) + "\n" +
                                    "IP Address: " + client.getInetAddress().getHostAddress() + "\n" +
                                    "--------------------------------\n" );
                 
@@ -114,8 +117,13 @@ public class HandleClient extends Thread
         
         else
         {
-            out.writeObject(null);
-            client.close();
+            try
+            {
+                out.writeObject(null);
+                client.close();
+            }
+            
+            catch (IOException e) {}
         }
     }
     

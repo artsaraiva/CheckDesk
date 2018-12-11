@@ -8,8 +8,8 @@ package com.checkdesk.model.util;
 import com.checkdesk.control.util.FormUtilities;
 import com.checkdesk.model.data.Form;
 import com.checkdesk.model.data.Question;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,7 +18,7 @@ import java.util.List;
 public class FormWrapper
 {
     private Form form;
-    private List<QuestionWrapper> questions;
+    private Map<QuestionWrapper, List<QuestionWrapper>> questions;
     private int type;
 
     public FormWrapper(Form form)
@@ -29,14 +29,9 @@ public class FormWrapper
     public FormWrapper(Form form, List<Question> questions)
     {
         this.form = form;
-        this.questions = new ArrayList<>();
-        
-        for (Question question : questions)
-        {
-            this.questions.add(new QuestionWrapper(question));
-        }
+        this.questions = FormUtilities.questionListToMap(questions);
     }
-
+    
     public Form getForm()
     {
         return form;
@@ -47,12 +42,12 @@ public class FormWrapper
         this.form = form;
     }
 
-    public List<QuestionWrapper> getQuestions()
+    public Map<QuestionWrapper, List<QuestionWrapper>> getQuestions()
     {
         return questions;
     }
 
-    public void setQuestions(List<QuestionWrapper> questions)
+    public void setQuestions(Map<QuestionWrapper, List<QuestionWrapper>> questions)
     {
         this.questions = questions;
     }

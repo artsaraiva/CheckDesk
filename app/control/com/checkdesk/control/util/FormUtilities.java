@@ -18,13 +18,16 @@ import com.checkdesk.model.util.Parameter;
 import com.checkdesk.model.util.QuestionWrapper;
 import com.checkdesk.views.editors.FormEditor;
 import com.checkdesk.views.editors.OptionEditor;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.parts.Prompts;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -49,7 +52,6 @@ import org.w3c.dom.NodeList;
  */
 public class FormUtilities
 {
-
     public static final Item TYPE_CATEGORY = new Item("Categoria", Question.TYPE_CATEGORY);
     public static final Item TYPE_SMALL_TEXT = new Item("Texto", Question.TYPE_SMALL_TEXT);
     public static final Item TYPE_LARGE_TEXT = new Item("Texto Grande", Question.TYPE_LARGE_TEXT);
@@ -64,7 +66,7 @@ public class FormUtilities
     {
         Form form = new Form();
 
-        new FormEditor(new EditorCallback<FormWrapper>(new FormWrapper(form))
+        new FormEditor(new Callback<FormWrapper>(new FormWrapper(form))
         {
             @Override
             public void handle(Event t)
@@ -84,7 +86,7 @@ public class FormUtilities
 
     public static void editForm(Form form)
     {
-        new FormEditor(new EditorCallback<FormWrapper>(new FormWrapper(form))
+        new FormEditor(new Callback<FormWrapper>(new FormWrapper(form))
         {
             @Override
             public void handle(Event t)
@@ -134,13 +136,7 @@ public class FormUtilities
         {
             formWrapper.setForm((Form) EntityService.getInstance().insert(formWrapper.getForm()));
 
-            for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
-            {
-                questionWrapper.getQuestion().setFormId(formWrapper.getForm().getId());
-
-                questionWrapper.setQuestion((Question) EntityService.getInstance().insert(questionWrapper.getQuestion()));
-                AttachmentUtilities.saveAttachments(questionWrapper);
-            }
+            save(null, formWrapper.getForm(), formWrapper.getQuestions());
         }
 
         else
@@ -149,11 +145,19 @@ public class FormUtilities
                                                                                 new Parameter(Question.class.getDeclaredField("formId"),
                                                                                         formWrapper.getForm().getId(),
                                                                                         Parameter.COMPARATOR_EQUALS));
+            
+            Set<QuestionWrapper> currentQuestions = new HashSet<>();
+            
+            formWrapper.getQuestions().values().forEach((list) ->
+            {
+                currentQuestions.addAll(list);
+            });
+            
             for (Question deletable : oldQuestions)
             {
                 boolean delete = true;
 
-                for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
+                for (QuestionWrapper questionWrapper : currentQuestions)
                 {
                     if (deletable.equals(questionWrapper.getQuestion()))
                     {
@@ -169,22 +173,43 @@ public class FormUtilities
                 }
             }
 
-            for (QuestionWrapper questionWrapper : formWrapper.getQuestions())
+            formWrapper.setForm((Form) EntityService.getInstance().update(formWrapper.getForm()));
+
+            save(null, formWrapper.getForm(), formWrapper.getQuestions());
+        }
+    }
+    
+    private static void save(QuestionWrapper wrapper, Form form, Map<QuestionWrapper, List<QuestionWrapper>> map) throws Exception
+    {
+        Integer id = null;
+        
+        if (wrapper != null)
+        {
+            wrapper.getQuestion().setFormId(form.getId());
+
+            if (wrapper.getQuestion().getId() == 0)
             {
-                if (questionWrapper.getQuestion().getId() == 0)
-                {
-                    questionWrapper.setQuestion((Question) EntityService.getInstance().insert(questionWrapper.getQuestion()));
-                }
-
-                else
-                {
-                    questionWrapper.setQuestion((Question) EntityService.getInstance().update(questionWrapper.getQuestion()));
-                }
-
-                AttachmentUtilities.saveAttachments(questionWrapper);
+                wrapper.setQuestion((Question) EntityService.getInstance().insert(wrapper.getQuestion()));
             }
 
-            formWrapper.setForm((Form) EntityService.getInstance().update(formWrapper.getForm()));
+            else
+            {
+                wrapper.setQuestion((Question) EntityService.getInstance().update(wrapper.getQuestion()));
+            }
+            
+            id = wrapper.getQuestion().getId();
+            
+            AttachmentUtilities.saveAttachments(wrapper);
+        }
+        
+        int count = 0;
+        
+        for (QuestionWrapper questionWrapper : map.get(wrapper))
+        {
+            questionWrapper.getQuestion().setPosition(count++);
+            questionWrapper.getQuestion().setParentId(id);
+            
+            save(questionWrapper, form, map);
         }
     }
 
@@ -310,7 +335,6 @@ public class FormUtilities
 
                             if (questions.getNodeType() == Node.ELEMENT_NODE)
                             {
-
                                 Element question = (Element) questions;
 
                                 questionName = question.getAttribute("name");
@@ -344,6 +368,7 @@ public class FormUtilities
         {
             ApplicationController.logException(e);
         }
+        
         return form != null ? new FormWrapper(form, questionList) : null;
     }
 
@@ -420,7 +445,7 @@ public class FormUtilities
     {
         if (onlyOptions)
         {
-            return Arrays.asList(TYPE_SINGLE_CHOICE, TYPE_MULTI_CHOICE);
+            return Arrays.asList(TYPE_CATEGORY, TYPE_SINGLE_CHOICE, TYPE_MULTI_CHOICE);
         }
         
         return Arrays.asList(TYPE_CATEGORY,
@@ -434,7 +459,7 @@ public class FormUtilities
     
     public static void addOption()
     {
-        new OptionEditor(new EditorCallback<OptionWrapper>(new OptionWrapper(new Option()))
+        new OptionEditor(new Callback<OptionWrapper>(new OptionWrapper(new Option()))
         {
             @Override
             public void handle(Event t)
@@ -463,7 +488,7 @@ public class FormUtilities
     
     public static void editOption(Option option)
     {
-        new OptionEditor(new EditorCallback<OptionWrapper>(new OptionWrapper(option))
+        new OptionEditor(new Callback<OptionWrapper>(new OptionWrapper(option))
         {
             @Override
             public void handle(Event t)
@@ -548,7 +573,7 @@ public class FormUtilities
         {
             try
             {
-                result = (Option) EntityService.getInstance().getValue(Option.class, optionId);
+                result = (Option) EntityService.getInstance().getValue(Option.class, (int) optionId);
             }
 
             catch (Exception e)
@@ -598,6 +623,50 @@ public class FormUtilities
             ApplicationController.logException(e);
         }
 
+        return result;
+    }
+
+    public static Map<QuestionWrapper, List<QuestionWrapper>> questionListToMap(List<Question> questions)
+    {
+        Map<QuestionWrapper, List<QuestionWrapper>> result = new HashMap<>();
+        Map<Question, QuestionWrapper> questionMap = new HashMap<>();
+        
+        for (Question question : questions)
+        {
+            QuestionWrapper parent = questionMap.get(findQuestion(question.getParentId(), questions));
+            
+            List<QuestionWrapper> list = result.get(parent);
+            
+            if (list == null)
+            {
+                result.put(parent, list = new ArrayList<>());
+            }
+            
+            QuestionWrapper wrapper = new QuestionWrapper(question);
+            
+            questionMap.put(question, wrapper);
+            list.add(wrapper);
+        }
+        
+        return result;
+    }
+
+    private static Question findQuestion(Integer id, List<Question> questions)
+    {
+        Question result = null;
+        
+        if (id != null)
+        {
+            for (Question question : questions)
+            {
+                if (question.getId() == id)
+                {
+                    result = question;
+                    break;
+                }
+            }
+        }
+        
         return result;
     }
 

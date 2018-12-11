@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -424,7 +423,8 @@ public class EntityService
         else if (field == null)
         {
             return schema.select +
-                   (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner;
+                   (!paramJoiner.toString().isEmpty() ? " where " : "" ) + paramJoiner +
+                   (!schema.orderBy().isEmpty() ? " order by " : "") + schema.orderBy();
         }
         
         else

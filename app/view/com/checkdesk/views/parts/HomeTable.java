@@ -5,6 +5,7 @@
  */
 package com.checkdesk.views.parts;
 
+import com.checkdesk.model.data.Answer;
 import com.checkdesk.model.data.Survey;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,16 +57,20 @@ public class HomeTable
         updateTitle();
     }
 
-    public Survey getSurvey()
+    public void setAnswers(List<Answer> answers)
     {
-        Survey result = null;
+        getVBoxChildren().clear();
 
-        if (selected != null)
+        if (answers != null)
         {
-            result = selected.getSurvey();
+            for (Answer a : answers)
+            {
+                getVBoxChildren().add(createItem(a));
+            }
         }
 
-        return result;
+        updateTitle();
+        HBox.setHgrow(vbox, Priority.ALWAYS);
     }
 
     public void setSurveys(List<Survey> surveys)
@@ -87,6 +92,27 @@ public class HomeTable
     public void bindSelection(HomeTable table)
     {
         bindedTables.add(table);
+    }
+
+    private HomeTableItem createItem(Answer answer)
+    {
+        final HomeTableItem item = new HomeTableItem(answer);
+        item.getStyleClass().add("home-cell");
+        
+        scrollPane.prefWidthProperty().bind(widthProperty());
+        scrollPane.prefHeightProperty().bind(heightProperty());
+        
+        scrollPane.viewportBoundsProperty().addListener((ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) ->
+        {
+            item.setPrefWidth(scrollPane.getViewportBounds().getWidth());
+        });
+        
+        item.setOnMouseClicked((MouseEvent event) ->
+        {
+            setSelected(item);
+        });
+        
+        return item;
     }
 
     private HomeTableItem createItem(Survey survey)

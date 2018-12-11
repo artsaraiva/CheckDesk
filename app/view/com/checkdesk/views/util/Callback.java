@@ -11,16 +11,16 @@ import javafx.event.EventHandler;
  *
  * @author MNicaretta
  */
-public abstract class EditorCallback<T>
+public abstract class Callback<T>
         implements EventHandler
 {
     private T source;
-    
-    public EditorCallback( T source )
+
+    public Callback(T source)
     {
         this.source = source;
     }
-    
+
     public T getSource()
     {
         return this.source;

@@ -12,7 +12,6 @@ import com.checkdesk.views.util.PermissionItem;
 import com.checkdesk.model.data.Group;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.Parameter;
-import java.util.Arrays;
 import javafx.scene.control.TreeItem;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

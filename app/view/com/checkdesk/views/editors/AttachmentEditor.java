@@ -6,7 +6,7 @@
 package com.checkdesk.views.editors;
 
 import com.checkdesk.model.data.Attachment;
-import com.checkdesk.views.util.EditorCallback;
+import com.checkdesk.views.util.Callback;
 import java.io.File;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,7 +27,7 @@ public class AttachmentEditor
 {
     private File file;
     
-    public AttachmentEditor(EditorCallback<Attachment> callback)
+    public AttachmentEditor(Callback<Attachment> callback)
     {
         super(callback);
         
