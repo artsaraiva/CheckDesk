@@ -46,7 +46,7 @@ public class QuestionAnswersFetcher
                     value.getAnswerId()        + ", " +
                     value.getQuestionId()      + ", " +
                     db.quote(value.getValue()) +
-               " )";
+               " ) returning 0";
     }
 
     @Override

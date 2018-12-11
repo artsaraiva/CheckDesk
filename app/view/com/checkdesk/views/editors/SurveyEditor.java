@@ -25,6 +25,7 @@ import com.checkdesk.views.parts.BrowseButton;
 import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.parts.GroupTable;
 import com.checkdesk.views.parts.ItemSelector;
+import com.checkdesk.views.pickers.CategoryPicker;
 import com.checkdesk.views.pickers.ItemPicker;
 import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.util.Validation;
@@ -110,14 +111,20 @@ public class SurveyEditor
         survey.setOwnerId(ownerSelector.getSelected().getId());
         survey.setCategoryId(categorySelector.getSelected().getId());
 
-        formPane.obtainInput();
+        if (formPane != null)
+        {
+            formPane.obtainInput();
+        }
     }
 
     @Override
     public List<Validation> getValidations()
     {
         List<Validation> validations = super.getValidations();
-        validations.addAll(formPane.getValidations());
+        if (formPane != null)
+        {
+            validations.addAll(formPane.getValidations());
+        }
         
         return validations;
     }
@@ -200,7 +207,10 @@ public class SurveyEditor
 
         if (picker.getSelected() != null)
         {
-            FormWrapper wrapper = new FormWrapper(picker.getSelected().clone());
+            Form form = picker.getSelected();
+            
+            FormWrapper wrapper = new FormWrapper(form);
+            wrapper.setForm(form.clone());
             wrapper.setType(typeField.getSelectionModel().getSelectedItem().getValue());
             
             source.setFormWrapper(wrapper);
@@ -254,7 +264,7 @@ public class SurveyEditor
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        infoField.setHtmlText("<html><body><font face=\"Times New Roman\"></font face></body></html>");
+        categorySelector.changePicker(new CategoryPicker());
         
         int count = 0;
 

@@ -62,7 +62,6 @@ public class MainView
         stage.show();
 
         ApplicationController.getInstance().setRootWindow(stage);
-        showRealeaseFile();
     }
 
     private void selectMenuItem(MenuItem selected)

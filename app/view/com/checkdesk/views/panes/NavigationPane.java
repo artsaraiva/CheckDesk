@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -116,6 +115,8 @@ public class NavigationPane
 
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.CENTER_LEFT);
+
+        setStyle("-fx-background-color: #20202C;");
 
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);

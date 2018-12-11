@@ -192,11 +192,11 @@ public class FormEditorPane
 
     private void initComponents()
     {
+        validations.add(ValidationController.addValidation(nameField));
+        
         //GeneralTab
         int count = 0;
 
-//        infoField.setHtmlText("<body><font face=\"Times New Roman\"></font face></body></html>");
-        
         VBox.setVgrow(viewersTable, Priority.ALWAYS);
         VBox.setVgrow(infoField, Priority.ALWAYS);
 
@@ -580,12 +580,15 @@ public class FormEditorPane
                 {
                     String error = "";
 
-                    if (typeField.getValue().getValue() == Question.TYPE_SINGLE_CHOICE ||
-                        typeField.getValue().getValue() == Question.TYPE_MULTI_CHOICE)
+                    if (typeField.getValue() != null)
                     {
-                        if (optionSelector.getText() != null && !optionSelector.getText().isEmpty())
+                        if (typeField.getValue().getValue() == Question.TYPE_SINGLE_CHOICE ||
+                            typeField.getValue().getValue() == Question.TYPE_MULTI_CHOICE)
                         {
-                            error = "Esse campo deve ser preenchido";
+                            if (optionSelector.getText() == null || optionSelector.getText().isEmpty())
+                            {
+                                error = "Esse campo deve ser preenchido";
+                            }
                         }
                     }
 

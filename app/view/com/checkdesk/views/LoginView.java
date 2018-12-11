@@ -153,8 +153,10 @@ public class LoginView
         {
             try
             {
-                new MainView().start(new Stage());
+                MainView main = new MainView();
+                main.start(new Stage());
                 stage.close();
+                main.showRealeaseFile();
             }
             catch (Exception e)
             {

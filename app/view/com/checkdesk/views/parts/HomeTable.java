@@ -6,6 +6,7 @@
 package com.checkdesk.views.parts;
 
 import com.checkdesk.model.data.Answer;
+import com.checkdesk.model.data.Entity;
 import com.checkdesk.model.data.Survey;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ public class HomeTable
         extends VBox
 {
     public static final EventType SELECT = new EventType("onSelect");
+    public static final EventType EDIT = new EventType("onEdit");
 
     private String title;
 
@@ -109,7 +111,16 @@ public class HomeTable
         
         item.setOnMouseClicked((MouseEvent event) ->
         {
-            setSelected(item);
+            if (event.getClickCount() == 2)
+            {
+                this.selected = item;
+                fireEvent(new Event(EDIT));
+            }
+            
+            else
+            {
+                setSelected(item);
+            }
         });
         
         return item;
@@ -160,6 +171,18 @@ public class HomeTable
         selected.getStyleClass().add("home-cell-selected");
 
         fireEvent(new Event(SELECT));
+    }
+    
+    public Entity getSelectedSource()
+    {
+        Entity result = null;
+        
+        if (selected != null)
+        {
+            result = selected.getSource();
+        }
+        
+        return result;
     }
 
     private void updateTitle()

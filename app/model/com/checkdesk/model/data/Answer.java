@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 public class Answer
         extends Entity
 {
+    public static final int STATE_FINISHED = 2;
+    
     private int surveyId;
     private int ownerId;
     private String feedback;

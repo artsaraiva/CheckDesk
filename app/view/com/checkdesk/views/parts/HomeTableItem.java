@@ -9,6 +9,7 @@ import com.checkdesk.control.util.AnswerUtilities;
 import com.checkdesk.control.util.SurveyUtilities;
 import com.checkdesk.control.util.UserUtilities;
 import com.checkdesk.model.data.Answer;
+import com.checkdesk.model.data.Entity;
 import com.checkdesk.model.data.Survey;
 import java.text.DateFormat;
 import java.util.Date;
@@ -32,14 +33,20 @@ import javafx.scene.shape.Circle;
 public class HomeTableItem
         extends GridPane
 {
+    private Entity source;
+    
     public HomeTableItem(Survey survey)
     {
+        this.source = survey;
+        
         setSource(survey.getOwnerId(), survey.getTitle(), survey.getCreatedDate(), SurveyUtilities.percentageFor(survey));
         initComponents();
     }
     
     public HomeTableItem(Answer answer)
     {
+        this.source = answer;
+        
         setSource(answer.getOwnerId(), SurveyUtilities.getValue(answer.getSurveyId()).getTitle(), answer.getOccurredDate(), AnswerUtilities.percentageFor(answer));
         initComponents();
     }
@@ -57,6 +64,11 @@ public class HomeTableItem
         
         progressIndicator.setProgress(percentage);
         tooltip.setText(String.format("%.2f%%", percentage * 100));
+    }
+
+    public Entity getSource()
+    {
+        return source;
     }
     
     private void initComponents()

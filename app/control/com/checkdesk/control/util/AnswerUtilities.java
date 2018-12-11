@@ -8,6 +8,7 @@ package com.checkdesk.control.util;
 import com.checkdesk.control.ApplicationController;
 import com.checkdesk.control.ValidationController;
 import com.checkdesk.model.data.Answer;
+import com.checkdesk.model.data.Entity;
 import com.checkdesk.model.data.Option;
 import com.checkdesk.model.data.OptionItem;
 import com.checkdesk.model.data.Question;
@@ -16,23 +17,20 @@ import com.checkdesk.model.data.Survey;
 import com.checkdesk.model.db.service.EntityService;
 import com.checkdesk.model.util.AnswerWrapper;
 import com.checkdesk.model.util.Parameter;
-import com.checkdesk.views.details.util.DetailsCaption;
+import static com.checkdesk.model.util.Parameter.COMPARATOR_UNLIKE;
 import com.checkdesk.views.parts.DatePicker;
 import com.checkdesk.views.util.Callback;
 import com.checkdesk.views.util.Validation;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -132,6 +130,13 @@ public class AnswerUtilities
                 Option option = FormUtilities.getOption(question.getOptionId());
                 CheckBox checkbox = null;
                 
+                String[] values = new String[0];
+                
+                if (value != null)
+                {
+                    values = value.split(";");
+                }
+                
                 for (OptionItem item : FormUtilities.getOptionItems(option))
                 {
                     checkbox = new CheckBox(item.getName());
@@ -139,9 +144,12 @@ public class AnswerUtilities
                     
                     hbox.getChildren().add(checkbox);
                     
-                    if (item.getValue().equals(value))
+                    for (String v : values)
                     {
-                        checkbox.setSelected(true);
+                        if (item.getValue().equals(v))
+                        {
+                            checkbox.setSelected(true);
+                        }
                     }
                 }
                 
@@ -495,6 +503,11 @@ public class AnswerUtilities
             break;
         }
         
+        if (result != null && result.isEmpty() && question.getType() != Question.TYPE_CATEGORY)
+        {
+            result = null;
+        }
+        
         return result;
     }
     
@@ -506,7 +519,7 @@ public class AnswerUtilities
         {
             try
             {
-                result = EntityService.getInstance().getValues(QuestionAnswer.class, new Parameter(QuestionAnswer.class.getDeclaredField("answerId"),
+                result = EntityService.getInstance().getValues(QuestionAnswer.class, true, new Parameter(QuestionAnswer.class.getDeclaredField("answerId"),
                                                                                                    answer.getId(),
                                                                                                    Parameter.COMPARATOR_EQUALS));
             }
@@ -561,7 +574,7 @@ public class AnswerUtilities
         return result;
     }
     
-    public static List<Answer> getOwnedAnswers()
+    public static List<Answer> getPendingAnswers()
     {
         List<Answer> result = new ArrayList<>();
 
@@ -569,7 +582,10 @@ public class AnswerUtilities
         {
             result = EntityService.getInstance().getValues(Answer.class, new Parameter(Answer.class.getDeclaredField("ownerId"),
                                                                                        ApplicationController.getInstance().getActiveUser().getId(),
-                                                                                       Parameter.COMPARATOR_EQUALS));
+                                                                                       Parameter.COMPARATOR_EQUALS),
+                                                                         new Parameter(Entity.class.getDeclaredField("state"),
+                                                                                       Answer.STATE_FINISHED,
+                                                                                       COMPARATOR_UNLIKE));
         }
 
         catch (Exception e)
@@ -610,9 +626,7 @@ public class AnswerUtilities
         {
             try
             {
-//                result = EntityService.getInstance().getValues(Answer.class, new Parameter(Answer.class.getDeclaredField("ownerId"),
-//                                                                                           ApplicationController.getInstance().getActiveUser().getId(),
-//                                                                                           Parameter.COMPARATOR_EQUALS));
+                result = ((BigDecimal) EntityService.getInstance().executeFunction("answer_percentage_concluded", Arrays.asList(answer.getId()))).doubleValue();
             }
 
             catch (Exception e)

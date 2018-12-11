@@ -18,15 +18,18 @@ and open the template in the editor.
         <item name="add.survey" allow="true"/>
         <item name="add.form" allow="true"/>
         <item name="add.option" allow="true"/>
+        <item name="add.category" allow="true"/>
         <item name="edit.user" allow="true"/>
         <item name="edit.survey" allow="true"/>
         <item name="edit.form" allow="true"/>
         <item name="edit.permission" allow="true"/>
         <item name="edit.log" allow="true"/>
         <item name="edit.option" allow="true"/>
+        <item name="edit.category" allow="true"/>
         <item name="delete.user" allow="true"/>
         <item name="delete.survey" allow="true"/>
         <item name="delete.option" allow="true"/>
+        <item name="delete.category" allow="true"/>
         <item name="export.form" allow="true"/>
         <item name="import.form" allow="true"/>
         <item name="delete.form" allow="true"/>
@@ -43,10 +46,12 @@ and open the template in the editor.
         <item name="add.survey" allow="true"/>
         <item name="add.form" allow="true"/>
         <item name="add.option" allow="true"/>
+        <item name="add.category" allow="true"/>
         <item name="edit.user" allow="true"/>
         <item name="edit.survey" allow="true"/>
         <item name="edit.form" allow="true"/>
         <item name="edit.option" allow="true"/>
+        <item name="edit.category" allow="true"/>
         <item name="export.form" allow="true"/>
         <item name="import.form" allow="true"/>
     </type>

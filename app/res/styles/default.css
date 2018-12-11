@@ -114,9 +114,7 @@ and open the template in the editor.
     opacity: 0.2;
 }
 
-.scroll-pane{
+.header-pane
+{
     -fx-background-color: #20202C;
-}
-.scroll-pane > .viewport {
-   -fx-background-color: transparent;
 }

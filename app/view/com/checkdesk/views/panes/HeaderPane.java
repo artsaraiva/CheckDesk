@@ -177,7 +177,7 @@ public class HeaderPane
     private void initComponents()
     {
         setHgrow(navigationPane, Priority.ALWAYS);
-        getStyleClass().add("scroll-pane");
+        getStyleClass().add("header-pane");
         
         dictionaty.setImage(new Image(ResourceLocator.getInstance().getImageResource("hp_help.png")));
         centerImage();

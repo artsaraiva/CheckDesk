@@ -21,6 +21,7 @@ and open the template in the editor.
         <item name="add.survey" label="Adicionar Pesquisa"/>
         <item name="add.form" label="Adicionar Formulário"/>
         <item name="add.option" label="Adicionar Opção"/>
+        <item name="add.category" label="Adicionar Categoria"/>
     </item>
     <item label="Editar">
         <item name="edit.user" label="Editar Usuário"/>
@@ -28,12 +29,14 @@ and open the template in the editor.
         <item name="edit.form" label="Editar Formulário"/>
         <item name="edit.permission" label="Modificar Permissões"/>
         <item name="edit.option" label="Editar Opção"/>
+        <item name="edit.category" label="Editar Categoria"/>
     </item>
     <item label="Excluir">
         <item name="delete.user" label="Excluir Usuário"/>
         <item name="delete.survey" label="Excluir Pesquisa"/>
         <item name="delete.form" label="Excluir Formulário"/>
         <item name="delete.option" label="Excluir Opção"/>
+        <item name="delete.category" label="Excluir Categoria"/>
     </item>
     <item name="edit.log" label="Ativar/Desativar auditorias"/>
     <item name="export.form" label="Exportar Formulário"/>

@@ -185,7 +185,10 @@ public class SurveyUtilities
         
         for (Answer answer : answers)
         {
-            result += AnswerUtilities.percentageFor(answer);
+            if (answer.getState() == Answer.STATE_FINISHED)
+            {
+                result++;
+            }
         }
         
         if (!answers.isEmpty())

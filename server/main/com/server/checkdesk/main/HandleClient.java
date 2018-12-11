@@ -109,10 +109,10 @@ public class HandleClient extends Thread
         if (object != null)
         {
             ServerRequest request = new ServerRequest().setRequest(ServerRequest.NOTIFY)
-                    .addParameter("object", object)
-                    .setWaitResponse(false);
+                                                       .addParameter("object", object)
+                                                       .setWaitResponse(false);
 
-            out.flush();
+//            out.flush();
             out.writeObject(request);
         }
 

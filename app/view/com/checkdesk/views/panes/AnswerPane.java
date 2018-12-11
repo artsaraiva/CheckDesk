@@ -129,9 +129,15 @@ public class AnswerPane
         if (validate())
         {
             callback.getSource().getAnswer().setFeedback(Prompts.input("Feedback da pesquisa", "Deixe seu feedback da pesquisa"));
+            callback.getSource().getAnswer().setState(Answer.STATE_FINISHED);
             
             save();
             close();
+        }
+        
+        else
+        {
+            Prompts.info("Existem campos com erros!");
         }
     }
     

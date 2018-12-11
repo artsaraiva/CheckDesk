@@ -216,7 +216,7 @@ public class FormUtilities
     public static void exportForm(Form form)
     {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialFileName("formulario" + System.currentTimeMillis());
+        fileChooser.setInitialFileName(form.getName());
         fileChooser.getExtensionFilters().add(XML_FILTER);
         File file = fileChooser.showSaveDialog(ApplicationController.getInstance().getRootWindow());
 
@@ -266,6 +266,14 @@ public class FormUtilities
                     Attr attrOptionId = doc.createAttribute("optionId");
                     attrOptionId.setValue(String.valueOf(question.getOptionId()));
                     element.setAttributeNode(attrOptionId);
+
+                    Attr attrParentId = doc.createAttribute("parentId");
+                    attrParentId.setValue(String.valueOf(question.getParentId()));
+                    element.setAttributeNode(attrParentId);
+
+                    Attr attrPosition = doc.createAttribute("position");
+                    attrPosition.setValue(String.valueOf(question.getPosition()));
+                    element.setAttributeNode(attrPosition);
                 }
 
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -306,7 +314,6 @@ public class FormUtilities
 
             if (formNode.getNodeType() == Node.ELEMENT_NODE)
             {
-
                 Element formElement = (Element) formNode;
 
                 formName = formElement.getElementsByTagName("name").item(0).getTextContent();
@@ -332,6 +339,8 @@ public class FormUtilities
                             Integer questionType = null;
                             String questionsConstraints = null;
                             Integer questionOptionId = null;
+                            Integer questionParentId = null;
+                            Integer questionPosition = null;
 
                             if (questions.getNodeType() == Node.ELEMENT_NODE)
                             {
@@ -341,6 +350,8 @@ public class FormUtilities
                                 questionType = Integer.parseInt(question.getAttribute("type"));
                                 questionsConstraints = question.getAttribute("constraints");
                                 questionOptionId = parseIntIgnoreException(question.getAttribute("optionId"));
+                                questionParentId = parseIntIgnoreException(question.getAttribute("parentId"));
+                                questionPosition = Integer.parseInt(question.getAttribute("position"));
                             }
 
                             if (questionName != null && questionType != null && questionsConstraints != null)
@@ -351,6 +362,8 @@ public class FormUtilities
                                 question.setType(questionType);
                                 question.setConstraints(questionsConstraints);
                                 question.setOptionId(questionOptionId);
+                                question.setParentId(questionParentId);
+                                question.setPosition(questionPosition);
 
                                 questionList.add(question);
                             }
@@ -683,10 +696,9 @@ public class FormUtilities
         {
             try
             {
-                result = EntityService.getInstance().getValues(Question.class,
-                        new Parameter(Question.class.getDeclaredField("formId"),
-                                formId,
-                                Parameter.COMPARATOR_EQUALS));
+                result = EntityService.getInstance().getValues(Question.class, new Parameter(Question.class.getDeclaredField("formId"),
+                                                                               formId,
+                                                                               Parameter.COMPARATOR_EQUALS));
             }
 
             catch (Exception e)
